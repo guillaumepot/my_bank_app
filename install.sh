@@ -1,5 +1,8 @@
+
+### Create files
+cd ./storage
+
 # Create accounts.json
-cd ../storage
 touch accounts.json
 echo "{}" > accounts.json}
 
