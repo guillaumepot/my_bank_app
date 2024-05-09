@@ -1,0 +1,6 @@
+{
+    "Guillaume": {
+        "password": "$argon2id$v=19$m=65536,t=3,p=4$2ttbK0XIGYMQImRsDeGckw$qGgOhFZ0KQyrKw2dbIVg+JEpv/gMYpwvOutOlgMXHUY",
+        "role": 0
+    }
+}

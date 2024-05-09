@@ -5,6 +5,8 @@
 
 ## INSTALL
 - Define ENV variables (.env file)
+    - api.env
+    - streamlit.env
 - Requirements -> Report to requirements.txt 
 
 ## API
@@ -25,3 +27,4 @@ To be implemented
 ## TODO
 
 - Add requirements.txt
+- transacxtion.apply() method + test
