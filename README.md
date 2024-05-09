@@ -2,21 +2,26 @@
 
 
 
+
+## INSTALL
+- Define ENV variables (.env file)
+- Requirements -> Report to requirements.txt 
+
 ## API
 Api version : 0.1
 Current state : Dev
 
 
-To do list :
-- Create a logger
 
-
-Changelogs
+### Changelogs
 
 
 ## Streamlit
 To be implemented
 
+### Changelogs
 
 
-## Objects & Functions
+## TODO
+
+- Add requirements.txt

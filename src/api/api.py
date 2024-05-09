@@ -6,6 +6,8 @@ API - MAIN
 LIB
 """
 from fastapi import FastAPI, Header, Request
+from functions import load_specific_account
+
 
 """
 VARS
@@ -28,6 +30,14 @@ app = FastAPI(
         {
             'name': 'account',
             'description': 'Account'
+        },
+        {
+            'name': 'create',
+            'description': 'Creation functions (accounts, budgets, transactions, ...)'
+        },
+        {
+            'name': 'budget',
+            'description': 'Budget'
         }
     ]
 )
@@ -47,8 +57,7 @@ API Logger
 """
 FUNCTIONS
 """
-
-
+import myBankPackage as mbp
 
 
 
@@ -84,8 +93,8 @@ async def get_status() -> dict:
 """ 
 Account routes
 """
-@app.get(f"/api/{api_version}/account", name="account", tags=['account'])
-async def get_account(account_name: str) -> None:
+@app.post(f"/api/{api_version}/create/account", name="account", tags=['create', 'account'])
+def app_create_account() -> None:
     """
 
     """

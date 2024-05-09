@@ -7,14 +7,29 @@ LIBS
 """
 import streamlit as st
 
+
+
+
+"""
+VARS
+"""
+from vars import available_account_types
+
+
+
+"""
+UI
+"""
 ## Sidebar ##
 
 # Title
 st.sidebar.title("Personal bank app")
 
 # Pages
-pages=["Home"]
+pages=["Settings"]
 page=st.sidebar.radio("", pages)
+
+
 
 
 
@@ -22,7 +37,30 @@ page=st.sidebar.radio("", pages)
 
 # Home page
 if page == pages[0]: 
-    pass
+    st.title("Settings")
+    st.write("This is the settings page, use the options below to change the settings of the app.")
+
+    # Settings
+    if st.button("Create an account"):
+        # Add account informations
+        st.subheader("Please fill in the form below to create an account.")
+        st.write("Name is free text")
+        st.text_input("name")
+        st.write(f"Type should be one of these values: {available_account_types}")
+        st.text_input("type")
+        st.write("Amount should be a number")
+        st.number_input("amount", format="%.2f")
+
+        if st.button("Submit"):
+            # Request API
+            pass
+
+
+
+
+
+
+
 
 
 

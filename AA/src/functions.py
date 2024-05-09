@@ -1,32 +1,3 @@
-"""
-
-
-"""
-
-
-"""
-LIBS
-"""
-import uuid
-import os
-import json
-import pandas as pd
-from datetime import datetime
-
-
-
-"""
-VARS
-"""
-budget_path = os.getenv("BUDGET_PATH", "../storage/test_budgets.csv")
-account_path = os.getenv("ACCOUNT_PATH", "../storage/test_accounts.json")
-
-
-"""
-FUNCS
-"""
-def generate_uuid():
-    return uuid.uuid4().hex
 
 
 ### LOADERS
