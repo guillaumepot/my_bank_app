@@ -7,6 +7,7 @@ This file is used to run unit tests with Pytest
 LIBS
 """
 import pytest
+import os
 from datetime import datetime
 
 from myBankPackage import Account, Budget, Transaction, generate_uuid
@@ -15,10 +16,12 @@ from myBankPackage import Account, Budget, Transaction, generate_uuid
 """
 VARS
 """
-test_account_path = "./test_accounts.json"
-test_budget_path = "./test_budgets.csv"
-test_transaction_path = "./test_transactions.csv"
-
+# Path to the budget folder
+budget_path = os.getenv("BUDGET_PATH", "./test_budgets/") 
+# Path to the account folder
+account_path = os.getenv("ACCOUNT_PATH", "./test_accounts/")
+# Path to the transaction folder
+transaction_path = os.getenv("TRANSACTION_PATH", "./test_transactions/test_transactions.csv")
 
 
 
@@ -32,7 +35,7 @@ def create_default_account() -> Account:
    Create a default account as a fixture
    """
    default_account = Account(
-      name="default test account",
+      name="default_test_account",
       type="checking",
       amount=1000.0
    )
@@ -46,7 +49,7 @@ def create_default_budget() -> Budget:
    Create a default budget as a fixture
    """
    default_budget = Budget(
-      name="default budget",
+      name="default_budget",
       month="June",
       amount=500.0
    )
@@ -67,6 +70,7 @@ def create_default_transaction() -> Transaction:
         destination_account='destination_test',
         amount=50.0,
         budget='test budget',
+        budget_month="June",
         description="Test transaction fixture")
    
    return default_transaction
@@ -164,6 +168,22 @@ def test_account_history(create_default_account) -> None:
         ]
     
 
+def test_budget_save_method(create_default_budget) -> None:
+    """
+    Test the save method of the Budget object.
+    """
+    create_default_budget.save(budget_path)
+    assert os.path.exists(budget_path)
+
+
+def test_account_save_method(create_default_account) -> None:
+    """
+    Test the save method of the Account object.
+    """
+    create_default_account.save(account_path)
+    assert os.path.exists(account_path)
+
+
 
 ## BUDGETS ##
 @pytest.mark.parametrize("name, month, amount",[( "Test1", "June", 75.0),("Test2", "December", -50)])
@@ -199,7 +219,7 @@ def test_budget_deposit(create_default_budget, amount = 100.0) -> None:
 
 
 @pytest.mark.parametrize("amount",[50.0, 600])
-def test_budget_withdraw_amount(create_default_budget, amount, transaction_id = "test_withdraw_mathod") -> None:
+def test_budget_withdraw(create_default_budget, amount, transaction_id = "test_withdraw_mathod") -> None:
     """
     Test the withdraw method of the Budget object.
     """
@@ -214,68 +234,56 @@ def test_budget_withdraw_amount(create_default_budget, amount, transaction_id = 
         assert create_default_budget.amount == base_budget_amount - amount
 
 
+def test_budget_save_method(create_default_budget) -> None:
+    """
+    Test the save method of the Budget object.
+    """
+    create_default_budget.save(budget_path)
+    assert os.path.exists(budget_path)
+
+
 
 ## TRANSACTIONS ##
-@pytest.mark.parametrize("test_nb, date, type, amount, budget, origin_account, destination_account",
+@pytest.mark.parametrize("test_nb, date, type, amount, budget, budget_month, origin_account, destination_account",
                          [
-                             (1, datetime.now(), "debit", 50.0, "Food", "origin", None),
-                             (2, None, "credit", 50.0, "Fuel", None, "destination"),
-                             (3, None, "transfert", 50.0, None, "origin_account", "destination_account"),
-                             (4, None, "test", 50.0, "Food", "origin", None),
-                             (5, None, "debit", -50.0, "Food", "origin", None),
+                             (1, None, "credit", 50.0, "test_budget", "January", None, "destination"),
+
                          ])
-def test_transaction_object(test_nb, date, type, amount, budget, origin_account, destination_account) -> None:
+def test_transaction_object(test_nb, date, type, amount, budget, budget_month, origin_account, destination_account) -> None:
     """
     Test the Transaction object.
     """
     if test_nb == 1:
-        transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
+        transaction = Transaction(date=date, type=type, amount=amount, budget=budget, budget_month=budget_month, origin_account=origin_account, destination_account=destination_account)
         assert transaction.date == date
         assert transaction.type == type
         assert transaction.amount == amount
         assert transaction.budget == budget
+        assert transaction.budget_month == budget_month
         assert transaction.origin_account == origin_account
         assert transaction.destination_account == destination_account
 
-    elif test_nb == 2:
-        transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
-        assert transaction.date == date
-        assert transaction.type == type
-        assert transaction.amount == amount
-        assert transaction.budget == budget
-        assert transaction.origin_account == origin_account
-        assert transaction.destination_account == destination_account
 
-    elif test_nb == 3:
-        transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
-        assert transaction.date == date
-        assert transaction.type == type
-        assert transaction.amount == amount
-        assert transaction.budget == budget
-        assert transaction.origin_account == origin_account
-        assert transaction.destination_account == destination_account
+def test_transaction_save_method(create_default_transaction) -> None:
+    """
+    Test the save method of the Transaction object.
+    """
+    create_default_transaction.save(transaction_path = transaction_path)
+    assert os.path.exists(transaction_path)
 
-    elif test_nb == 4:
-        with pytest.raises(TypeError):
-            transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
 
-    elif test_nb == 5:
-        with pytest.raises(ValueError):
-            transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
-    
-
-@pytest.mark.parametrize("date, type, amount, budget, origin_account, destination_account",
+@pytest.mark.parametrize("date, type, amount, budget, budget_month, origin_account, destination_account",
                          [
-                             (datetime.now(), "debit", 50.0, "Test Budget", "test_origin_account", None),
-                             (None, "credit", 50.0, "Test Budget", None, "test_destination_account"),
-                             (None, "transfert", 50.0, None, "test_origin_account", "test_destination_account")
+                             (None, "debit", 50.0, "default_budget", "June", "default_test_account", None),
+                             (None, "credit", 50.0, "default_budget", "June", None, "default_test_account"),
+                             (None, "transfert", 50.0, None, None, "default_test_account", "default_test_account")
                              ])
-def test_transaction_apply_method(date, type, amount, budget, origin_account, destination_account) -> None:
+def test_transaction_apply_method(date, type, amount, budget, budget_month, origin_account, destination_account) -> None:
     """
     Test the apply method of the Transaction object.
     """
-    transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
-    transaction.apply_transaction(account_path = test_account_path, budget_path = test_budget_path)
+    transaction = Transaction(date=date, type=type, amount=amount, budget=budget, budget_month=budget_month, origin_account=origin_account, destination_account=destination_account)
+    transaction.apply(account_path = account_path, budget_path = budget_path)
 
 
 

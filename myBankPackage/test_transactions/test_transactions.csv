@@ -1,0 +1,8 @@
+date,type,amount,origin_account,destination_account,budget,budget_month,description,id
+2024-05-11 09:23:30.308812,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,63ac9ff5b22b4e479a7dfbbaba9cd7c6
+2024-05-11 09:24:46.400430,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,496167b88bec41e992805ffb3c05217c
+2024-05-11 09:25:19.293420,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,0dd7eb684e0a4af294d037da738533b3
+2024-05-11 09:25:51.423129,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,97db53da056d4c67b24e3c0bb7de9e46
+2024-05-11 09:26:23.808843,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,2e54c91ec8714806a37944ea3c5ae54d
+2024-05-11 09:26:35.426996,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,f575eaaa93264890ab820ebfc1e9ab5c
+2024-05-11 09:27:25.500129,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,1303d0f288d745fdb6930a24d3487e79
