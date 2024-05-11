@@ -8,9 +8,10 @@ LIBS
 """
 import pytest
 import os
+import pandas as pd
 from datetime import datetime
 
-from myBankPackage import Account, Budget, Transaction, generate_uuid
+from myBankPackage import Account, Budget, Transaction, generate_uuid, account_to_table, budget_to_table
 
 
 """
@@ -298,3 +299,19 @@ def test_generate_uuid() -> None:
     uuid = generate_uuid()
     assert len(uuid) == 32
     assert isinstance(uuid, str)
+
+
+def test_account_to_table() -> pd.DataFrame:
+    """
+    Test the account_to_table function.
+    """
+    account_table = account_to_table(account_path)
+    assert isinstance(account_table, pd.DataFrame)
+
+
+def budget_to_table() -> pd.DataFrame:
+    """
+    Test the budget_to_table function.
+    """
+    budget_table = budget_to_table(budget_path)
+    assert isinstance(budget_table, pd.DataFrame)

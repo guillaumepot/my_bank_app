@@ -86,6 +86,31 @@ def load_budget(budget_path:str=budget_path, budget_name:str=None, budget_month:
         raise FileNotFoundError(f"Budget {budget_name} for month {budget_month} not found.")
 
 
+def account_to_table(account_path):
+    """
+    Convert account data stored as pickle files in the given account_path directory into a pandas DataFrame.
+
+    Parameters:
+    account_path (str): The path to the directory containing the account data pickle files.
+
+    Returns:
+    pandas.DataFrame: A DataFrame containing the account data with columns: "name", "type", "amount", "id", "history".
+    """
+    account_table = pd.DataFrame(columns=["name", "type", "amount", "id", "history"])
+    for file in os.listdir(account_path):
+        if file.endswith(".pkl"):
+            account_name = file.rsplit('.', 1)[0]  # remove the .pkl extension from the file name
+            account = load_account(account_path, account_name)
+            account_table = pd.concat([account_table, pd.DataFrame([account.__dict__])], ignore_index=True)
+    return account_table
+
+
+
+def budget_to_table(budget_path):
+    """
+    
+    """
+    pass
 
 
 """
