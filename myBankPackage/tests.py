@@ -309,7 +309,7 @@ def test_account_to_table() -> pd.DataFrame:
     assert isinstance(account_table, pd.DataFrame)
 
 
-def budget_to_table() -> pd.DataFrame:
+def test_budget_to_table() -> pd.DataFrame:
     """
     Test the budget_to_table function.
     """

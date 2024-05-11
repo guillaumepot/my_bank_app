@@ -11,16 +11,6 @@ from dataclasses import dataclass, field
 
 
 """
-PATHS
-"""
-# Path to the budget folder
-budget_path = os.getenv("BUDGET_PATH", "./test_budgets/") 
-# Path to the account folder
-account_path = os.getenv("ACCOUNT_PATH", "./test_accounts/")
-# Path to the transaction folder
-transaction_path = os.getenv("TRANSACTION_PATH", "./test_transactions/test_transactions.csv")
-
-"""
 VALUE RESTRICTIONS
 """
 available_account_types = ("checking", "savings")
@@ -36,7 +26,7 @@ def generate_uuid():
     return uuid.uuid4().hex
 
 
-def load_account(account_path:str=account_path, account_name:str=None):
+def load_account(account_path:str, account_name:str=None):
     """
     Load an account from a file.
 
@@ -60,7 +50,7 @@ def load_account(account_path:str=account_path, account_name:str=None):
         raise FileNotFoundError(f"Account {account_name} not found.")
     
 
-def load_budget(budget_path:str=budget_path, budget_name:str=None, budget_month:str=None):
+def load_budget(budget_path:str, budget_name:str=None, budget_month:str=None):
     """
     Load a budget from a file.
 
@@ -99,7 +89,7 @@ def account_to_table(account_path):
     account_table = pd.DataFrame(columns=["name", "type", "amount", "id", "history"])
     for file in os.listdir(account_path):
         if file.endswith(".pkl"):
-            account_name = file.rsplit('.', 1)[0]  # remove the .pkl extension from the file name
+            account_name = file.rsplit('.', 1)[0]
             account = load_account(account_path, account_name)
             account_table = pd.concat([account_table, pd.DataFrame([account.__dict__])], ignore_index=True)
     return account_table
@@ -110,7 +100,14 @@ def budget_to_table(budget_path):
     """
     
     """
-    pass
+    budget_table = pd.DataFrame(columns=["name", "month", "amount", "id", "history"])
+    for file in os.listdir(budget_path):
+        if file.endswith(".pkl"):
+            budget_name = file.rsplit('_', 1)[0]
+            budget_month = file.rsplit('_', 1)[1].rsplit('.', 1)[0]
+            budget = load_budget(budget_path, budget_name, budget_month)
+            budget_table = pd.concat([budget_table, pd.DataFrame([budget.__dict__])], ignore_index=True)
+    return budget_table
 
 
 """
@@ -188,7 +185,7 @@ class Account:
 
 
 
-    def save(self, account_path:str=account_path) -> None:
+    def save(self, account_path:str) -> None:
         """
 
         """
@@ -259,7 +256,7 @@ class Budget:
         })
 
 
-    def save(self, budget_path: str=budget_path) -> None:
+    def save(self, budget_path: str) -> None:
         """
 
         """
@@ -315,7 +312,7 @@ class Transaction:
         
         
 
-    def save(self, transaction_path:str=transaction_path) -> None:
+    def save(self, transaction_path:str) -> None:
         """
         
         """
