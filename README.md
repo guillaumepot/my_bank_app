@@ -27,4 +27,11 @@ To be implemented
 ## TODO
 
 - Add requirements.txt
-- transaction.apply() method + test
+- Do API relative to myBankPackage:
+
+
+- Create an account
+    - Show acocunt table
+- Create a budget
+    - Show budget table
+- Create a transaction + apply a transaction
