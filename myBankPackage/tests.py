@@ -6,11 +6,21 @@ This file is used to run unit tests with Pytest
 """
 LIBS
 """
-import os
 import pytest
 from datetime import datetime
 
 from myBankPackage import Account, Budget, Transaction, generate_uuid
+
+
+"""
+VARS
+"""
+test_account_path = "./test_accounts.json"
+test_budget_path = "./test_budgets.csv"
+test_transaction_path = "./test_transactions.csv"
+
+
+
 
 """
 FIXTURES
@@ -38,7 +48,7 @@ def create_default_budget() -> Budget:
    default_budget = Budget(
       name="default budget",
       month="June",
-      amount=50.0
+      amount=500.0
    )
    
    return default_budget
@@ -46,17 +56,18 @@ def create_default_budget() -> Budget:
 
 # Default transaction fixture
 @pytest.fixture
-def create_default_transaction(create_default_account) -> Transaction:
+def create_default_transaction() -> Transaction:
    """
    Create a default transaction as a fixture
    """
    default_transaction = Transaction(
         date=datetime.now(),
         type="credit",
-        origin_account=None,
-        destination_account=create_default_account,
+        origin_account='origin_test',
+        destination_account='destination_test',
         amount=50.0,
-        budget=None)
+        budget='test budget',
+        description="Test transaction fixture")
    
    return default_transaction
 
@@ -178,28 +189,28 @@ def test_budget_object(name, month, amount) -> None:
                 amount=amount)
 
 
-def test_add_amount(create_default_budget, amount = 100.0):
+def test_budget_deposit(create_default_budget, amount = 100.0) -> None:
     """
-    Test the add_amount method of the Budget object.
+    Test the deposit method of the Budget object.
     """
     base_budget_amount = create_default_budget.amount
-    create_default_budget.add_amount(amount)
+    create_default_budget.deposit(amount, transaction_id = "test_deposit_method")
     assert create_default_budget.amount == base_budget_amount + amount
 
 
-@pytest.mark.parametrize("amount",[50.0, 100.0])
-def test_withdraw_amount(create_default_budget, amount, transaction_id = "1"):
+@pytest.mark.parametrize("amount",[50.0, 600])
+def test_budget_withdraw_amount(create_default_budget, amount, transaction_id = "test_withdraw_mathod") -> None:
     """
-    Test the withdraw_amount method of the Budget object.
+    Test the withdraw method of the Budget object.
     """
     base_budget_amount = create_default_budget.amount
-    if amount == 100.0:
+    if amount == 600.0:
         with pytest.raises(ValueError):
-            create_default_budget.withdraw_amount(amount, transaction_id)
+            create_default_budget.withdraw(amount, transaction_id)
 
     else:
         print(create_default_budget.amount, amount)
-        create_default_budget.withdraw_amount(amount, transaction_id)
+        create_default_budget.withdraw(amount, transaction_id)
         assert create_default_budget.amount == base_budget_amount - amount
 
 
@@ -253,24 +264,19 @@ def test_transaction_object(test_nb, date, type, amount, budget, origin_account,
             transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
     
 
-@pytest.mark.parametrize("test_nb, date, type, amount, budget, origin_account, destination_account",
+@pytest.mark.parametrize("date, type, amount, budget, origin_account, destination_account",
                          [
-                             (1, datetime.now(), "debit", 50.0, "Food", "origin", None),
-                             (2, None, "credit", 50.0, "Fuel", None, "destination"),
-                             (3, None, "transfert", 50.0, None, "origin_account", "destination_account")
-                         ])
-def test_transaction_apply_method(test_nb, date, type, amount, budget, origin_account, destination_account) -> None:
+                             (datetime.now(), "debit", 50.0, "Test Budget", "test_origin_account", None),
+                             (None, "credit", 50.0, "Test Budget", None, "test_destination_account"),
+                             (None, "transfert", 50.0, None, "test_origin_account", "test_destination_account")
+                             ])
+def test_transaction_apply_method(date, type, amount, budget, origin_account, destination_account) -> None:
     """
     Test the apply method of the Transaction object.
     """
-    if test_nb == 1:
-        pass
+    transaction = Transaction(date=date, type=type, amount=amount, budget=budget, origin_account=origin_account, destination_account=destination_account)
+    transaction.apply_transaction(account_path = test_account_path, budget_path = test_budget_path)
 
-    elif test_nb == 2:
-        pass
-
-    elif test_nb == 3:
-        pass
 
 
 

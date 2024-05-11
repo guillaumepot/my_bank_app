@@ -27,4 +27,4 @@ To be implemented
 ## TODO
 
 - Add requirements.txt
-- transacxtion.apply() method + test
+- transaction.apply() method + test

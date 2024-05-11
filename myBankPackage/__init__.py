@@ -5,6 +5,7 @@ __version__ = '0.1.1'
 import uuid
 import os
 import json
+import pickle
 import pandas as pd
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -13,10 +14,12 @@ from dataclasses import dataclass, field
 """
 PATHS
 """
-# Path to the budget CSV file
-budget_path = os.getenv("BUDGET_PATH", "./test_budgets.csv") 
-# Path to the account JSON file
-account_path = os.getenv("ACCOUNT_PATH", "./test_accounts.json")
+# Path to the budget folder
+budget_path = os.getenv("BUDGET_PATH", "./test_budgets/") 
+# Path to the account folder
+account_path = os.getenv("ACCOUNT_PATH", "./test_accounts/")
+# Path to the transaction folder
+transaction_path = os.getenv("TRANSACTION_PATH", "./test_transactions/test_transactions.csv")
 
 """
 VALUE RESTRICTIONS
@@ -34,6 +37,57 @@ def generate_uuid():
     return uuid.uuid4().hex
 
 
+def load_account(account_path:str=account_path, account_name:str=None):
+    """
+    Load an account from a file.
+
+    Args:
+        account_path (str): The path to the directory where the account files are stored.
+        account_name (str): The name of the account to load.
+
+    Returns:
+        The loaded account object.
+
+    Raises:
+        ValueError: If the account name is not provided.
+        FileNotFoundError: If the account file is not found.
+    """
+    if account_name is None:
+        raise ValueError("Account name is required.")
+    try:
+        with open(f"{account_path}{account_name}.pkl", 'rb') as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Account {account_name} not found.")
+    
+
+def load_budget(budget_path:str=budget_path, budget_name:str=None, budget_month:str=None):
+    """
+    Load a budget from a file.
+
+    Args:
+        budget_path (str): The path to the directory where the budget files are stored.
+        budget_name (str): The name of the budget.
+        budget_month (str): The month of the budget.
+
+    Returns:
+        The loaded budget.
+
+    Raises:
+        ValueError: If budget_name or budget_month is None.
+        FileNotFoundError: If the budget file is not found.
+
+    """
+    if budget_name is None or budget_month is None:
+        raise ValueError("Budget name and month are required.")
+    try:
+        with open(f"{budget_path}{budget_name}_{budget_month}.pkl", 'rb') as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Budget {budget_name} for month {budget_month} not found.")
+
+
+
 
 """
 ACCOUNT
@@ -42,21 +96,7 @@ ACCOUNT
 @dataclass(frozen=False, order=False)
 class Account:
     """
-    Represents a bank account.
 
-    Attributes:
-        name (str): The name of the account.
-        type (str): The type of the account (checking or savings).
-        amount (float): The amount of money in the account.
-        id (str): The unique identifier of the account.
-        history (list): The transaction history of the account.
-        _search_string (str): A string used for searching the account.
-
-    Methods:
-        __post_init__(): Initializes the account object.
-        deposit(amount: float, transaction_id): Deposits money into the account.
-        withdraw(amount: float, transaction_id): Withdraws money from the account.
-        save(account_path: str = account_path): Saves the account to a JSON file without overwriting existing data.
     """
     # Name of the account
     name:str
@@ -81,25 +121,11 @@ class Account:
         if self.amount < 0:
             raise ValueError(f"Invalid Account Amount: {self.amount}")
         
-        print(f"Successfully created account ! \n" \
-                              f"Name: {self.name} \n" \
-                              f"Type: {self.type} \n" \
-                              f"Amount: {self.amount}")
 
 
-    def deposit(self, amount:float, transaction_id) -> None:
+    def deposit(self, amount:float, transaction_id:str) -> None:
         """
-        Deposit money into the account
 
-        Args:
-            amount (float): The amount of money to deposit.
-            transaction_id: The ID of the transaction.
-
-        Raises:
-            ValueError: If the amount is negative.
-
-        Returns:
-            None
         """
         if amount < 0:
             raise ValueError(f"Invalid Deposit Amount: {amount}")
@@ -112,22 +138,11 @@ class Account:
             "amount": amount,
         })
 
-        print(f"Successfully deposited {amount} into account {self.name}. \n New amount: {self.amount}")
 
 
-    def withdraw(self, amount:float, transaction_id) -> None:
+    def withdraw(self, amount:float, transaction_id:str) -> None:
         """
-        Withdraw money from the account
 
-        Args:
-            amount (float): The amount of money to withdraw.
-            transaction_id: The ID of the transaction.
-
-        Raises:
-            ValueError: If the amount is negative or exceeds the account balance.
-
-        Returns:
-            None
         """
         if amount < 0:
             raise ValueError(f"Invalid Withdraw Amount: {amount}")
@@ -144,31 +159,18 @@ class Account:
             "amount": amount,
         })
 
-        print(f"Successfully withdrew {amount} from account {self.name}. \n New amount: {self.amount}")
 
 
     def save(self, account_path:str=account_path) -> None:
         """
-        Save the account to a JSON file without overwriting existing data
 
-        Args:
-            account_path (str): The path to the JSON file.
-
-        Returns:
-            None
         """
-        try:
-            with open(account_path, "r") as file:
-                data = json.load(file)
-        except FileNotFoundError:
-            data = {}
-
-        # Update the data dictionary to include the new account
-        data[self.name] = self.__dict__
-
-        with open(account_path, "w") as file:
-            json.dump(data, file, indent=4)
-
+        # Check if account already exists
+        if os.path.exists(f"{account_path}{self.name}.pkl"):
+            raise FileExistsError(f"Account {self.name} already exists.")
+        # Save the account
+        with open(f"{account_path}{self.name}.pkl", 'wb') as f:
+            pickle.dump(self, f)
 
 
 """
@@ -178,21 +180,6 @@ BUDGET
 @dataclass(frozen=False, order=False)
 class Budget:
     """
-    Represents a budget in the banking app.
-
-    Attributes:
-        id (str): The unique identifier of the budget.
-        name (str): The name of the budget.
-        month (str): The month to which the budget is applicable.
-        amount (float): The amount of the budget.
-        history (list): The transaction history of the budget.
-        _search_string (str): The search string used for filtering budgets.
-
-    Methods:
-        __post_init__(): Initializes the budget object after it has been created.
-        add_amount(amount: float): Adds the specified amount to the budget.
-        withdraw_amount(amount: float, transaction_id: int): Withdraws the specified amount from the budget.
-        save(path: str="../storage/accounts.csv"): Saves the budget to a CSV file.
 
     """
     name: str
@@ -211,38 +198,26 @@ class Budget:
 
     def __post_init__(self) -> None:
         if self.amount < 0:
-            raise ValueError(f"Invalid Account Amount: {self.amount}")
-        print(f"Successfully created a budget:\nname: {self.name}\nmonth: {self.month}\namount: {self.amount}")
+            raise ValueError(f"Invalid Budget Amount (negative value): {self.amount}")
 
 
-    def add_amount(self, amount: float) -> None:
+
+
+
+    def deposit(self, amount: float, transaction_id:str) -> None:
         """
-        Adds the specified amount to the budget.
-
-        Parameters:
-            amount (float): The amount to be added to the budget.
-
-        Returns:
-            None
 
         """
         self.amount += amount
-        print(f"Added {amount} to budget {self.name}. New amount: {self.amount}")
+        self.history.append({
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "transaction_id": transaction_id,
+            "amount": amount
+        })
 
 
-    def withdraw_amount(self, amount: float, transaction_id: int) -> None:
+    def withdraw(self, amount: float, transaction_id: str) -> None:
         """
-        Withdraws the specified amount from the budget.
-
-        Parameters:
-            amount (float): The amount to be withdrawn.
-            transaction_id (int): The ID of the transaction.
-
-        Raises:
-            ValueError: If the specified amount is greater than the available amount in the budget.
-
-        Returns:
-            None
 
         """
         if amount > self.amount:
@@ -254,29 +229,18 @@ class Budget:
             "transaction_id": transaction_id,
             "amount": amount
         })
-        print(f"Removed {amount} from budget {self.name}. New amount: {self.amount}")
 
 
     def save(self, budget_path: str=budget_path) -> None:
         """
-        Saves the budget to a CSV file.
-
-        Parameters:
-            budget_path (str): The path to the CSV file. Default is "../storage/accounts.csv".
-
-        Returns:
-            None
 
         """
-        budget_table = pd.read_csv(budget_path)
-
-        # Check if a budget with the same name and month already exists
-        if ((budget_table['name'] == self.name) & (budget_table['month'] == self.month)).any():
-            raise ValueError(f"A budget with the name {self.name} and month {self.month} already exists.")
-        # Save the budget to the CSV file
-        new_budget_row = pd.Series(self.__dict__)
-        budget_table = pd.concat([budget_table, new_budget_row.to_frame().T], ignore_index=True)
-        budget_table.to_csv(budget_path, index=False)
+        # Check if budget already exists
+        if os.path.exists(f"{budget_path}{self.name}.pkl"):
+            raise FileExistsError(f"Budget {self.name} already exists.")
+        # Save the account
+        with open(f"{budget_path}{self.name}_{self.month}.pkl", 'wb') as f:
+            pickle.dump(self, f)
 
 
 
@@ -289,59 +253,96 @@ class Transaction:
     """
 
     """
-    date: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    date: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
     type:str = "debit"
     amount:float = 0.0
     origin_account:str = None
     destination_account:str = None
     budget:str = None
+    budget_month:str = None
+    description:str=""
 
     ### NO INIT ###
 
     # Random ID is generated by a function
     id: str = field(init=False, default_factory=generate_uuid)
-    # History
-    history: list = field(init=False, default_factory=list)
-
 
     def __post_init__(self) -> None:
+        """
+
+        """
         # Check if the type is an instance of available_account_types
         if self.type not in available_transactions_types:
             raise TypeError(f"Invalid Transaction Type: {self.type}")
         # Check if the amount is a float and positive
         if self.amount < 0:
             raise ValueError(f"Invalid Account Amount: {self.amount}")
+        # If budget, check if it exists
+        if (self.budget is not None) and (self.budget_month is None):
+            raise ValueError("Budget month is required when budget is not None.")
         
-        print(f"Successfully created Transaction ! \n" \
-                              f"Date: {self.date} \n" \
-                              f"Type: {self.type} \n" \
-                              f"Amount: {self.amount} \n" \
-                              f"Origin Account: {self.origin_account} \n" \
-                              f"Destination Account: {self.destination_account} \n" \
-                              f"Budget: {self.budget}")
         
 
-    def apply_transaction(self) -> None:
+    def save(self, transaction_path:str=transaction_path) -> None:
         """
-        
+
         """
+        transaction_table = pd.read_csv(transaction_path)
+        # Save the transaction to the CSV file
+        new_transaction_row = pd.Series(self.__dict__)
+        transaction_table = pd.concat([transaction_table, new_transaction_row.to_frame().T], ignore_index=True)
+        transaction_table.to_csv(transaction_path, index=False)        
+
+
+
+    def apply(self, account_path:str, budget_path:str) -> None:
+        """
+
+        """
+        ## Load accounts & budgets
         # Load origin_account
+        if self.origin_account is not None:
+            loaded_origin_account = load_account(account_path, self.origin_account)
 
         # Load destination_account
+        if self.destination_account is not None:
+            loaded_destination_account = load_account(account_path, self.destination_account)
 
-        # load budget
+
+        # Load budget
+        if self.budget is not None:
+            loaded_budget = load_budget(budget_path, self.budget)
 
 
         ## Apply transaction
-
         # Debit
         if self.type == "debit":
-            pass
+            # Update amount
+            loaded_origin_account.withdraw(self.amount, self.id)
+            # Save changes
+            loaded_origin_account.save(account_path)
+            # Update budget
+            if self.budget is not None:
+                loaded_budget.withdraw_amount(self.amount, self.id)
+                loaded_budget.save_budget(budget_path)
+
 
         # Credit
         elif self.type == "credit":
-            pass
+            # Update amount
+            loaded_destination_account.deposit(self.amount, self.id)
+            # Save changes
+            loaded_destination_account.save(account_path)
+            # Update budget
+            if self.budget is not None:
+                loaded_budget.add_amount(self.amount)
+                loaded_budget.save_budget(budget_path)
 
         # Transfert
         else:
-            pass
+            # Update origin account
+            loaded_origin_account.withdraw(self.amount, self.id)
+            loaded_origin_account.save(account_path)
+            # Update destination account
+            loaded_destination_account.deposit(self.amount, self.id)
+            loaded_destination_account.save(account_path)
