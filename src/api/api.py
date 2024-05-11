@@ -15,7 +15,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
 
-from myBankPackage import Account
+from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table
 
 """
 VARS
@@ -40,6 +40,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
 
 # File paths
 account_path = os.getenv("ACCOUNT_PATH")
+budget_path = os.getenv("BUDGET_PATH")
+transaction_path = os.getenv("TRANSACTION_PATH")
 
 """
 API declaration
@@ -62,13 +64,17 @@ app = FastAPI(
             'description': 'Account'
         },
         {
-            'name': 'create',
-            'description': 'Creation functions (accounts, budgets, transactions, ...)'
-        },
-        {
             'name': 'budget',
             'description': 'Budget'
-        }
+        },
+        {
+            'name': 'transaction',
+            'description': 'Transaction'
+        },
+        {
+            'name': 'create',
+            'description': 'Creation functions (accounts, budgets, transactions, ...)'
+        }        
     ]
 )
 
@@ -127,7 +133,7 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     access_token_expiration = timedelta(minutes=access_token_expiration)
-    expire = datetime.utcnow() + access_token_expiration
+    expire = datetime.now() + access_token_expiration
     data__to_encode = {"sub": credentials.username, "exp": expire}
 
     encoded_jwt = jwt.encode(data__to_encode, jwt_secret_key, algorithm=algorithm)
@@ -157,17 +163,86 @@ async def get_status() -> dict:
 """ 
 Account routes
 """
-@app.post(f"/api/{api_version}/create/account", name="account", tags=['create', 'account'])
+# Create Account
+@app.post(f"/api/{api_version}/create/account", name="create_account", tags=['create', 'account'])
 def app_create_account(name:str,
                        type:str,
                        amount:float,
-                       current_user: str = Depends(get_current_user)) -> None:
+                       current_user: str = Depends(get_current_user)):
     """
 
     """
     account = Account(name, type, amount)
     account.save(account_path)
-    print(f"Account created: {account["name"]} - {account["type"]} - {account["amount"]}")
-    return {"account": account.__dict__}
+    return account
+
+# Load Account Table
+@app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
+def app_load_account_table(current_user: str = Depends(get_current_user)):
+    """
+    
+    """
+    account_table = account_to_table(account_path)
+    return account_table
 
 
+
+
+""" 
+Budget routes
+"""
+# Create Budget
+@app.post(f"/api/{api_version}/create/budget", name="create_budget", tags=['create', 'budget'])
+def app_create_budget(name:str,
+                      month:str,
+                      amount:float,
+                      current_user: str = Depends(get_current_user)):
+    """
+
+    """
+    budget = Budget(name, month, amount)
+    budget.save(budget_path)
+    return budget
+
+# Load Budget Table
+@app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['account'])
+def app_load_budget_table(current_user: str = Depends(get_current_user)):
+    """
+    
+    """
+    budget_table = budget_to_table(budget_path)
+    return budget_table
+
+
+
+
+""" 
+Transaction routes
+"""
+# Create Transaction
+@app.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['create', 'transaction'])
+def app_create_transaction(date:str=None,
+                           type:str='debit',
+                           amount:float=0.0,
+                           origin_account:str=None,
+                           destination_account:str=None,
+                           budget:str=None,
+                           budget_month:str=None,
+                           description:str='',
+                           current_user: str = Depends(get_current_user)):
+    """
+
+    """
+    transaction = Transaction(date, type, amount, origin_account, destination_account, budget, budget_month, description)
+    transaction.save(transaction_path)
+    return transaction
+
+
+@app.post(f"/api/{api_version}/apply/transaction", name="apply_transaction", tags=['transaction'])
+def app_apply_transaction(transaction:Transaction,
+                          current_user: str = Depends(get_current_user)):
+    """
+    
+    """
+    transaction.apply(account_path, budget_path)
+    return {'message':f"Transaction id {transaction.id}, type {transaction.type} applied."}
