@@ -176,6 +176,7 @@ def app_create_account(name:str,
     account.save(account_path)
     return account
 
+
 # Load Account Table
 @app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
 def app_load_account_table(current_user: str = Depends(get_current_user)):
@@ -185,6 +186,19 @@ def app_load_account_table(current_user: str = Depends(get_current_user)):
     account_table = account_to_table(account_path)
     return account_table
 
+
+# Get available accounts
+@app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
+def app_get_available_accounts(current_user: str = Depends(get_current_user)):
+    """
+    
+    """
+    available_accounts = []
+    for file in os.listdir(account_path):
+        available_accounts.append(file)
+
+    return {'available_accounts': available_accounts}
+                               
 
 
 
@@ -213,6 +227,18 @@ def app_load_budget_table(current_user: str = Depends(get_current_user)):
     budget_table = budget_to_table(budget_path)
     return budget_table
 
+
+# Get available budgets
+@app.get(f"/api/{api_version}/get/budgets", name="get_available_budgets", tags=['budgets'])
+def app_get_available_budgets(current_user: str = Depends(get_current_user)):
+    """
+    
+    """
+    available_budgets = []
+    for file in os.listdir(budget_path):
+        available_budgets.append(file)
+
+    return available_budgets
 
 
 

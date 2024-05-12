@@ -95,7 +95,6 @@ def account_to_table(account_path):
     return account_table
 
 
-
 def budget_to_table(budget_path):
     """
     
