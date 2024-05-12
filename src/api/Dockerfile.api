@@ -1,0 +1,25 @@
+# API image
+FROM python:3.10
+
+# Define Workdir
+WORKDIR /app
+
+# Install dependencies
+COPY ./requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./myBankPackage ./myBankPackage
+RUN pip install ./myBankPackage
+
+
+# Copy the rest of the working directory contents into the container at /app
+COPY ./api.py /app
+
+# Port to expose
+EXPOSE 8000
+
+# Define environment variable
+ENV PYTHONPATH=/app
+
+# Start uvicorn server
+CMD uvicorn api:app --host $UVICORN_HOST --port $UVICORN_PORT

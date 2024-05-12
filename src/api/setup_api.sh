@@ -1,5 +1,14 @@
 #!/bin/bash
 
 
-# Generate API Token secret key as an environment variable
-export BANK_APP_API_TOKEN_SECRET_KEY=$(python3 ./src/utils/generate_secret_key.py)
+# Copy myBankPackage
+cp -r ../../myBankPackage ./myBankPackage
+
+# Building image
+docker build -t personal_bank_app_api:latest -f ./Dockerfile.api .
+
+# Start container
+docker-compose -f docker-compose.yaml up -d
+
+# Remove myBankPackage
+rm -rf ./myBankPackage
