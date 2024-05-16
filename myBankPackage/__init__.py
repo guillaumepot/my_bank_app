@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 """
 VALUE RESTRICTIONS
 """
-available_account_types = ("checking", "savings")
+available_account_types = ("checking", "saving")
 available_transactions_types = ("debit", "credit", "transfert")
 
 """
@@ -97,7 +97,14 @@ def account_to_table(account_path):
 
 def budget_to_table(budget_path):
     """
-    
+    Convert budget files in a given directory to a pandas DataFrame.
+
+    Parameters:
+    budget_path (str): The path to the directory containing the budget files.
+
+    Returns:
+    pandas.DataFrame: A DataFrame containing the budget information from the files.
+
     """
     budget_table = pd.DataFrame(columns=["name", "month", "amount", "id", "history"])
     for file in os.listdir(budget_path):

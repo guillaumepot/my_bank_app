@@ -31,6 +31,8 @@ Current state : Dev
 ### Todo
 - Add logger
 - Change dir paths (wait for todo:Datas/DB migration)
+- /create/account should check if an account already exists instead of erasing it
+- /create/budget should check if a budget already exists instead of erasing it
 
 
 
@@ -43,7 +45,6 @@ Current state : Dev
 
 
 ### Todo
-- UI
 - container
 
 

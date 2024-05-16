@@ -4,6 +4,7 @@ API - MAIN
 # Version : 0.1.0
 # Current state : Dev
 # Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
 api_version = "0.1.0"
 current_state = "Dev"
 
@@ -189,7 +190,7 @@ def app_load_account_table(current_user: str = Depends(get_current_user)):
 
 
 # Get available accounts
-@app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
+@app.get(f"/api/{api_version}/get/accounts", name="get_available_accounts", tags=['account'])
 def app_get_available_accounts(current_user: str = Depends(get_current_user)):
     """
     
@@ -198,7 +199,7 @@ def app_get_available_accounts(current_user: str = Depends(get_current_user)):
     for file in os.listdir(account_path):
         available_accounts.append(file)
 
-    return {'available_accounts': available_accounts}
+    return {'available accounts': available_accounts}
                                
 
 
@@ -239,7 +240,7 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
     for file in os.listdir(budget_path):
         available_budgets.append(file)
 
-    return available_budgets
+    return {"Available budgets": available_budgets}
 
 
 
