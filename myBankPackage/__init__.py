@@ -214,8 +214,7 @@ class Budget:
     id: str = field(init=False, default_factory=generate_uuid)
     # History
     history: list = field(init=False, default_factory=list)
-    # Search String
-    _search_string: str = field(init=False, repr=False)
+
 
     def __post_init__(self) -> None:
         if self.amount < 0:

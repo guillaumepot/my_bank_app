@@ -1,6 +1,11 @@
 """
 API - MAIN
 """
+# Version : 0.1.0
+# Current state : Dev
+# Author : Guillaume Pot
+api_version = "0.1.0"
+current_state = "Dev"
 
 """
 LIB
@@ -20,10 +25,6 @@ from myBankPackage import Account, Budget, Transaction, account_to_table, budget
 """
 VARS
 """
-api_version = "0.1.0" # Update changelogs and version in the README.md file
-current_state = "Dev" # Update changelogs and version in the README.md file
-
-
 # Auth
 crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
 pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
@@ -31,7 +32,7 @@ pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
 user_file_path = os.getenv("USER_FILE_PATH")
 authorized_users = os.getenv("AUTHORIZED_USERS").split(',')
 
-access_token_expiration = os.getenv("ACCESS_TOKEN_EXPIRATION")
+access_token_expiration = int(os.getenv("ACCESS_TOKEN_EXPIRATION"))
 algorithm = os.getenv("ALGORITHM")
 jwt_secret_key = os.getenv("BANK_APP_API_TOKEN_SECRET_KEY")
 
@@ -112,7 +113,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 """
 AUTH
 """
-@app.post(f"/login", name="login", tags=['auth'])
+@app.post(f"/api/{api_version}/login", name="login", tags=['auth'])
 def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
     
@@ -132,8 +133,8 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     if not pwd_context.verify(password, user_credentials[username]["password"]):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    access_token_expiration = timedelta(minutes=access_token_expiration)
-    expire = datetime.now() + access_token_expiration
+    token_expiration = timedelta(minutes=access_token_expiration)
+    expire = datetime.now() + token_expiration
     data__to_encode = {"sub": credentials.username, "exp": expire}
 
     encoded_jwt = jwt.encode(data__to_encode, jwt_secret_key, algorithm=algorithm)
@@ -148,7 +149,7 @@ ROUTES
 home routes
 """
 # status route
-@app.get(f"/status", name="status", tags=['home'])
+@app.get(f"/api/{api_version}/status", name="status", tags=['home'])
 async def get_status() -> dict:
     """
     Get the status of the API.
@@ -164,7 +165,7 @@ async def get_status() -> dict:
 Account routes
 """
 # Create Account
-@app.post(f"/create/account", name="create_account", tags=['create', 'account'])
+@app.post(f"/api/{api_version}/create/account", name="create_account", tags=['account'])
 def app_create_account(name:str,
                        type:str,
                        amount:float,
@@ -178,7 +179,7 @@ def app_create_account(name:str,
 
 
 # Load Account Table
-@app.get(f"/table/account", name="load_account_table", tags=['account'])
+@app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
 def app_load_account_table(current_user: str = Depends(get_current_user)):
     """
     
@@ -188,7 +189,7 @@ def app_load_account_table(current_user: str = Depends(get_current_user)):
 
 
 # Get available accounts
-@app.get(f"/get/account", name="get_available_accounts", tags=['account'])
+@app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
 def app_get_available_accounts(current_user: str = Depends(get_current_user)):
     """
     
@@ -206,7 +207,7 @@ def app_get_available_accounts(current_user: str = Depends(get_current_user)):
 Budget routes
 """
 # Create Budget
-@app.post(f"/create/budget", name="create_budget", tags=['create', 'budget'])
+@app.post(f"/api/{api_version}/create/budget", name="create_budget", tags=['budget'])
 def app_create_budget(name:str,
                       month:str,
                       amount:float,
@@ -219,7 +220,7 @@ def app_create_budget(name:str,
     return budget
 
 # Load Budget Table
-@app.get(f"/table/budget", name="load_budget_table", tags=['account'])
+@app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['budget'])
 def app_load_budget_table(current_user: str = Depends(get_current_user)):
     """
     
@@ -229,7 +230,7 @@ def app_load_budget_table(current_user: str = Depends(get_current_user)):
 
 
 # Get available budgets
-@app.get(f"/get/budgets", name="get_available_budgets", tags=['budgets'])
+@app.get(f"/api/{api_version}/get/budgets", name="get_available_budgets", tags=['budget'])
 def app_get_available_budgets(current_user: str = Depends(get_current_user)):
     """
     
@@ -246,7 +247,7 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
 Transaction routes
 """
 # Create Transaction
-@app.post(f"/create/transaction", name="create_transaction", tags=['create', 'transaction'])
+@app.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['transaction'])
 def app_create_transaction(date:str=None,
                            type:str='debit',
                            amount:float=0.0,
@@ -264,7 +265,7 @@ def app_create_transaction(date:str=None,
     return transaction
 
 
-@app.post(f"/apply/transaction", name="apply_transaction", tags=['transaction'])
+@app.post(f"/api/{api_version}/apply/transaction", name="apply_transaction", tags=['transaction'])
 def app_apply_transaction(transaction:Transaction,
                           current_user: str = Depends(get_current_user)):
     """

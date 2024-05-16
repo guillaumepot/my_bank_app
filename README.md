@@ -4,34 +4,50 @@
 
 
 ## INSTALL
-- Define ENV variables (.env file)
-    - api.env
-    - streamlit.env
-- Requirements -> Report to requirements.txt 
+- To do
 
-## API
-Api version : 0.1
+
+
+## Package
+Package version : 0.1.1
 Current state : Dev
 
 
 
 ### Changelogs
 
+### Todo
+
+
+
+
+
+## API
+Api version : 0.1.0
+Current state : Dev
+
+### Changelogs
+
+### Todo
+- Add logger
+- Change dir paths (wait for todo:Datas/DB migration)
+
+
 
 ## Streamlit
-To be implemented
+Steamlit version : 0.1.0
+Current state : Dev
+
 
 ### Changelogs
 
 
-## TODO
+### Todo
+- UI
+- container
 
-- Add requirements.txt
-- Do API relative to myBankPackage:
 
+## Datas
 
-- Create an account
-    - Show acocunt table
-- Create a budget
-    - Show budget table
-- Create a transaction + apply a transaction
+### Todo
+- DB migration

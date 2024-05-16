@@ -4,22 +4,25 @@ FROM python:3.10
 # Define Workdir
 WORKDIR /app
 
-# Install dependencies
-COPY ./requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY ./myBankPackage ./myBankPackage
-RUN pip install ./myBankPackage
-
-
-# Copy the rest of the working directory contents into the container at /app
+# Copy files
+COPY ./myBankPackage /app/myBankPackage
+COPY ./requirements.txt /app
+COPY ./generate_secret_key.py /app
 COPY ./api.py /app
+COPY ./generate_secret_key.sh /app
+
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install ./myBankPackage
+RUN chmod +x ./generate_secret_key.sh
+
 
 # Port to expose
 EXPOSE 8000
 
-# Define environment variable
-ENV PYTHONPATH=/app
-
 # Start uvicorn server
 CMD uvicorn api:app --host $UVICORN_HOST --port $UVICORN_PORT
+
+# Define the entrypoint
+ENTRYPOINT ["./generate_secret_key.sh"]
