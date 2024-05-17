@@ -85,7 +85,7 @@ OBJECTS TESTS
 @pytest.mark.parametrize("name, type, amount",
                          [
                              ("Test1", "checking", 1000),
-                             ("Test2", "savings", 0.0),
+                             ("Test2", "saving", 0.0),
                              ("Test3", "test", 100.0),
                              ("Test4", "checking", -50.0)
                              ])
@@ -105,7 +105,7 @@ def test_account_object(name, type, amount) -> None:
         account = Account(name, type, amount)
 
         assert account.name == "Test2"
-        assert account.type == "savings"
+        assert account.type == "saving"
         assert account.amount == 0.0
 
     # Invalid type

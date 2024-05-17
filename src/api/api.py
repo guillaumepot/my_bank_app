@@ -344,28 +344,26 @@ Transaction routes
 def app_create_transaction(date:str,
                            type:str,
                            amount:float,
-                           origin_account:str,
-                           destination_account:str,
-                           budget:str,
-                           budget_month:str,
-                           description:str,
+                           origin_account:str=None,
+                           destination_account:str=None,
+                           budget:str=None,
+                           budget_month:str=None,
+                           description:str="",
                            current_user: str = Depends(get_current_user)):
     """
 
     """
+    if type == "debit" and origin_account is None:
+        raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
+    if type == "credit" and destination_account is None:
+        raise HTTPException(status_code=400, detail="Destination account is required for credit transactions.")
+    if type == "transfer" and (origin_account is None or destination_account is None):
+        raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
+    
     transaction = Transaction(date, type, amount, origin_account, destination_account, budget, budget_month, description)
     transaction.save(transaction_path)
-    return transaction
-
-
-# Apply Transaction
-@app.post(f"/api/{api_version}/apply/transaction", name="apply_transaction", tags=['transaction'])
-def app_apply_transaction(transaction:Transaction,
-                          current_user: str = Depends(get_current_user)):
-    """
-    
-    """
     transaction.apply(account_path, budget_path)
+
     return {'message':f"Transaction id {transaction.id}, type {transaction.type} applied."}
 
 

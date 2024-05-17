@@ -104,7 +104,8 @@ page=st.sidebar.radio("Navigation", pages)
 ### API HEADER AUTHORIZATION ###
 st.session_state.headers = {
     "accept": "application/json",
-    "Content-Type": "application/x-www-form-urlencoded",
+    'Content-Type': 'application/json',    
+    #"Content-Type": "application/x-www-form-urlencoded",
     "Authorization": f"Bearer {st.session_state.access_token}"
     }        
 
@@ -132,10 +133,22 @@ if page == pages[0]:
         st.session_state.df_accounts = df
 
         st.subheader("Accounts")
+        filter_col, sortby_col = st.columns(2)
+
+        # Filter button
+        with filter_col:
+            filters = [x for x in st.session_state.df_accounts.type.unique()]
+            filters.insert(0, "")
+            filter_value = st.selectbox('Filter type:', filters, key="filter_by_accounts")
+            if filter_value != "":
+                st.session_state.df_accounts = st.session_state.df_accounts[st.session_state.df_accounts["type"] == filter_value]
+
         # Sort by button
-        sort_by = st.selectbox('Sort by:', st.session_state.df_accounts.columns, key="sort_by_accounts")
-        sorted_df = st.session_state.df_accounts.sort_values(sort_by)
-        st.table(sorted_df)
+        with sortby_col:
+            sort_by = st.selectbox('Sort by:', st.session_state.df_accounts.columns, key="sort_by_accounts")
+            st.session_state.df_accounts = st.session_state.df_accounts.sort_values(sort_by)
+
+        st.table(st.session_state.df_accounts)
 
 
     # Get budget table
@@ -153,10 +166,22 @@ if page == pages[0]:
         st.session_state.df_budgets = df
 
         st.subheader("Budgets")
-        # Sortby button
-        sort_by = st.selectbox('Sort by:', st.session_state.df_budgets.columns, key="sort_by_budgets")
-        sorted_df = st.session_state.df_budgets.sort_values(sort_by)
-        st.table(sorted_df)
+        filter_col, sortby_col = st.columns(2)
+
+        # Filter button
+        with filter_col:
+            filters = [x for x in st.session_state.df_budgets.month.unique()]
+            filters.insert(0, "")
+            filter_value = st.selectbox('Filter month:', filters, key="filter_by_budgets")
+            if filter_value != "":
+                st.session_state.df_budgets = st.session_state.df_budgets[st.session_state.df_budgets["month"] == filter_value]
+
+        # Sort by button
+        with sortby_col:
+            sort_by = st.selectbox('Sort by:', st.session_state.df_budgets.columns, key="sort_by_budgets")
+            st.session_state.df_budgets = st.session_state.df_budgets.sort_values(sort_by)
+
+        st.table(st.session_state.df_budgets)
 
 
 
@@ -187,9 +212,13 @@ if page == pages[1]:
         account_to_display = st.session_state.df_accounts[st.session_state.df_accounts["name"] == account_choice]
 
         st.write(account_to_display["name"].values[0])
-        for col in account_to_display.columns[1:]:
+        for col in account_to_display.columns[1:4]:
             st.write(f"{col}: {account_to_display[col].values[0]}")
-
+        st.write("**History**")
+        account_history = account_to_display["history"].values[0]
+        #account_history["amount"] = account_history["amount"].astype(float)
+        #account_history["amount"] = account_history["amount"].apply(lambda x: f"{x:.2f} €")
+        st.table(account_history)
 
     if choice == "Budgets":
         # Get budget table
@@ -209,8 +238,14 @@ if page == pages[1]:
         budget_to_display = st.session_state.df_budgets[st.session_state.df_budgets["name"] == budget_choice]
 
         st.write(budget_to_display["name"].values[0])
-        for col in budget_to_display.columns[1:]:
+        for col in budget_to_display.columns[1:4]:
             st.write(f"{col}: {budget_to_display[col].values[0]}")
+        st.write("**History**")
+        budget_history = budget_to_display["history"].values[0]
+        #budget_history["amount"] = budget_history["amount"].astype(float)
+        #budget_history["amount"] = budget_history["amount"].apply(lambda x: f"{x:.2f} €")
+        st.table(budget_history)
+
 
 
     if choice == "Transactions":
@@ -223,6 +258,10 @@ if page == pages[1]:
 if page == pages[2]: 
     st.session_state.pop('df_budgets', None)
     st.session_state.pop('df_accounts', None)
+    if "transaction_datas" in st.session_state:
+        st.session_state.pop('transaction_datas', None)
+
+
     st.title("Transactions")
 
     # Get available transaction types
@@ -254,44 +293,65 @@ if page == pages[2]:
         transaction_date = str(transaction_date)
         transaction_type = st.selectbox("Choose transaction type", available_transaction_types, key="transaction_type")
         transaction_amount = st.number_input("Amount", format="%.2f", key="amount_account_input")
+
+        datas = {
+            "date": transaction_date,
+            "type": transaction_type,
+            "amount": transaction_amount
+            }
+
         origin_account = st.selectbox("Choose origin account", available_accounts, key="origin_account")
-        origin_account = None if origin_account == "None" else origin_account
+
+        if origin_account != None:
+            datas["origin_account"] = origin_account
+
+
         destination_account = st.selectbox("Choose destination account", available_accounts, key="destination_account")
-        destination_account = None if destination_account == "None" else destination_account
+
+        if destination_account:
+            datas["destination_account"] = destination_account
+
+
         budget = st.selectbox("Choose budget", available_budgets, key="budget_transaction")
         budget = None if budget == "None" else budget
+        if budget is not None:
+            budget_name = budget.split("_")[0]
+
         budget_month = budget.split("_")[1] if budget != None else None
-        description = st.text_input("Description", key="transaction_description")
+
+        if budget:
+            datas["budget"] = budget_name
+            datas["budget_month"] = budget_month
+
+
+        description = st.text_input("description", key="transaction_description")
+
+        datas["description"] = description
+
+
         submit_button = st.form_submit_button(label='Create Transaction')
 
     if submit_button:
         # Request API
         access_token = st.session_state.access_token
         if access_token:
-            datas = {
-                "date": transaction_date,
-                "type": transaction_type,
-                "amount": transaction_amount,
-                "origin_account": origin_account,
-                "destination_account": destination_account,
-                "budget": budget,
-                "budget_month": budget_month,
-                "description": description
-            }
             st.write(datas)
-            for key, value in datas.items():
-                st.write(f"{key}: {type(value)}")
             url = f"{api_url}/api/{api_version}/create/transaction"
-            response = requests.post(url, headers=st.session_state.headers, data=datas)
-            if response.status_code == 200:
-                st.success(response.json())
-            else:
-                st.error("An error occurred.")
-                st.write(response)
+            response = requests.post(url, headers=st.session_state.headers, params=datas)
 
+            # Add transaction to seesion_state
+            if response.status_code == 200:
+                st.session_state.transaction_datas = response.json()
+                st.success(f"Transaction created: \n {st.session_state.transaction_datas}")                             
+
+            # If status code is not 200
+            else:
+                st.write(response.json())
+         
+        # If no access token
         else:
             st.error("Please Log In to create a transaction.")
-
+            st.write(response.json())
 
 
 
@@ -339,6 +399,7 @@ if page == pages[3]:
             if access_token:
                 url = f"{api_url}/api/{api_version}/create/account?name={name}&type={account_type}&amount={amount}"
                 response = requests.post(url, headers=st.session_state.headers)
+                
                 if response.status_code == 200:
                     st.success(response.json())
                 else:

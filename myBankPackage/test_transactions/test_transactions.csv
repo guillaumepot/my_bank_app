@@ -16,3 +16,7 @@ date,type,amount,origin_account,destination_account,budget,budget_month,descript
 2024-05-11 16:34:56.871616,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,45c4e97ff16444ec9bd1f43d43a1bf2d
 2024-05-11 16:36:49.055853,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,bb0586cd18254918bbced374bb4b8dfb
 2024-05-16 12:39:36.439647,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,ff7655ee16fe4fd89fe41e423c3ed1e5
+2024-05-17 14:30:00.402023,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,3c1b0da45e2b452a89c40e19dcfda1f9
+2024-05-17 14:30:29.278057,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,9bfb00109fe445bc9b3e351fd61248c2
+2024-05-17 14:30:43.420183,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,7fed6a04130b45a6900d9e3c3383c74d
+2024-05-17 14:30:56.041325,credit,50.0,origin_test,destination_test,test budget,June,Test transaction fixture,1e1883b2a7984b99a8b80f09deb35eaa
