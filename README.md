@@ -9,7 +9,7 @@
 
 
 ## Package
-Package version : 0.1.1
+Package version : 0.1.0
 Current state : Dev
 
 
@@ -46,6 +46,8 @@ Current state : Dev
 
 ### Todo
 - container
+- Debut 'add transaction' poll
+- Add 'apply transaction route' after new transaction submit
 
 
 ## Datas

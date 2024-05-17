@@ -311,8 +311,18 @@ class Transaction:
         # If budget, check if it exists
         if (self.budget is not None) and (self.budget_month is None):
             raise ValueError("Budget month is required when budget is not None.")
+        # If type is credit, destination account is required
+        if (self.type == "credit") and (self.destination_account is None):
+            raise ValueError("Destination account is required for credit transactions.")
+        # If type is debit, origin account is required
+        if (self.type == "debit") and (self.origin_account is None):
+            raise ValueError("Origin account is required for debit transactions.")
+        # If type is transfert, both origin and destination accounts are required
+        if (self.type == "transfert") and ((self.origin_account is None) or (self.destination_account is None)):
+            raise ValueError("Origin and destination accounts are required for transfert transactions.")
         
-        
+
+
 
     def save(self, transaction_path:str) -> None:
         """

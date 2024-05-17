@@ -21,7 +21,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
 
-from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table
+from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table, available_account_types, available_transactions_types, load_account, load_budget
 
 """
 VARS
@@ -72,11 +72,7 @@ app = FastAPI(
         {
             'name': 'transaction',
             'description': 'Transaction'
-        },
-        {
-            'name': 'create',
-            'description': 'Creation functions (accounts, budgets, transactions, ...)'
-        }        
+        }   
     ]
 )
 
@@ -94,8 +90,26 @@ API Logger
 """
 FUNCTIONS
 """
-def get_current_user(token: str = Depends(oauth2_scheme)):
 
+
+######################################################################################
+"""
+AUTH
+"""
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    """
+    Get the username of the current user based on the provided token.
+
+    Parameters:
+    - token (str): The authentication token.
+
+    Returns:
+    - str: The username of the current user.
+
+    Raises:
+    - HTTPException: If the credentials cannot be validated.
+
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -110,14 +124,20 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     
     return username
 
-######################################################################################
-"""
-AUTH
-"""
+
 @app.post(f"/api/{api_version}/login", name="login", tags=['auth'])
 def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
-    
+    Logs in a user with the provided credentials and returns an access token.
+
+    Args:
+        credentials (OAuth2PasswordRequestForm): The user's login credentials.
+
+    Returns:
+        dict: A dictionary containing the access token.
+
+    Raises:
+        HTTPException: If the username or password is incorrect, the user is not authorized, or the password verification fails.
     """
     # Load existing user datas from user_database
     with open(user_file_path, "r") as file:
@@ -167,11 +187,21 @@ Account routes
 """
 # Create Account
 @app.post(f"/api/{api_version}/create/account", name="create_account", tags=['account'])
-def app_create_account(name:str,
-                       type:str,
-                       amount:float,
+def app_create_account(name: str,
+                       type: str,
+                       amount: float,
                        current_user: str = Depends(get_current_user)):
     """
+    Create a new bank account for the specified user.
+
+    Parameters:
+    name (str): The name of the account holder.
+    type (str): The type of the account (e.g., "savings", "checking").
+    amount (float): The initial amount to deposit into the account.
+    current_user (str, optional): The current user making the request. Defaults to the result of the `get_current_user` function.
+
+    Returns:
+    Account: The newly created account.
 
     """
     account = Account(name, type, amount)
@@ -183,24 +213,56 @@ def app_create_account(name:str,
 @app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
 def app_load_account_table(current_user: str = Depends(get_current_user)):
     """
-    
+    Loads the account table for the current user.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - account_table (Table): The account table for the current user.
+
     """
     account_table = account_to_table(account_path)
     return account_table
 
 
 # Get available accounts
-@app.get(f"/api/{api_version}/get/accounts", name="get_available_accounts", tags=['account'])
+@app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
 def app_get_available_accounts(current_user: str = Depends(get_current_user)):
     """
-    
+    Get the list of available accounts for the current user.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - dict: A dictionary containing the list of available accounts.
+
+    Example:
+    >>> app_get_available_accounts('john_doe')
+    {'available accounts': ['account1', 'account2', 'account3']}
     """
     available_accounts = []
     for file in os.listdir(account_path):
         available_accounts.append(file)
 
     return {'available accounts': available_accounts}
-                               
+
+
+# Get available account types
+@app.get(f"/api/{api_version}/available/account_types", name="get_available_account_types", tags=['account'])
+def app_get_available_account_types(current_user:str = Depends(get_current_user)):
+    """
+    Get the available account types for the current user.
+
+    Parameters:
+    - current_user (str): The current user's username.
+
+    Returns:
+    - available_account_types (list): A list of available account types for the current user.
+
+    """
+    return available_account_types
 
 
 
@@ -209,38 +271,68 @@ Budget routes
 """
 # Create Budget
 @app.post(f"/api/{api_version}/create/budget", name="create_budget", tags=['budget'])
-def app_create_budget(name:str,
-                      month:str,
-                      amount:float,
+def app_create_budget(name: str,
+                      month: str,
+                      amount: float,
                       current_user: str = Depends(get_current_user)):
     """
+    Create a new budget for the current user.
+
+    Parameters:
+    - name (str): The name of the budget.
+    - month (str): The month for which the budget is created.
+    - amount (float): The amount allocated for the budget.
+    - current_user (str, optional): The current user. Defaults to the result of the `get_current_user` function.
+
+    Returns:
+    - budget: The created budget object.
 
     """
     budget = Budget(name, month, amount)
     budget.save(budget_path)
     return budget
 
+
 # Load Budget Table
 @app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['budget'])
 def app_load_budget_table(current_user: str = Depends(get_current_user)):
     """
-    
+    Loads the budget table for the current user.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - budget_table (Table): The budget table for the current user.
+
     """
     budget_table = budget_to_table(budget_path)
     return budget_table
 
 
 # Get available budgets
-@app.get(f"/api/{api_version}/get/budgets", name="get_available_budgets", tags=['budget'])
+@app.get(f"/api/{api_version}/get/budget", name="get_available_budgets", tags=['budget'])
 def app_get_available_budgets(current_user: str = Depends(get_current_user)):
     """
-    
+    Get the list of available budgets for the current user.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - dict: A dictionary containing the list of available budgets.
+
+    Example:
+    {
+        "available budgets": ["budget1", "budget2", "budget3"]
+    }
     """
     available_budgets = []
     for file in os.listdir(budget_path):
         available_budgets.append(file)
 
-    return {"Available budgets": available_budgets}
+    return {"available budgets": available_budgets}
+
 
 
 
@@ -249,14 +341,14 @@ Transaction routes
 """
 # Create Transaction
 @app.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['transaction'])
-def app_create_transaction(date:str=None,
-                           type:str='debit',
-                           amount:float=0.0,
-                           origin_account:str=None,
-                           destination_account:str=None,
-                           budget:str=None,
-                           budget_month:str=None,
-                           description:str='',
+def app_create_transaction(date:str,
+                           type:str,
+                           amount:float,
+                           origin_account:str,
+                           destination_account:str,
+                           budget:str,
+                           budget_month:str,
+                           description:str,
                            current_user: str = Depends(get_current_user)):
     """
 
@@ -266,6 +358,7 @@ def app_create_transaction(date:str=None,
     return transaction
 
 
+# Apply Transaction
 @app.post(f"/api/{api_version}/apply/transaction", name="apply_transaction", tags=['transaction'])
 def app_apply_transaction(transaction:Transaction,
                           current_user: str = Depends(get_current_user)):
@@ -274,3 +367,18 @@ def app_apply_transaction(transaction:Transaction,
     """
     transaction.apply(account_path, budget_path)
     return {'message':f"Transaction id {transaction.id}, type {transaction.type} applied."}
+
+
+# Get available transaction types
+@app.get(f"/api/{api_version}/available/transaction_types", name="get_available_transaction_types", tags=['transaction'])
+def app_get_available_transaction_types(current_user: str = Depends(get_current_user)):
+    """
+    Get the available transaction types for the current user.
+
+    Parameters:
+    - current_user (str): The current user.
+
+    Returns:
+    - available_transactions_types: The available transaction types for the current user.
+    """
+    return available_transactions_types

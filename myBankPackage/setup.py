@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="myBankPackage",
-    version="0.1.1",
+    version="0.1.0",
     author="Guillaume Pot",
     author_email="guillaumepot.pro@outlook.com",
     description="This package contains simple tools to create a personal bank app",
