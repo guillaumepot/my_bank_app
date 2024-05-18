@@ -1,0 +1,27 @@
+services:
+  # API Container
+  container_api:
+    image: personal_bank_app_api:latest
+    container_name: bank_app_api
+    env_file:
+      - api.env
+    ports:
+      - "8000:8000" # If you change api.env PORT, change it here too like <new_port>:8001
+    volumes:
+      - ../../storage/accounts:/app/storage/accounts
+      - ../../storage/budgets:/app/storage/budgets
+      - ../../storage/transactions:/app/storage/transactions
+      - ../../storage/users.json:/app/storage/users.json
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - bank_app_network
+
+# Networks
+networks:
+  bank_app_network:
+    external: true
