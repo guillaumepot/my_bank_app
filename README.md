@@ -1,38 +1,36 @@
-# Bank personal app
+# Bank Personal App
 
-This is a personal project to check my bank accounts.
-Currently in dev state, I plan to add new features in the future.
+This is a personal project to check my bank accounts. It is currently in development, with plans to add new features in the future.
 
+## Table of Contents
+- [Repository Architecture](#repository-architecture)
+- [Installation](#installation)
+- [Additional Information](#additional-information)
+- [Roadmap](#roadmap)
 
-## Repo Architecture
+## Repository Architecture
 [TODO]
 
+## Installation
 
-
-## INSTALL
-
-### User account
-- Use generate_user_credentials.py to generate a user account. Your username should be added in api.env (AUTHORIZED_USERS)
-
+### User Account
+- Use `generate_user_credentials.py` to generate a user account. Your username should be added in `api.env` (AUTHORIZED_USERS).
 
 ### API
-- Configure API vars in api.env
-- Add usernames as AUTHORIZED_USERS
-- Change storage path in docker-compose if needed
-- Use setup & remove scripts to start & stop API container easily.
+- Configure API variables in `api.env`.
+- Add usernames as AUTHORIZED_USERS.
+- Change storage path in docker-compose if needed.
+- Use setup & remove scripts to easily start & stop the API container.
 
 ### Streamlit
-- Configure Streamlit vars in streamlit.env (for API communication)
-- Use setup & remove scripts to start & stop API container easily.
+- Configure Streamlit variables in `streamlit.env` (for API communication).
+- Use setup & remove scripts to easily start & stop the API container.
 
+## Additional Information
 
-
-
-## Additional Informations
 ### Package
-Package version : 0.1.0
-Current state : Prod
-
+Package version: 0.1.0
+Current state: Production
 
 #### Changelogs
 0.1.0 :
@@ -41,30 +39,23 @@ Current state : Prod
 #### Todo
 -
 
-
-
-
 ### API
-Api version : 0.1.0
-Current state : Prod
+API version: 0.1.0
+Current state: Production
 
 #### Changelogs
 0.1.0 :
     - API creation
 
-
 #### Todo
 - Add logger
-- Change dir paths (wait for todo:Datas/DB migration)
+- Change directory paths (wait for todo: Data/DB migration)
 - /create/account should check if an account already exists instead of erasing it
 - /create/budget should check if a budget already exists instead of erasing it
 
-
-
 ### Streamlit
-Steamlit version : 0.1.0
-Current state : Prod
-
+Streamlit version: 0.1.0
+Current state: Production
 
 #### Changelogs
 0.1.0 :
@@ -73,29 +64,22 @@ Current state : Prod
 #### Todo
 - Add analytics page
 
-
-
-### Datas (storage)
+### Data (Storage)
 
 #### Todo
-- DB migration
-
-
-
-
+- Database migration
 
 ## Roadmap
-Done :
+Done:
 - First version of the app containing an API & a Streamlit interface
 
-
-Todo :
+Todo:
 - Add analytics (charts)
-- Add a ML pipeline to a analyse temporal charts
-- Add more unit tests, ex: api tests
+- Add a ML pipeline to analyze temporal charts
+- Add more unit tests, e.g., API tests
 - Add Container tests (Github Actions)
-- Refactorize API files (cleaning & readability)
-- Refactorize Streamlit files (cleaning & readability)
+- Refactor API files (cleaning & readability)
+- Refactor Streamlit files (cleaning & readability)
 - Add a logger (API)
-- Update API security (max requests, ..)
+- Update API security (max requests, etc.)
 - Move objects (accounts, budgets, transactions, users) to RDB
