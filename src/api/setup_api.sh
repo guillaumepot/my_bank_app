@@ -15,7 +15,7 @@ chmod +x generate_secret_key.sh
 docker build -t personal_bank_app_api:latest -f ./Dockerfile.api .
 
 # Start container
-docker-compose -f docker-compose.yaml up -d
+docker compose -f docker-compose.yaml up -d
 
 # Remove myBankPackage
 rm -rf ./myBankPackage

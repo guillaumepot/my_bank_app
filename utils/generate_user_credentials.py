@@ -4,7 +4,7 @@ import getpass
 from passlib.context import CryptContext
 
 crypt_context_scheme = "argon2"
-user_file_path = "./src/storage/users.json"
+user_file_path = "../storage/users.json"
 
 
 def generate_user_credentials() -> None:
@@ -48,4 +48,4 @@ if __name__ == "__main__":
     generate_user_credentials()
 
 # CLI example
-# python3 ./utils/generate_user_credentials.py
+# python3 generate_user_credentials.py

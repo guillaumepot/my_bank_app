@@ -83,3 +83,6 @@ Todo:
 - Add a logger (API)
 - Update API security (max requests, etc.)
 - Move objects (accounts, budgets, transactions, users) to RDB
+
+### Git repository
+- Add requirements (Docker) and/or furnish other ways to start the app
