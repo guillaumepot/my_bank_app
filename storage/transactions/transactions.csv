@@ -1,6 +1,1 @@
 id,date,type,amount,origin_account,destination_account,budget,budget_month,description
-1429b1f3b15944b3aabfa99f8cd71e1f,2024-05-17,debit,195.0,Bourso-Guillaume,,Courses_May,May,Test budget courses transaction
-acbdd7605f334a0bb675bbb1c1432968,2024-05-17,debit,195.0,Bourso-Guillaume,,Courses_May,May,test
-bf99d69416e0408798dff712345eab46,2024-05-17,debit,195.0,Bourso-Guillaume,,Courses_June,June,test
-6c9abae5a7f84df08f62935b712b7650,2024-05-17,debit,195.0,Bourso-Guillaume,,Carburant_June,June,test
-4c2c82481a18487abcb82a54374406dc,2024-05-17,debit,194.97,Bourso-Guillaume,,Courses,May,test

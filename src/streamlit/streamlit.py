@@ -15,14 +15,8 @@ import streamlit as st
 
 
 # VARS
-api_version = os.getenv("API_VERSION")
-api_url = os.getenv("API_URL")
-
-
-api_version = "0.1.0" # TO DELETE WHEN DOCKERIZED
-api_url = "http://localhost:8000" # TO DELETE WHEN DOCKERIZED
-
-
+api_version = os.getenv("API_VERSION", "0.1.0")
+api_url = os.getenv("API_URL", "http://localhost:8000")
 
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -216,24 +210,36 @@ if page == pages[1]:
             st.write(f"{col}: {account_to_display[col].values[0]}")
         st.write("**History**")
         account_history = account_to_display["history"].values[0]
-        #account_history["amount"] = account_history["amount"].astype(float)
-        #account_history["amount"] = account_history["amount"].apply(lambda x: f"{x:.2f} €")
-        st.table(account_history)
+        account_history_df = pd.DataFrame(account_history)
+        account_history_df["amount"] = account_history_df["amount"].apply(lambda x: f"{x:.2f} €")
+        st.dataframe(account_history_df)
 
     if choice == "Budgets":
         # Get budget table
         url = f"{api_url}/api/{api_version}/table/budget"
         response = requests.get(url, headers=st.session_state.headers)
+
+        # If status code is not 200
         if response.status_code != 200:
             st.error("Error while requesting API.")
             response.status_code
             st.stop()
+
+        # If status code is 200
         else:
             df = pd.DataFrame(response.json())
             df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
             # Save df to session state
             st.session_state.df_budgets = df
+        
 
+        # Display budget
+        # Month Choice
+        available_months = st.session_state.df_budgets["month"].unique()
+        month_choice = st.selectbox("Choose a month", available_months)
+        st.session_state.df_budgets = st.session_state.df_budgets[st.session_state.df_budgets["month"] == month_choice]
+
+        # Budget Choice
         budget_choice = st.selectbox("Choose a budget", st.session_state.df_budgets["name"].values)
         budget_to_display = st.session_state.df_budgets[st.session_state.df_budgets["name"] == budget_choice]
 
@@ -242,15 +248,35 @@ if page == pages[1]:
             st.write(f"{col}: {budget_to_display[col].values[0]}")
         st.write("**History**")
         budget_history = budget_to_display["history"].values[0]
-        #budget_history["amount"] = budget_history["amount"].astype(float)
-        #budget_history["amount"] = budget_history["amount"].apply(lambda x: f"{x:.2f} €")
-        st.table(budget_history)
+        budget_history_df = pd.DataFrame(budget_history)
+        budget_history_df["amount"] = budget_history_df["amount"].apply(lambda x: f"{x:.2f} €")
+        st.dataframe(budget_history_df)
 
 
 
     if choice == "Transactions":
-        st.write("Not implemented yet.")
-        pass # TO BE IMPLEMENTED
+        # Get transaction table
+        url = f"{api_url}/api/{api_version}/table/transaction"
+        response = requests.get(url, headers=st.session_state.headers)
+
+        # If status code is not 200
+        if response.status_code != 200:
+            st.error("Error while requesting API.")
+            response.status_code
+            st.stop()
+
+        # If status code is 200
+        else:
+            transaction_table = response
+            transaction_table = pd.DataFrame(transaction_table.json())
+            transaction_table["amount"] = transaction_table["amount"].apply(lambda x: f"{x:.2f} €")
+            st.subheader("Transaction table")
+            # Search bar for transaxction id
+            search = st.text_input("Search by transaction id")
+            if search:
+                transaction_table = transaction_table[transaction_table["id"] == search]
+            st.dataframe(transaction_table)
+
 
 
 

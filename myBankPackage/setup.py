@@ -1,11 +1,17 @@
 from setuptools import setup, find_packages
 
+# Version : 0.1.0
+# Current state : Prod
+# Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
+
+
 setup(
     name="myBankPackage",
     version="0.1.0",
     author="Guillaume Pot",
     author_email="guillaumepot.pro@outlook.com",
-    description="This package contains simple tools to create a personal bank app",
+    description="Contains simple tools to create a personal bank app",
     long_description_content_type="text/markdown",
     url="https://github.com/guillaumepot/my_bank_app",
     packages=find_packages(),

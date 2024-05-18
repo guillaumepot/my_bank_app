@@ -1064,6 +1064,23 @@ files = [
 ]
 
 [[package]]
+name = "myBankPackage"
+version = "0.1.1"
+description = "This package contains simple tools to create a personal bank app"
+optional = false
+python-versions = ">=3.10"
+files = []
+develop = false
+
+[package.dependencies]
+pandas = "*"
+requests = "*"
+
+[package.source]
+type = "directory"
+url = "myBankPackage"
+
+[[package]]
 name = "nest-asyncio"
 version = "1.6.0"
 description = "Patch asyncio to allow nested event loops"
@@ -2768,4 +2785,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "21486553febd032e33d8a7817eddf8e724ba996cbeb9ef3f444ca049cc694c83"
+content-hash = "f1d35058effea652afd13146c70b7d19d029dc4b6aeceb746aaed4387d0a8b3a"

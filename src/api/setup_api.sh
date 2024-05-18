@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Create network
+docker network create bank_app_network
+
 
 # Copy myBankPackage
 cp -r ../../myBankPackage ./myBankPackage

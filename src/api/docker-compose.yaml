@@ -24,4 +24,4 @@ services:
 # Networks
 networks:
   bank_app_network:
-    driver: bridge
+    external: true

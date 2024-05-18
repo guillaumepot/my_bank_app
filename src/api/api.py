@@ -6,7 +6,8 @@ API - MAIN
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 api_version = "0.1.0"
-current_state = "Dev"
+current_state = "Prod"
+
 
 """
 LIB
@@ -14,14 +15,16 @@ LIB
 import os
 import jwt
 import json
-from fastapi import FastAPI, Header, Request, Depends, HTTPException, status
+import pandas as pd
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-
 from datetime import datetime, timedelta
 
 
-from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table, available_account_types, available_transactions_types, load_account, load_budget
+from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table, available_account_types, available_transactions_types
+
+
 
 """
 VARS
@@ -44,6 +47,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
 account_path = os.getenv("ACCOUNT_PATH")
 budget_path = os.getenv("BUDGET_PATH")
 transaction_path = os.getenv("TRANSACTION_PATH")
+
+
 
 """
 API declaration
@@ -335,7 +340,6 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
 
 
 
-
 """ 
 Transaction routes
 """
@@ -351,7 +355,24 @@ def app_create_transaction(date:str,
                            description:str="",
                            current_user: str = Depends(get_current_user)):
     """
+    Create a transaction in the bank application.
 
+    Parameters:
+    - date (str): The date of the transaction.
+    - type (str): The type of the transaction. Can be 'debit', 'credit', or 'transfer'.
+    - amount (float): The amount of the transaction.
+    - origin_account (str, optional): The origin account for debit or transfer transactions.
+    - destination_account (str, optional): The destination account for credit or transfer transactions.
+    - budget (str, optional): The budget category for the transaction.
+    - budget_month (str, optional): The month of the budget for the transaction.
+    - description (str, optional): Additional description for the transaction.
+    - current_user (str, optional): The current user making the transaction.
+
+    Returns:
+    - dict: A dictionary containing the message indicating the success of the transaction.
+
+    Raises:
+    - HTTPException: If the required parameters are missing or invalid.
     """
     if type == "debit" and origin_account is None:
         raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
@@ -380,3 +401,20 @@ def app_get_available_transaction_types(current_user: str = Depends(get_current_
     - available_transactions_types: The available transaction types for the current user.
     """
     return available_transactions_types
+
+
+# Get transaction table
+@app.get(f"/api/{api_version}/table/transaction", name="load_transaction_table", tags=['transaction'])
+def app_load_transaction_table(current_user: str = Depends(get_current_user)):
+    """
+    Load the transaction table for the current user.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - transaction_table: The transaction table for the current user.
+    """
+    transaction_table = pd.read_csv(transaction_path)
+    transaction_table = transaction_table.fillna(value="N/A")
+    return transaction_table.to_dict(orient='records')
