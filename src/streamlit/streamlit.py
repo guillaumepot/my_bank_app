@@ -1,7 +1,7 @@
 """
 ### STREAMLIT APP ###
 """
-# Version : 0.1.0
+# Version : 0.1.1
 # Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
@@ -120,6 +120,9 @@ if page == pages[0]:
         response.status_code
         st.stop()
     else:
+        if response.json() == []:
+            st.warning("No data available.")
+            st.stop()
         df = pd.DataFrame(response.json())
         df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
         df.drop(columns=["id", "history"], inplace=True)
@@ -152,7 +155,10 @@ if page == pages[0]:
         st.error("Error while requesting API.")
         response.status_code
         st.stop()
-    else:    
+    else: 
+        if response.json() == []:
+            st.warning("No data available.")
+            st.stop()
         df = pd.DataFrame(response.json())
         df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
         df.drop(columns=["id", "history"], inplace=True)
@@ -210,6 +216,9 @@ if page == pages[1]:
             st.write(f"{col}: {account_to_display[col].values[0]}")
         st.write("**History**")
         account_history = account_to_display["history"].values[0]
+        if account_history == []:
+            st.write("No history available.")
+            st.stop()
         account_history_df = pd.DataFrame(account_history)
         account_history_df["amount"] = account_history_df["amount"].apply(lambda x: f"{x:.2f} €")
         st.dataframe(account_history_df)
@@ -248,6 +257,9 @@ if page == pages[1]:
             st.write(f"{col}: {budget_to_display[col].values[0]}")
         st.write("**History**")
         budget_history = budget_to_display["history"].values[0]
+        if budget_history == []:
+            st.write("No history available.")
+            st.stop()
         budget_history_df = pd.DataFrame(budget_history)
         budget_history_df["amount"] = budget_history_df["amount"].apply(lambda x: f"{x:.2f} €")
         st.dataframe(budget_history_df)
