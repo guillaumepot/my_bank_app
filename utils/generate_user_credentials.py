@@ -4,7 +4,6 @@ import getpass
 from passlib.context import CryptContext
 
 crypt_context_scheme = "argon2"
-user_file_path = "../storage/users.json"
 
 
 def generate_user_credentials() -> None:
@@ -12,6 +11,8 @@ def generate_user_credentials() -> None:
     Generate a username and password for a user.
     """
     # Load user file
+    user_file_path = input("Enter the path to the user file: (Ex: ../storage/users.json)")
+
     if os.path.exists(user_file_path):
         with open(user_file_path, 'r') as user_file:
             all_user_datas = json.load(user_file)
