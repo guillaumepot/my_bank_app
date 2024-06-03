@@ -21,8 +21,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
-
-from myBankPackage import Account, Budget, Transaction, account_to_table, budget_to_table, available_account_types, available_transactions_types
+from sqlalchemy import create_engine
 
 
 
@@ -43,11 +42,19 @@ jwt_secret_key = os.getenv("BANK_APP_API_TOKEN_SECRET_KEY")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
 
 
-# File paths
-account_path = os.getenv("ACCOUNT_PATH")
-budget_path = os.getenv("BUDGET_PATH")
-transaction_path = os.getenv("TRANSACTION_PATH")
+# Database related variables
+host = os.getenv('POSTGRES_HOST')
+port = os.getenv('POSTGRES_PORT')
+user = os.getenv('POSTGRES_USER')
+password = os.getenv('POSTGRES_PASSWORD')
+database = os.getenv('POSTGRES_DB')
 
+
+
+
+# Value Locks
+available_account_types = ("checking", "saving")
+available_transactions_types = ("debit", "credit", "transfert")
 
 
 """

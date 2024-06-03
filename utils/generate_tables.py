@@ -8,16 +8,18 @@ import psycopg2
 # Get credentials to log in the database
 user = os.getenv('POSTGRES_USER')
 password = os.getenv('POSTGRES_PASSWORD') 
-
+db = os.getenv('POSTGRES_DB')
+host = os.getenv('POSTGRES_HOST')
+port = os.getenv('POSTGRES_PORT')
 
 
 # Connect Database
 conn = psycopg2.connect(
-    dbname="bank_db",
+    dbname=db,
     user=user,
     password=password,
-    host="bank_app_postgres",
-    port="5432"
+    host=host,
+    port=port
 )
 
 # Create a cursor
