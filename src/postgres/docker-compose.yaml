@@ -1,7 +1,7 @@
 services:
   # PostGres Container
   container_postgres:
-    image: personal_bank_app_postgres:latest
+    image: postgres:13
     container_name: bank_app_postgres
     env_file:
       - postgres.env

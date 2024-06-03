@@ -1,3 +1,13 @@
+"""
+Generate user credentials & add it to PostgreSQL database.
+"""
+# Version : 0.2.0
+# Current state : Dev
+# Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
+
+
+# THIS SECTION NEEDS TO BE UPDATED
 import os
 import json
 import time
