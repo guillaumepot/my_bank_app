@@ -59,6 +59,7 @@ def main(params):
     # User table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
+            id UUID PRIMARY KEY,
             username VARCHAR(255) PRIMARY KEY,
             password VARCHAR(255) NOT NULL,
             role INTEGER NOT NULL,
@@ -74,10 +75,10 @@ def main(params):
             type VARCHAR(255) NOT NULL,
             balance FLOAT CHECK(balance >= 0) NOT NULL,  
             owner VARCHAR(255) REFERENCES users(username),
+            history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            deleted_at TIMESTAMP,
-            history JSONB
+            deleted_at TIMESTAMP
         )
     """)
 
@@ -91,8 +92,7 @@ def main(params):
             history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            deleted_at TIMESTAMP,
-            history JSONB
+            deleted_at TIMESTAMP
         )
     """)
 
@@ -103,8 +103,8 @@ def main(params):
             date DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             type VARCHAR(255) CHECK(type IN ('debit', 'credit', 'transfert')) NOT NULL,
             amount FLOAT CHECK(amount >= 0) NOT NULL,
-            origin_account UUID,
-            destination_account UUID,
+            origin_account VARCHAR(255),
+            destination_account VARCHAR(255),
             budget UUID,
             category VARCHAR(255),
             description TEXT,
