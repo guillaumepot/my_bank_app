@@ -4,4 +4,4 @@
 docker compose down
 
 # Remove image
-#docker image rm postgres:13
+docker image rm personal_bank_app_postgres:latest

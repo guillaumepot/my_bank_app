@@ -1,12 +1,13 @@
 """
 Generate table in a PostgreSQL database
 """
+import os
 import psycopg2
 
 
 # Get credentials to log in the database
-user = input("Enter your username: ")
-password = input("Enter your password: ") 
+user = os.getenv('POSTGRES_USER')
+password = os.getenv('POSTGRES_PASSWORD') 
 
 
 
