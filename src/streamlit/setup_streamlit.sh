@@ -4,7 +4,7 @@
 docker network create bank_app_network
 
 # Build image
-docker build -t personal_bank_app_streamlit:latest -f ./Dockerfile.streamlit .
+docker build -t postgres_bank_app:latest -f ./Dockerfile.postgre .
 
 # Start container
 docker compose -f docker-compose.yaml up -d

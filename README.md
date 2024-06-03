@@ -13,14 +13,24 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ## Installation
 
+
+### Requirements
+[TODO]
+
+
 ### User Account
 - Use `generate_user_credentials.py` to generate a user account. Your username should be added in `api.env` (AUTHORIZED_USERS).
+
+### PostGres Database
+- Configure POSTGRES variables in `postgres.env`.
+
 
 ### API
 - Configure API variables in `api.env`.
 - Add usernames as AUTHORIZED_USERS.
 - Change storage path in docker-compose if needed.
 - Use setup & remove scripts to easily start & stop the API container.
+
 
 ### Streamlit
 - Configure Streamlit variables in `streamlit.env` (for API communication).
@@ -38,6 +48,13 @@ Current state: Production
 
 #### Todo
 -
+
+### POSTGRES
+POSTGRES version: latest
+Current state: Dev
+
+#### Changelogs
+N/C
 
 ### API
 API version: 0.1.0

@@ -1,5 +1,7 @@
 import os
 import json
+import time
+from datetime import datetime
 import getpass
 from passlib.context import CryptContext
 
@@ -36,6 +38,7 @@ def generate_user_credentials() -> None:
     user_datas = {}
     user_datas["password"] = hashed_password
     user_datas["role"] = 0
+    user_datas["created_at"] = time.mktime(datetime.now().timetuple())
     all_user_datas[username] = user_datas
 
 
@@ -47,6 +50,7 @@ def generate_user_credentials() -> None:
 
 if __name__ == "__main__":
     generate_user_credentials()
+
 
 # CLI example
 # python3 generate_user_credentials.py
