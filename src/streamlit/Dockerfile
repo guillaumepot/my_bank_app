@@ -1,5 +1,5 @@
-# Version : 0.1.0
-# Current state : Prod
+# Version : 0.2.0
+# Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
