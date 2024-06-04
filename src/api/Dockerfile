@@ -1,3 +1,8 @@
+# Version : 0.2.0
+# Current state : Prod
+# Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
+
 # API image
 FROM python:3.10
 

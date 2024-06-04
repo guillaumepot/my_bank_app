@@ -10,7 +10,7 @@ services:
     image: personal_bank_app_streamlit:latest
     container_name: bank_app_streamlit
     environment:
-      - API_VERSION="0.1.0"
+      - API_VERSION="0.2.0"
       - API_URL="http://bank_app_api:8000"
     ports:
       - "8001:8001"

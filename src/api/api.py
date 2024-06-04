@@ -1,11 +1,11 @@
 """
 API - MAIN
 """
-# Version : 0.1.0
+# Version : 0.2.0
 # Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
-api_version = "0.1.0"
+api_version = "0.2.0"
 current_state = "Prod"
 
 
@@ -14,7 +14,7 @@ LIB
 """
 import os
 import jwt
-import json
+import uuid
 import pandas as pd
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -49,7 +49,7 @@ user = os.getenv('POSTGRES_USER')
 password = os.getenv('POSTGRES_PASSWORD')
 database = os.getenv('POSTGRES_DB')
 
-
+engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{database}")
 
 
 # Value Locks
@@ -88,7 +88,6 @@ app = FastAPI(
     ]
 )
 
-
 ###############################################################
 """
 API Logger
@@ -102,6 +101,7 @@ API Logger
 """
 FUNCTIONS
 """
+
 
 
 ######################################################################################
@@ -142,28 +142,30 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
     Logs in a user with the provided credentials and returns an access token.
 
-    Args:
-        credentials (OAuth2PasswordRequestForm): The user's login credentials.
+    Parameters:
+    - credentials: OAuth2PasswordRequestForm, optional (default: Depends())
+        The user's credentials used for authentication.
 
     Returns:
-        dict: A dictionary containing the access token.
+    - dict: A dictionary containing the access token.
 
     Raises:
-        HTTPException: If the username or password is incorrect, the user is not authorized, or the password verification fails.
+    - HTTPException: If the username or password is incorrect, the user is not authorized, or an error occurs during authentication.
+
     """
     # Load existing user datas from user_database
-    with open(user_file_path, "r") as file:
-        user_credentials = json.load(file)
+    with engine.connect() as conn:
+
+        user_credentials = pd.read_sql("SELECT username, password FROM users", conn)
 
     username = credentials.username
     password = credentials.password
 
-    # Check if the user exists and get the current password in the database
-    if username not in user_credentials:
+    if username not in user_credentials['username'].values:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     if username not in authorized_users:
         raise HTTPException(status_code=400, detail="User not authorized")
-    if not pwd_context.verify(password, user_credentials[username]["password"]):
+    if not pwd_context.verify(password, user_credentials[user_credentials['username'] == username]["password"].values[0]):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     token_expiration = timedelta(minutes=access_token_expiration)
@@ -173,6 +175,7 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     encoded_jwt = jwt.encode(data__to_encode, jwt_secret_key, algorithm=algorithm)
 
     return {"access_token": encoded_jwt}
+
 ######################################################################################
 """
 ROUTES
@@ -201,69 +204,114 @@ Account routes
 @app.post(f"/api/{api_version}/create/account", name="create_account", tags=['account'])
 def app_create_account(name: str,
                        type: str,
-                       amount: float,
-                       current_user: str = Depends(get_current_user)):
+                       balance: float,
+                       current_user: str = Depends(get_current_user)) -> dict:
     """
-    Create a new bank account for the specified user.
+    Create a new bank account for the current user.
 
     Parameters:
-    name (str): The name of the account holder.
-    type (str): The type of the account (e.g., "savings", "checking").
-    amount (float): The initial amount to deposit into the account.
-    current_user (str, optional): The current user making the request. Defaults to the result of the `get_current_user` function.
+    - name (str): The name of the account.
+    - type (str): The type of the account (e.g., savings, checking).
+    - balance (float): The initial balance of the account.
+    - current_user (str, optional): The username of the current user. Defaults to the result of the `get_current_user` function.
 
     Returns:
-    Account: The newly created account.
+    A dictionary containing a success message and the details of the created account.
+
+    Raises:
+    - HTTPException: If an account with the same name already exists.
 
     """
-    account = Account(name, type, amount)
-    account.save(account_path)
-    return account
+    with engine.connect() as conn:
+
+        # Check if the account name already exists
+        account_names = pd.read_sql("SELECT name FROM accounts", conn)
+        if name in account_names['name'].values:
+            raise HTTPException(status_code=400, detail="Account already exists")
+        else:
+            # Generate an id for the account
+            id = uuid.uuid4()
+            owner = pd.read_sql("SELECT id FROM users WHERE username = :username", conn, params={"username": current_user})['id'].values[0]
+            history = {}
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO accounts (id, name, type, balance, owner, history)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (id, name, type, balance, owner, history))
+
+            conn.commit()
+
+    return {"message": f"Account {name} created successfully." \
+                        f"Type: {type}, Balance: {balance}" \
+                        f"Owner: {current_user}"}
+
+
+# Delete Account
+@app.delete(f"/api/{api_version}/delete/account", name="delete_account", tags=['account'])
+def app_delete_account(name: str, current_user: str = Depends(get_current_user)) -> dict:
+    """
+    
+    """
+    with engine.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            DELETE FROM accounts
+            WHERE name = :name
+        """, {"name": name})
+
+        conn.commit()
+
+    return {"message": f"Account {name} deleted successfully."}
+
+
 
 
 # Load Account Table
 @app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
-def app_load_account_table(current_user: str = Depends(get_current_user)):
+def app_load_account_table(current_user: str = Depends(get_current_user)) -> dict:
     """
-    Loads the account table for the current user.
+    Load the account table from the database and return it as a JSON object.
 
     Parameters:
-    - current_user (str): The username of the current user.
+    - current_user (str): The username of the current user. Defaults to the result of the `get_current_user` function.
 
     Returns:
-    - account_table (Table): The account table for the current user.
+    - dict: A dictionary representing the account table in JSON format.
 
     """
-    account_table = account_to_table(account_path)
-    return account_table
+    with engine.connect() as conn:
+        accounts_table = pd.read_sql("SELECT * FROM accounts", conn)
+        accounts_table_json = accounts_table.to_json()
+
+    return accounts_table_json
+
 
 
 # Get available accounts
 @app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
-def app_get_available_accounts(current_user: str = Depends(get_current_user)):
+def app_get_available_accounts(current_user: str = Depends(get_current_user)) -> dict:
     """
-    Get the list of available accounts for the current user.
+    Retrieve the available accounts for the current user.
 
     Parameters:
     - current_user (str): The username of the current user.
 
     Returns:
-    - dict: A dictionary containing the list of available accounts.
-
-    Example:
-    >>> app_get_available_accounts('john_doe')
-    {'available accounts': ['account1', 'account2', 'account3']}
+    - dict: A dictionary containing the available accounts as a list under the key 'available accounts'.
     """
     available_accounts = []
-    for file in os.listdir(account_path):
-        available_accounts.append(file)
+
+    with engine.connect() as conn:
+        accounts = pd.read_sql("SELECT name FROM accounts", conn)
+        available_accounts = accounts['name'].values
 
     return {'available accounts': available_accounts}
 
 
 # Get available account types
 @app.get(f"/api/{api_version}/available/account_types", name="get_available_account_types", tags=['account'])
-def app_get_available_account_types(current_user:str = Depends(get_current_user)):
+def app_get_available_account_types(current_user:str = Depends(get_current_user)) -> dict:
     """
     Get the available account types for the current user.
 
@@ -274,7 +322,7 @@ def app_get_available_account_types(current_user:str = Depends(get_current_user)
     - available_account_types (list): A list of available account types for the current user.
 
     """
-    return available_account_types
+    return {'available account types': available_account_types}
 
 
 
@@ -286,28 +334,76 @@ Budget routes
 def app_create_budget(name: str,
                       month: str,
                       amount: float,
-                      current_user: str = Depends(get_current_user)):
+                      current_user: str = Depends(get_current_user)) -> dict:
     """
-    Create a new budget for the current user.
+    Create a new budget for the specified month.
 
-    Parameters:
-    - name (str): The name of the budget.
-    - month (str): The month for which the budget is created.
-    - amount (float): The amount allocated for the budget.
-    - current_user (str, optional): The current user. Defaults to the result of the `get_current_user` function.
+    Args:
+        name (str): The name of the budget.
+        month (str): The month for which the budget is created.
+        amount (float): The amount allocated for the budget.
+        current_user (str, optional): The current user. Defaults to Depends(get_current_user).
 
     Returns:
-    - budget: The created budget object.
+        dict: A dictionary containing a success message with the details of the created budget.
+
+    Raises:
+        HTTPException: If a budget with the same name already exists for the specified month.
 
     """
-    budget = Budget(name, month, amount)
-    budget.save(budget_path)
-    return budget
+    with engine.connect() as conn:
+        # Check if the budget name already exists for the current month
+        budget_names = pd.read_sql("SELECT name FROM budgets WHERE month = :month", conn, params={"month": month})
+        if name in budget_names['name'].values:
+            raise HTTPException(status_code=400, detail="Budget already exists for this month")
+        else:
+            # Generate an id for the budget
+            id = uuid.uuid4()
+            history = {}
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO accounts (id, name, month, amount, history)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (id, name, month, amount, history))
+
+            conn.commit()
+
+    return {"message": f"Budget {name} created successfully. Month: {month}, Amount: {amount}"}
+
+
+
+
+# Delete Budget
+@app.delete(f"/api/{api_version}/delete/budget", name="delete_budget", tags=['budget'])
+def app_delete_budget(name: str, month: str, current_user: str = Depends(get_current_user)) -> dict:
+    """
+    Deletes a budget from the accounts table.
+
+    Args:
+        name (str): The name of the budget.
+        month (str): The month of the budget.
+        current_user (str, optional): The current user. Defaults to Depends(get_current_user).
+
+    Returns:
+        dict: A dictionary containing a success message.
+    """
+    with engine.connect() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            DELETE FROM accounts
+            WHERE name = :name AND month = :month
+        """, {"name": name, "month": month})
+
+        conn.commit()
+
+    return {"message": f"Budget {name} deleted successfully."}
+
 
 
 # Load Budget Table
 @app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['budget'])
-def app_load_budget_table(current_user: str = Depends(get_current_user)):
+def app_load_budget_table(current_user: str = Depends(get_current_user)) -> dict:
     """
     Loads the budget table for the current user.
 
@@ -318,8 +414,12 @@ def app_load_budget_table(current_user: str = Depends(get_current_user)):
     - budget_table (Table): The budget table for the current user.
 
     """
-    budget_table = budget_to_table(budget_path)
-    return budget_table
+    with engine.connect() as conn:
+        budgets_table = pd.read_sql("SELECT * FROM budgets", conn)
+        budgets_table_json = budgets_table.to_json()
+
+    return budgets_table_json
+
 
 
 # Get available budgets
@@ -340,8 +440,10 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
     }
     """
     available_budgets = []
-    for file in os.listdir(budget_path):
-        available_budgets.append(file)
+
+    with engine.connect() as conn:
+        budgets = pd.read_sql("SELECT name FROM budgets", conn)
+        available_budgets = budgets['name'].values
 
     return {"available budgets": available_budgets}
 
@@ -359,69 +461,154 @@ def app_create_transaction(date:str,
                            destination_account:str=None,
                            budget:str=None,
                            budget_month:str=None,
+                           category:str="",
                            description:str="",
-                           current_user: str = Depends(get_current_user)):
+                           current_user: str = Depends(get_current_user)) -> dict:
     """
     Create a transaction in the bank application.
 
     Parameters:
     - date (str): The date of the transaction.
-    - type (str): The type of the transaction. Can be 'debit', 'credit', or 'transfer'.
+    - type (str): The type of the transaction (debit, credit, transfer).
     - amount (float): The amount of the transaction.
-    - origin_account (str, optional): The origin account for debit or transfer transactions.
-    - destination_account (str, optional): The destination account for credit or transfer transactions.
-    - budget (str, optional): The budget category for the transaction.
+    - origin_account (str, optional): The name of the origin account for debit or transfer transactions.
+    - destination_account (str, optional): The name of the destination account for credit or transfer transactions.
+    - budget (str, optional): The name of the budget for the transaction.
     - budget_month (str, optional): The month of the budget for the transaction.
-    - description (str, optional): Additional description for the transaction.
+    - category (str, optional): The category of the transaction.
+    - description (str, optional): The description of the transaction.
     - current_user (str, optional): The current user making the transaction.
 
     Returns:
-    - dict: A dictionary containing the message indicating the success of the transaction.
+    - dict: A dictionary containing the message indicating the success of the transaction creation and application.
 
     Raises:
-    - HTTPException: If the required parameters are missing or invalid.
+    - HTTPException: If the transaction type is debit and the origin account is not provided.
+    - HTTPException: If the transaction type is credit and the destination account is not provided.
+    - HTTPException: If the transaction type is transfer and either the origin or destination account is not provided.
     """
+
+    # Check if the transaction is valid
+    if type not in available_transactions_types:
+        raise HTTPException(status_code=400, detail="Invalid transaction type.")
     if type == "debit" and origin_account is None:
         raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
     if type == "credit" and destination_account is None:
         raise HTTPException(status_code=400, detail="Destination account is required for credit transactions.")
     if type == "transfer" and (origin_account is None or destination_account is None):
         raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
-    
-    transaction = Transaction(date, type, amount, origin_account, destination_account, budget, budget_month, description)
-    transaction.save(transaction_path)
-    transaction.apply(account_path, budget_path)
 
-    return {'message':f"Transaction id {transaction.id}, type {transaction.type} applied."}
+
+    # Create the transaction
+    with engine.connect() as conn:
+        id = uuid.uuid4()
+
+        if budget == None:
+            budget_id = 0
+            budget_month = "N/A"
+        budget_id = pd.read_sql("SELECT id FROM budgets WHERE name = :budget AND month = :month", conn, params={"budget": budget, "month": budget_month})['id'].values[0]
+
+
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO transactions (id, date, type, amount, origin_account, destination_account, budget, category, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (id, date, type, amount, origin_account, destination_account, budget_id, category, description))
+
+        conn.commit()
+
+
+    # Apply the transaction to the accounts and budgets
+    with engine.connect() as conn:
+        cursor = conn.cursor()
+
+    if type == "debit":
+        cursor.execute("""
+            UPDATE accounts
+            SET balance = balance - :amount,
+                history = history || jsonb_build_object('transaction', :id)
+            WHERE name = :origin_account
+        """, {"amount": amount, "origin_account": origin_account, "id": str(id)})
+
+    if type == "credit":
+        cursor.execute("""
+            UPDATE accounts
+            SET balance = balance + :amount,
+                history = history || jsonb_build_object('transaction', :id)
+            WHERE name = :destination_account
+        """, {"amount": amount, "destination_account": destination_account, "id": str(id)})
+
+    if type == "transfer":
+        cursor.execute("""
+            UPDATE accounts
+            SET balance = balance - :amount,
+                history = history || jsonb_build_object('transaction', :id)
+            WHERE name = :origin_account
+        """, {"amount": amount, "origin_account": origin_account, "id": str(id)})
+
+        cursor.execute("""
+            UPDATE accounts
+            SET balance = balance + :amount,
+                history = history || jsonb_build_object('transaction', :id)
+            WHERE name = :destination_account
+        """, {"amount": amount, "destination_account": destination_account, "id": str(id)})
+
+    if budget != None:
+        cursor.execute("""
+            UPDATE budgets
+            SET amount = amount - :amount,
+                history = history || jsonb_build_object('transaction', :id)
+            WHERE name = :budget AND month = :month
+        """, {"amount": amount, "budget": budget, "month": budget_month, "id": str(id)})
+
+
+    conn.commit()
+
+
+    return {"message": "Transaction created & applied successfully."}
+
+
+
+
 
 
 # Get available transaction types
 @app.get(f"/api/{api_version}/available/transaction_types", name="get_available_transaction_types", tags=['transaction'])
 def app_get_available_transaction_types(current_user: str = Depends(get_current_user)):
     """
-    Get the available transaction types for the current user.
-
-    Parameters:
-    - current_user (str): The current user.
-
-    Returns:
-    - available_transactions_types: The available transaction types for the current user.
-    """
-    return available_transactions_types
-
-
-# Get transaction table
-@app.get(f"/api/{api_version}/table/transaction", name="load_transaction_table", tags=['transaction'])
-def app_load_transaction_table(current_user: str = Depends(get_current_user)):
-    """
-    Load the transaction table for the current user.
+    Retrieves the available transaction types for the current user.
 
     Parameters:
     - current_user (str): The username of the current user.
 
     Returns:
-    - transaction_table: The transaction table for the current user.
+    - available_transactions_types (list): A list of available transaction types.
+
     """
-    transaction_table = pd.read_csv(transaction_path)
-    transaction_table = transaction_table.fillna(value="N/A")
-    return transaction_table.to_dict(orient='records')
+    return available_transactions_types
+
+
+# Load Transaction Table
+@app.get(f"/api/{api_version}/table/transaction", name="load_transaction_table", tags=['transaction'])
+def app_load_transaction_table(current_user: str = Depends(get_current_user)):
+    """
+    Load the transaction table from the database and return it as a JSON string.
+
+    Parameters:
+    - current_user (str): The username of the current user.
+
+    Returns:
+    - str: A JSON string representing the transaction table.
+
+    Raises:
+    - None
+
+    Example Usage:
+    >>> app_load_transaction_table("john_doe")
+    '{"transaction_id": [1, 2, 3], "amount": [100, 200, 300], ...}'
+    """
+    with engine.connect() as conn:
+        transactions_table = pd.read_sql("SELECT * FROM transactions", conn)
+        transactions_table_json = transactions_table.to_json()
+
+    return transactions_table_json
