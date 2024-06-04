@@ -81,6 +81,9 @@ def main(params):
         )
     """)
 
+
+
+
     # Budget table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS budgets (
@@ -105,8 +108,6 @@ def main(params):
         VALUES (%s, %s, %s, %s, %s)
         ON CONFLICT DO NOTHING
     """, (default_budget_id, default_budget_name, default_budget_month, default_budget_amount, default_budget_history))
-
-
 
 
 
