@@ -12,8 +12,9 @@ This is a personal project to check my bank accounts. It is currently in develop
 [TODO]
 
 ## Installation
-- Setup POstGres DB Container
+- Setup PostGres DB Container
 - Generate Tables
+- Generate User
 - Setup API container
 - Setup Streamlit container
 
@@ -30,6 +31,8 @@ This is a personal project to check my bank accounts. It is currently in develop
 ### PostGres Database
 - Configure POSTGRES variables in `postgres.env`.
 - User setup & remove scripts to easily start & stop the POSTGRES container.
+- Generate tables using the script 'generate_tables'
+- Add a user using the script 'generate_user_credentials'
 
 ### API
 - Configure API variables in `api.env`.
@@ -42,21 +45,16 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Configure Streamlit variables in `streamlit.env` (for API communication).
 - Use setup & remove scripts to easily start & stop the API container.
 
+
+
 ## Additional Information
 
-### Package
-Package version: 0.1.0
-Current state: Production
-
-#### Changelogs
-0.1.0 :
-    - Package creation
 
 #### Todo
 -
 
 ### POSTGRES
-POSTGRES version: latest
+POSTGRES version: 13
 Current state: Dev
 
 #### Changelogs
@@ -64,21 +62,22 @@ N/C
 
 ### API
 API version: 0.1.0
-Current state: Production
+Current state: Dev
 
 #### Changelogs
 0.1.0 :
     - API creation
-
+*
 #### Todo
 - Add logger
-- Change directory paths (wait for todo: Data/DB migration)
+- -> Migrate functions to query the database
 - /create/account should check if an account already exists instead of erasing it
 - /create/budget should check if a budget already exists instead of erasing it
 
 ### Streamlit
 Streamlit version: 0.1.0
-Current state: Production
+Current state: Dev
+
 
 #### Changelogs
 0.1.0 :
@@ -87,10 +86,13 @@ Current state: Production
 #### Todo
 - Add analytics page
 
+
 ### Data (Storage)
 
 #### Todo
-- Database migration
+- [Done] Database migration 
+
+
 
 ## Roadmap
 Done:
@@ -105,7 +107,7 @@ Todo:
 - Refactor Streamlit files (cleaning & readability)
 - Add a logger (API)
 - Update API security (max requests, etc.)
-- Move objects (accounts, budgets, transactions, users) to RDB
+
 
 ### Git repository
 - Add requirements (Docker) and/or furnish other ways to start the app
