@@ -11,8 +11,6 @@ Generate a secret key and store it in a file
 
 from cryptography.fernet import Fernet
 
-
-
 def generate_secret_key() -> None:
     """
     Generates a secret key using the Fernet encryption algorithm and sets it as the value of the BANK_APP_API_TOKEN_SECRET_KEY environment variable.

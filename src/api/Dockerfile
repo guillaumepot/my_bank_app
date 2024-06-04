@@ -5,16 +5,14 @@ FROM python:3.10
 WORKDIR /app
 
 # Copy files
-COPY ./myBankPackage /app/myBankPackage
 COPY ./requirements.txt /app
-COPY ./generate_secret_key.py /app
 COPY ./api.py /app
+COPY ./generate_secret_key.py /app
 COPY ./generate_secret_key.sh /app
 
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install ./myBankPackage
 RUN chmod +x ./generate_secret_key.sh
 
 
