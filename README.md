@@ -12,6 +12,12 @@ This is a personal project to check my bank accounts. It is currently in develop
 [TODO]
 
 ## Installation
+- Setup POstGres DB Container
+- Generate Tables
+- Setup API container
+- Setup Streamlit container
+
+
 
 
 ### Requirements

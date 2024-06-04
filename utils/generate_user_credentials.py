@@ -6,7 +6,6 @@ Generate user credentials & add it to PostgreSQL database.
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
-
 # THIS SECTION NEEDS TO BE UPDATED
 import os
 import json
@@ -15,13 +14,21 @@ from datetime import datetime
 import getpass
 from passlib.context import CryptContext
 
+
 crypt_context_scheme = "argon2"
+
+
 
 
 def generate_user_credentials() -> None:
     """
-    Generate a username and password for a user.
+    Generate a username and password for a user and add it into postgresql database.
     """
+
+
+
+
+    
     # Load user file
     user_file_path = input("Enter the path to the user file: (Ex: ../storage/users.json)")
 
@@ -56,6 +63,13 @@ def generate_user_credentials() -> None:
         json.dump(all_user_datas, file, indent=4)
 
     print(f"User {username} succefully registered.")
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
