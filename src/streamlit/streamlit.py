@@ -81,6 +81,8 @@ else:
         st.session_state.pop('access_token', None)
     st.sidebar.empty()
 
+
+
 # Navigation
 st.sidebar.title("Personal bank app")
 
@@ -95,6 +97,9 @@ page=st.sidebar.radio("Navigation", pages)
 ## END OF SIDEBAR ##
 
 
+
+
+
 ### API HEADER AUTHORIZATION ###
 st.session_state.headers = {
     "accept": "application/json",
@@ -102,9 +107,6 @@ st.session_state.headers = {
     #"Content-Type": "application/x-www-form-urlencoded",
     "Authorization": f"Bearer {st.session_state.access_token}"
     }        
-
-
-
 
 
 ### MAIN UI ###
@@ -146,6 +148,7 @@ if page == pages[0]:
             st.session_state.df_accounts = st.session_state.df_accounts.sort_values(sort_by)
 
         st.table(st.session_state.df_accounts)
+
 
 
     # Get budget table
@@ -392,9 +395,6 @@ if page == pages[2]:
             st.write(response.json())
 
 
-
-
-
 # Settings page
 if page == pages[3]: 
     st.session_state.pop('df_budgets', None)
@@ -420,58 +420,111 @@ if page == pages[3]:
 
 
     col_account, col_budget = st.columns(2)
-    # Create account
+    # Create | Delete account
     with col_account:
-        with st.form(key="create_account_form"):
-            # Add account informations
-            st.subheader("Please fill in the form below to create an account.")
-            st.write("Name is free text")
-            name = st.text_input(label="Account name")
-            account_type = st.selectbox("Choose account type", available_account_types, key="account_type")
-            amount = st.number_input("Amount", format="%.2f", key="amount_account_input")
-            submit_button = st.form_submit_button(label='Create Account')
+        create_delete_choice_account = st.radio("Choose", ["Create Account", "Delete Account"])
+        if create_delete_choice_account == "Create Account":
+            with st.form(key="create_account_form"):
+                # Add account informations
+                st.subheader("Please fill in the form below to create an account.")
+                st.write("Name is free text")
+                name = st.text_input(label="Account name")
+                account_type = st.selectbox("Choose account type", available_account_types, key="account_type")
+                amount = st.number_input("Amount", format="%.2f", key="amount_account_input")
+                submit_button = st.form_submit_button(label='Create Account')
 
-        if submit_button:
-            # Request API
-            access_token = st.session_state.access_token
-            if access_token:
-                url = f"{api_url}/api/{api_version}/create/account?name={name}&type={account_type}&amount={amount}"
-                response = requests.post(url, headers=st.session_state.headers)
-                
-                if response.status_code == 200:
-                    st.success(response.json())
+            if submit_button:
+                # Request API
+                access_token = st.session_state.access_token
+                if access_token:
+                    url = f"{api_url}/api/{api_version}/create/account?name={name}&type={account_type}&amount={amount}"
+                    response = requests.post(url, headers=st.session_state.headers)
+                    
+                    if response.status_code == 200:
+                        st.success(response.json())
+                    else:
+                        st.error("An error occurred.")
+                        st.write(response)
+
                 else:
-                    st.error("An error occurred.")
-                    st.write(response)
+                    st.error("Please Log In to create an account.")
 
-            else:
-                st.error("Please Log In to create an account.")
+        if create_delete_choice_account == "Delete Account":
+            with st.form(key="delete_account_form"):
+                # Add account informations
+                st.subheader("Please fill in the form below to delete an account.")
+                st.write("Name is free text")
+                name = st.text_input(label="Account name")
+                submit_button = st.form_submit_button(label='Delete Account')
 
-    # Create budget
+            if submit_button:
+                # Request API
+                access_token = st.session_state.access_token
+                if access_token:
+                    url = f"{api_url}/api/{api_version}/delete/account?name={name}"
+                    response = requests.delete(url, headers=st.session_state.headers)
+                    if response.status_code == 200:
+                        st.success(response.json())
+                    else:
+                        st.error("An error occurred.")
+                        st.write(response)
+
+                else:
+                    st.error("Please Log In to delete an account.")
+
+
+
+    # Create | Delete budget
     with col_budget:
-        with st.form(key="create_budget_form"):
-            # Add budget informations
-            st.subheader("Please fill in the form below to create a budget.")
-            st.write("Name is free text")
-            name = st.text_input(label="Budget name")
-            budget_month = st.selectbox("Choose month", months, key="budget_month")
-            amount = st.number_input("Amount", format="%.2f", key="amount_budget_input")
-            submit_button = st.form_submit_button(label='Create Budget')
+        create_delete_choice_budget = st.radio("Choose", ["Create Budget", "Delete Budget"])
+        if create_delete_choice_budget == "Create Budget":
+            with st.form(key="create_budget_form"):
+                # Add budget informations
+                st.subheader("Please fill in the form below to create a budget.")
+                st.write("Name is free text")
+                name = st.text_input(label="Budget name")
+                budget_month = st.selectbox("Choose month", months, key="budget_month")
+                amount = st.number_input("Amount", format="%.2f", key="amount_budget_input")
+                submit_button = st.form_submit_button(label='Create Budget')
 
-        if submit_button:
-            # Request API
-            access_token = st.session_state.access_token
-            if access_token:
-                url = f"{api_url}/api/{api_version}/create/budget?name={name}&month={budget_month}&amount={amount}"
-                response = requests.post(url, headers=st.session_state.headers)
-                if response.status_code == 200:
-                    st.success(response.json())
+            if submit_button:
+                # Request API
+                access_token = st.session_state.access_token
+                if access_token:
+                    url = f"{api_url}/api/{api_version}/create/budget?name={name}&month={budget_month}&amount={amount}"
+                    response = requests.post(url, headers=st.session_state.headers)
+                    if response.status_code == 200:
+                        st.success(response.json())
+                    else:
+                        st.error("An error occurred.")
+                        st.write(response)
+
                 else:
-                    st.error("An error occurred.")
-                    st.write(response)
+                    st.error("Please Log In to create an account.")
 
-            else:
-                st.error("Please Log In to create an account.")
+        if create_delete_choice_budget == "Delete Budget":
+            with st.form(key="delete_budget_form"):
+                # Add budget informations
+                st.subheader("Please fill in the form below to delete a budget.")
+                st.write("Name is free text")
+                name = st.text_input(label="Budget name")
+                month = st.selectbox("Choose month", months, key="delete_budget_month")
+                submit_button = st.form_submit_button(label='Delete Budget')
+
+            if submit_button:
+                # Request API
+                access_token = st.session_state.access_token
+                if access_token:
+                    url = f"{api_url}/api/{api_version}/delete/budget?name={name}&month={month}"
+                    response = requests.delete(url, headers=st.session_state.headers)
+                    if response.status_code == 200:
+                        st.success(response.json())
+                    else:
+                        st.error("An error occurred.")
+                        st.write(response)
+
+                else:
+                    st.error("Please Log In to delete a budget.")
 
 
 
