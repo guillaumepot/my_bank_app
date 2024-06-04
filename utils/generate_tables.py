@@ -2,7 +2,7 @@
 Generate table in a PostgreSQL database
 """
 # Version : 0.1.0
-# Current state : Dev
+# Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
@@ -60,7 +60,7 @@ def main(params):
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id UUID PRIMARY KEY,
-            username VARCHAR(255) PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             role INTEGER NOT NULL,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -74,7 +74,7 @@ def main(params):
             name VARCHAR(255) NOT NULL,
             type VARCHAR(255) NOT NULL,
             balance FLOAT CHECK(balance >= 0) NOT NULL,  
-            owner VARCHAR(255) REFERENCES users(username),
+            owner UUID REFERENCES users(id),
             history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -100,12 +100,12 @@ def main(params):
     cur.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
             id UUID PRIMARY KEY,
-            date DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             type VARCHAR(255) CHECK(type IN ('debit', 'credit', 'transfert')) NOT NULL,
             amount FLOAT CHECK(amount >= 0) NOT NULL,
             origin_account VARCHAR(255),
             destination_account VARCHAR(255),
-            budget UUID,
+            budget UUID REFERENCES budgets(id),
             category VARCHAR(255),
             description TEXT,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
