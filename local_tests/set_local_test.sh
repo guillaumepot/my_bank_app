@@ -5,6 +5,10 @@
 # This will launch all the containers and services needed to run the test.
 
 
+### Step 0 - Add Docker network & Use conda env ###
+docker network create bank_app_network
+conda activate bank-app
+
 ### Step 1 - Start Postgres ###
 
 # Start container
@@ -16,7 +20,7 @@ cd ../../utils
 python3 generate_tables.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
 
 # Generate test user credentials
-python2 generate_user_credentials.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
+python3 generate_user_credentials.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
 
 
 

@@ -7,7 +7,7 @@
 services:
   # API Container
   container_api:
-    image: personal_bank_app_api:v0.2.0
+    image: personal_bank_app_api:latest
     container_name: bank_app_api
     env_file:
       - api.env
