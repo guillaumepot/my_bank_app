@@ -1,0 +1,21 @@
+@app.post(f"/api/{api_version}/login", name="login", tags=['auth'])
+
+
+@app.get(f"/api/{api_version}/status", name="status", tags=['home'])
+
+
+@app.post(f"/api/{api_version}/create/account", name="create_account", tags=['account'])
+@app.delete(f"/api/{api_version}/delete/account", name="delete_account", tags=['account'])
+@app.get(f"/api/{api_version}/table/account", name="load_account_table", tags=['account'])
+@app.get(f"/api/{api_version}/get/account", name="get_available_accounts", tags=['account'])
+@app.get(f"/api/{api_version}/available/account_types", name="get_available_account_types", tags=['account'])
+
+
+@app.post(f"/api/{api_version}/create/budget", name="create_budget", tags=['budget'])
+@app.delete(f"/api/{api_version}/delete/budget", name="delete_budget", tags=['budget'])
+@app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['budget'])
+@app.get(f"/api/{api_version}/get/budget", name="get_available_budgets", tags=['budget'])
+
+@app.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['transaction'])
+@app.get(f"/api/{api_version}/available/transaction_types", name="get_available_transaction_types", tags=['transaction'])
+@app.get(f"/api/{api_version}/table/transaction", name="load_transaction_table", tags=['transaction'])

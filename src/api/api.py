@@ -251,7 +251,15 @@ def app_create_account(name: str,
 @app.delete(f"/api/{api_version}/delete/account", name="delete_account", tags=['account'])
 def app_delete_account(name: str, current_user: str = Depends(get_current_user)) -> dict:
     """
-    
+    Deletes a bank account with the specified name.
+
+    Args:
+        name (str): The name of the account to be deleted.
+        current_user (str, optional): The current user. Defaults to Depends(get_current_user).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
     """
     with engine.connect() as conn:
         cursor = conn.cursor()
@@ -263,8 +271,6 @@ def app_delete_account(name: str, current_user: str = Depends(get_current_user))
         conn.commit()
 
     return {"message": f"Account {name} deleted successfully."}
-
-
 
 
 # Load Account Table
@@ -285,7 +291,6 @@ def app_load_account_table(current_user: str = Depends(get_current_user)) -> dic
         accounts_table_json = accounts_table.to_json()
 
     return accounts_table_json
-
 
 
 # Get available accounts
@@ -323,6 +328,8 @@ def app_get_available_account_types(current_user:str = Depends(get_current_user)
 
     """
     return {'available account types': available_account_types}
+
+
 
 
 
@@ -372,8 +379,6 @@ def app_create_budget(name: str,
     return {"message": f"Budget {name} created successfully. Month: {month}, Amount: {amount}"}
 
 
-
-
 # Delete Budget
 @app.delete(f"/api/{api_version}/delete/budget", name="delete_budget", tags=['budget'])
 def app_delete_budget(name: str, month: str, current_user: str = Depends(get_current_user)) -> dict:
@@ -400,7 +405,6 @@ def app_delete_budget(name: str, month: str, current_user: str = Depends(get_cur
     return {"message": f"Budget {name} deleted successfully."}
 
 
-
 # Load Budget Table
 @app.get(f"/api/{api_version}/table/budget", name="load_budget_table", tags=['budget'])
 def app_load_budget_table(current_user: str = Depends(get_current_user)) -> dict:
@@ -419,7 +423,6 @@ def app_load_budget_table(current_user: str = Depends(get_current_user)) -> dict
         budgets_table_json = budgets_table.to_json()
 
     return budgets_table_json
-
 
 
 # Get available budgets
@@ -446,6 +449,8 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
         available_budgets = budgets['name'].values
 
     return {"available budgets": available_budgets}
+
+
 
 
 
@@ -566,10 +571,6 @@ def app_create_transaction(date:str,
 
 
     return {"message": "Transaction created & applied successfully."}
-
-
-
-
 
 
 # Get available transaction types

@@ -6,7 +6,7 @@
 services:
   # API Container
   container_streamlit:
-    image: personal_bank_app_streamlit:latest
+    image: personal_bank_app_streamlit:v0.2.0
     container_name: bank_app_streamlit
     environment:
       - API_VERSION="0.2.0"
