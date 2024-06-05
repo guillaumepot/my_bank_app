@@ -228,11 +228,11 @@ def app_create_account(name: str,
         account_names = pd.DataFrame(result.fetchall())
 
 
-        if name in account_names['name'].values:
+        if name in account_names.get('name', {}).values():
             raise HTTPException(status_code=400, detail="Account already exists")
         else:
-            # Generate an id for the account
-            id = uuid.uuid4()
+            # Generate an id for the account          
+            account_id = uuid.uuid4()
             result = conn.execute("SELECT id FROM users WHERE username = :username", {"username": current_user})
             owner = pd.DataFrame(result.fetchall(), columns=['id'])['id'].values[0]
             history = {}
@@ -241,7 +241,7 @@ def app_create_account(name: str,
             cursor.execute("""
                 INSERT INTO accounts (id, name, type, balance, owner, history)
                 VALUES (%s, %s, %s, %s, %s, %s)
-            """, (id, name, type, balance, owner, history))
+            """, (account_id, name, type, balance, owner, history))
 
             conn.commit()
 
@@ -320,9 +320,13 @@ def app_get_available_accounts(current_user: str = Depends(get_current_user)) ->
         
         result = conn.execute("SELECT name FROM accounts")
         accounts = pd.DataFrame(result.fetchall())
-        available_accounts = accounts['name'].values
 
-    return {'available accounts': available_accounts}
+        if accounts.empty:
+            return {"message": "No accounts found."}
+        
+        else:
+            available_accounts = accounts['name'].values
+            return {'available accounts': available_accounts}
 
 
 # Get available account types
