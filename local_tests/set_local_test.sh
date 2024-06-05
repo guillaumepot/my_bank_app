@@ -4,6 +4,9 @@
 # This script is used to set a local test.
 # This will launch all the containers and services needed to run the test.
 
+# You should have a python env with the required packages installed. (See requirements.txt)
+
+
 
 ### Step 0 - Add Docker network & Use conda env ###
 docker network create bank_app_network

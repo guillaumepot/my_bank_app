@@ -6,7 +6,7 @@ API - MAIN
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 api_version = "0.2.0"
-current_state = "Prod"
+current_state = "Dev"
 
 
 """
@@ -32,7 +32,6 @@ VARS
 crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
 pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
 
-user_file_path = os.getenv("USER_FILE_PATH")
 authorized_users = os.getenv("AUTHORIZED_USERS").split(',')
 
 access_token_expiration = int(os.getenv("ACCESS_TOKEN_EXPIRATION"))
@@ -155,9 +154,9 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
     # Load existing user datas from user_database
     with engine.connect() as conn:
-
-        user_credentials = pd.read_sql("SELECT username, password FROM users", conn)
-
+        result = conn.execute("SELECT username, password FROM users")
+        user_credentials = pd.DataFrame(result.fetchall(), columns=['username', 'password'])
+        
     username = credentials.username
     password = credentials.password
 
@@ -225,13 +224,17 @@ def app_create_account(name: str,
     with engine.connect() as conn:
 
         # Check if the account name already exists
-        account_names = pd.read_sql("SELECT name FROM accounts", conn)
+        result = conn.execute("SELECT name FROM accounts")
+        account_names = pd.DataFrame(result.fetchall())
+
+
         if name in account_names['name'].values:
             raise HTTPException(status_code=400, detail="Account already exists")
         else:
             # Generate an id for the account
             id = uuid.uuid4()
-            owner = pd.read_sql("SELECT id FROM users WHERE username = :username", conn, params={"username": current_user})['id'].values[0]
+            result = conn.execute("SELECT id FROM users WHERE username = :username", {"username": current_user})
+            owner = pd.DataFrame(result.fetchall(), columns=['id'])['id'].values[0]
             history = {}
 
             cursor = conn.cursor()
@@ -287,10 +290,16 @@ def app_load_account_table(current_user: str = Depends(get_current_user)) -> dic
 
     """
     with engine.connect() as conn:
-        accounts_table = pd.read_sql("SELECT * FROM accounts", conn)
-        accounts_table_json = accounts_table.to_json()
+        result = conn.execute("SELECT * FROM accounts")
+        accounts_table = pd.DataFrame(result.fetchall())
 
-    return accounts_table_json
+        if accounts_table.empty:
+            return {"message": "No accounts found."}
+
+        else:
+            accounts_table_json = accounts_table.to_json()
+            return accounts_table_json
+
 
 
 # Get available accounts
@@ -308,7 +317,9 @@ def app_get_available_accounts(current_user: str = Depends(get_current_user)) ->
     available_accounts = []
 
     with engine.connect() as conn:
-        accounts = pd.read_sql("SELECT name FROM accounts", conn)
+        
+        result = conn.execute("SELECT name FROM accounts")
+        accounts = pd.DataFrame(result.fetchall())
         available_accounts = accounts['name'].values
 
     return {'available accounts': available_accounts}
@@ -360,7 +371,9 @@ def app_create_budget(name: str,
     """
     with engine.connect() as conn:
         # Check if the budget name already exists for the current month
-        budget_names = pd.read_sql("SELECT name FROM budgets WHERE month = :month", conn, params={"month": month})
+        result = conn.execute("SELECT name FROM budgets WHERE month = :month", {"month": month})
+        budget_names = pd.DataFrame(result.fetchall(), columns=['name'])
+
         if name in budget_names['name'].values:
             raise HTTPException(status_code=400, detail="Budget already exists for this month")
         else:
@@ -419,7 +432,9 @@ def app_load_budget_table(current_user: str = Depends(get_current_user)) -> dict
 
     """
     with engine.connect() as conn:
-        budgets_table = pd.read_sql("SELECT * FROM budgets", conn)
+
+        result = conn.execute("SELECT * FROM budgets")
+        budgets_table = pd.DataFrame(result.fetchall())
         budgets_table_json = budgets_table.to_json()
 
     return budgets_table_json
@@ -445,7 +460,8 @@ def app_get_available_budgets(current_user: str = Depends(get_current_user)):
     available_budgets = []
 
     with engine.connect() as conn:
-        budgets = pd.read_sql("SELECT name FROM budgets", conn)
+        result = conn.execute("SELECT name FROM budgets")
+        budgets = pd.DataFrame(result.fetchall())
         available_budgets = budgets['name'].values
 
     return {"available budgets": available_budgets}
@@ -511,7 +527,9 @@ def app_create_transaction(date:str,
         if budget == None:
             budget_id = 0
             budget_month = "N/A"
-        budget_id = pd.read_sql("SELECT id FROM budgets WHERE name = :budget AND month = :month", conn, params={"budget": budget, "month": budget_month})['id'].values[0]
+
+        result = conn.execute("SELECT id FROM users WHERE username = :username", {"username": current_user})
+        budget_id = pd.DataFrame(result.fetchall(), columns=['id'])['id'].values[0]
 
 
         cursor = conn.cursor()
@@ -609,7 +627,8 @@ def app_load_transaction_table(current_user: str = Depends(get_current_user)):
     '{"transaction_id": [1, 2, 3], "amount": [100, 200, 300], ...}'
     """
     with engine.connect() as conn:
-        transactions_table = pd.read_sql("SELECT * FROM transactions", conn)
+        result = conn.execute("SELECT * FROM transactions")
+        transactions_table = pd.DataFrame(result.fetchall())
         transactions_table_json = transactions_table.to_json()
 
     return transactions_table_json
