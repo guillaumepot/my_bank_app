@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Copy files
 COPY ./requirements.txt /app
-COPY ./api.py /app
+COPY ./main.py /app
 COPY ./generate_secret_key.py /app
 COPY ./generate_secret_key.sh /app
 
