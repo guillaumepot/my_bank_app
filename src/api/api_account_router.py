@@ -122,12 +122,8 @@ def app_create_account(account_name: str,
     results = query_for_informations(request_to_do='get_username_informations', additional=current_user)
     current_user_id = results[0][0]
 
-    # Generate empty history
-    history = json.dumps({})
-
-
     # Insert new account into accounts table
-    account_informations = (account_id, account_name, account_type, account_balance, current_user_id, history)
+    account_informations = (account_id, account_name, account_type, account_balance, current_user_id)
     query_insert_values(request_to_do='create_new_account', additional=account_informations)
 
 

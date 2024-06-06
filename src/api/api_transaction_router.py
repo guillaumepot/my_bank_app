@@ -63,7 +63,7 @@ def app_create_transaction(transaction_date: str,
                            transaction_amount: float,
                             origin_account: str = None,
                             destination_account: str = None,
-                            budget: str = None,
+                            budget_name: str = None,
                             budget_month: str = None,
                             category: str = "",
                             description: str = "",
@@ -92,12 +92,12 @@ def app_create_transaction(transaction_date: str,
     # If budget None, convert to default budget ID, else get budget ID
     results = query_for_informations(request_to_do='get_existing_budgets', additional=None)
 
-    if budget == None:
+    if budget_name == None:
         budget_id = str([budget[0] for budget in results if budget[1] == 'default'][0])
         default_budget = True
 
     else:
-        budget_id = str([budget[0] for budget in results if budget[1] == budget][0])
+        budget_id = str([budget[0] for budget in results if budget[1] == budget_name][0])
         default_budget = False
 
 
@@ -113,13 +113,13 @@ def app_create_transaction(transaction_date: str,
 
 
     # Apply the transaction to the account
-    values_to_apply = (transaction_type, transaction_amount, transaction_id, origin_account, destination_account)   
+    values_to_apply = (transaction_type, transaction_amount, origin_account, destination_account)   
     query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
 
     # Apply the transaction to the budget
     if default_budget == False:
-        values_to_apply = (transaction_amount, transaction_id, budget_id)
+        values_to_apply = (transaction_amount, budget_id)
         query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
 
 

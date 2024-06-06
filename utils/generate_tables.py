@@ -75,7 +75,6 @@ def main(params):
             type VARCHAR(255) NOT NULL,
             balance FLOAT CHECK(balance >= 0) NOT NULL,  
             owner UUID REFERENCES users(id),
-            history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
@@ -91,7 +90,6 @@ def main(params):
             name VARCHAR(255) NOT NULL,
             month VARCHAR(255) NOT NULL,
             amount FLOAT NOT NULL,
-            history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
@@ -102,12 +100,11 @@ def main(params):
     default_budget_name = "default"
     default_budget_month = "N/A"
     default_budget_amount = 0
-    default_budget_history = {}
     cur.execute("""
         INSERT INTO budgets (id, name, month, amount, history)
-        VALUES (%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT DO NOTHING
-    """, (default_budget_id, default_budget_name, default_budget_month, default_budget_amount, json.dumps(default_budget_history)))
+    """, (default_budget_id, default_budget_name, default_budget_month, default_budget_amount))
 
 
 
@@ -123,9 +120,8 @@ def main(params):
             budget UUID REFERENCES budgets(id),
             category VARCHAR(255),
             description TEXT,
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
     """)
 
     # Validate Changes

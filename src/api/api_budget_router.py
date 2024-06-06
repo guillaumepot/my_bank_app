@@ -98,12 +98,8 @@ def app_create_budget(budget_name: str,
     # Generate unique ID for budget
     budget_id = generate_uuid()
 
-    # Generate empty history
-    history = json.dumps({})
-
-
     # Insert new budget into budget table
-    budget_informations = (budget_id, budget_name, budget_month, budget_amount, history)
+    budget_informations = (budget_id, budget_name, budget_month, budget_amount)
     query_insert_values(request_to_do='create_new_budget', additional=budget_informations)
 
     return {"message": f"Budget {budget_name} created successfully." \

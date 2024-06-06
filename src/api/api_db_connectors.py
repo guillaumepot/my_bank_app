@@ -140,7 +140,7 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
     if request_to_do == 'apply_transaction_to_budget':
         query = """
         UPDATE budgets 
-        SET amount = amount - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true) 
+        SET amount = amount - %s
         WHERE id = %s
         """
     if request_to_do == 'apply_transaction_to_accounts':
@@ -152,39 +152,39 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
 
         if type == 'credit':
             # Remove origin account from additional and convert back to tuple
+            additional_list.pop(1)
+            additional = tuple(additional_list)
+            query = """
+            UPDATE accounts
+            SET balance = balance + %s
+            WHERE name = %s
+            """
+        if type == 'debit':
+            # Remove destination account from additional and convert back to tuple
             additional_list.pop(2)
             additional = tuple(additional_list)
             query = """
             UPDATE accounts
-            SET balance = balance + %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
-            WHERE id = %s
-            """
-        if type == 'debit':
-            # Remove destination account from additional and convert back to tuple
-            additional_list.pop(3)
-            additional = tuple(additional_list)
-            query = """
-            UPDATE accounts
-            SET balance = balance - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
-            WHERE id = %s
+            SET balance = balance - %s
+            WHERE name = %s
             """
         if type == 'transfert':
             # Extract values from additional
-            transaction_amount, transaction_id, origin_account, destination_account = additional
+            transaction_amount, origin_account, destination_account = additional
 
             # Query to decrease balance of origin account and add transaction id to history
             query1 = """
             UPDATE accounts
-            SET balance = balance - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
-            WHERE id = %s
-            """ % (transaction_amount, transaction_id, origin_account)
+            SET balance = balance - %s
+            WHERE name = %s
+            """ % (transaction_amount, origin_account)
 
             # Query to increase balance of destination account and add transaction id to history
             query2 = """
             UPDATE accounts
-            SET balance = balance + %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
-            WHERE id = %s
-            """ % (transaction_amount, transaction_id, destination_account)
+            SET balance = balance + %s
+            WHERE name = %s
+            """ % (transaction_amount, destination_account)
 
             # Combine queries
             query = query1 + query2
