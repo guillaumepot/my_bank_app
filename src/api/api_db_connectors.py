@@ -126,12 +126,12 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
 
     # initialize query
     if request_to_do == 'create_new_account':
-        query = 'INSERT INTO accounts (id, name, type, balance, owner, history) VALUES (%s, %s, %s, %s, %s, %s)'
+        query = 'INSERT INTO accounts (id, name, type, balance, owner) VALUES (%s, %s, %s, %s, %s)'
     if request_to_do == 'delete_account':
         query = 'DELETE FROM accounts WHERE id=%s'
 
     if request_to_do == 'create_new_budget':
-        query = 'INSERT INTO budgets (id, name, month, amount, history) VALUES (%s, %s, %s, %s, %s)'
+        query = 'INSERT INTO budgets (id, name, month, amount) VALUES (%s, %s, %s, %s)'
     if request_to_do == 'delete_budget':
         query = 'DELETE FROM budgets WHERE id=%s'
 
@@ -170,24 +170,18 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
             """
         if type == 'transfert':
             # Extract values from additional
-            transaction_amount, origin_account, destination_account = additional
-
-            # Query to decrease balance of origin account and add transaction id to history
-            query1 = """
+            transaction_amount, origin_account, destination_account = additional_list
+            additional = (origin_account, transaction_amount, destination_account, transaction_amount, origin_account, destination_account)
+            query = """
             UPDATE accounts
-            SET balance = balance - %s
-            WHERE name = %s
-            """ % (transaction_amount, origin_account)
+            SET balance = CASE 
+                WHEN name = %s THEN balance - %s
+                WHEN name = %s THEN balance + %s
+                ELSE balance
+            END
+            WHERE name IN (%s, %s)
+            """ 
 
-            # Query to increase balance of destination account and add transaction id to history
-            query2 = """
-            UPDATE accounts
-            SET balance = balance + %s
-            WHERE name = %s
-            """ % (transaction_amount, destination_account)
-
-            # Combine queries
-            query = query1 + query2
 
     # Get engine
     engine = connect_to_db()

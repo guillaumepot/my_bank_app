@@ -82,7 +82,6 @@ def main(params):
 
 
 
-
     # Budget table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS budgets (
@@ -101,7 +100,7 @@ def main(params):
     default_budget_month = "N/A"
     default_budget_amount = 0
     cur.execute("""
-        INSERT INTO budgets (id, name, month, amount, history)
+        INSERT INTO budgets (id, name, month, amount)
         VALUES (%s, %s, %s, %s)
         ON CONFLICT DO NOTHING
     """, (default_budget_id, default_budget_name, default_budget_month, default_budget_amount))
