@@ -89,3 +89,6 @@ app.include_router(auth_router, tags=["auth"])
 
 from api_account_router import account_router
 app.include_router(account_router, tags=["account"])
+
+from api_budget_router import budget_router
+app.include_router(budget_router, tags=["budget"])

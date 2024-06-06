@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 
 
-from api_db_connectors import query_pg_db
+from api_db_connectors import query_for_informations
 
 
 """
@@ -71,13 +71,13 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
 
     # Load existing user datas from table
-    result = query_pg_db(request_to_do='get_username_informations', additional = credentials.username)
+    results = query_for_informations(request_to_do='get_username_informations', additional = credentials.username)
 
 
     # CREDENTIALS CONTROL
 
     # Check if the username exists
-    if credentials.username not in result['username']:
+    if credentials.username not in results[0][1]:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
     # The username should be in "authorized users" value var
@@ -85,7 +85,7 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="User not authorized")
 
     # The password should be correct
-    if not pwd_context.verify(credentials.password, result['password']):
+    if not pwd_context.verify(credentials.password, results[0][2]):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
 
