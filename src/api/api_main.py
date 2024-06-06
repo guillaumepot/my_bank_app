@@ -10,22 +10,15 @@ API - MAIN
 """
 LIB
 """
-import os
-import jwt
-import uuid
-import pandas as pd
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from sqlalchemy import create_engine
+from fastapi import FastAPI
 
 
 """
 VARS
 """
 
-######################################################################################
+
+
 """
 API declaration
 """
@@ -91,3 +84,8 @@ async def get_status() -> dict:
 """
 ROUTERS
 """
+from api_auth_router import auth_router
+app.include_router(auth_router, tags=["auth"])
+
+from api_account_router import account_router
+app.include_router(account_router, tags=["account"])
