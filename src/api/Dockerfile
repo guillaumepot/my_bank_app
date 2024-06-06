@@ -17,6 +17,7 @@ COPY ./api_db_connectors.py /app
 COPY ./api_auth_router.py /app
 COPY ./api_account_router.py /app
 COPY ./api_budget_router.py /app
+COPY ./api_transaction_router.py /app
 
 
 COPY ./generate_secret_key.py /app

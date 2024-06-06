@@ -92,3 +92,6 @@ app.include_router(account_router, tags=["account"])
 
 from api_budget_router import budget_router
 app.include_router(budget_router, tags=["budget"])
+
+from api_transaction_router import transaction_router
+app.include_router(transaction_router, tags=["transaction"])

@@ -90,7 +90,7 @@ def main(params):
             id UUID PRIMARY KEY NOT NULL,
             name VARCHAR(255) NOT NULL,
             month VARCHAR(255) NOT NULL,
-            amount FLOAT CHECK(amount >= 0) NOT NULL,
+            amount FLOAT NOT NULL,
             history JSONB,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

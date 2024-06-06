@@ -87,6 +87,9 @@ def query_for_informations(request_to_do:str=None, additional=None) -> dict:
     if request_to_do == 'get_existing_budgets':
         query = 'SELECT * FROM budgets'
 
+    if request_to_do == 'get_existing_transactions':
+        query = 'SELECT * FROM transactions'
+
 
 
     # Get engine
@@ -126,11 +129,65 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
         query = 'INSERT INTO accounts (id, name, type, balance, owner, history) VALUES (%s, %s, %s, %s, %s, %s)'
     if request_to_do == 'delete_account':
         query = 'DELETE FROM accounts WHERE id=%s'
+
     if request_to_do == 'create_new_budget':
         query = 'INSERT INTO budgets (id, name, month, amount, history) VALUES (%s, %s, %s, %s, %s)'
     if request_to_do == 'delete_budget':
         query = 'DELETE FROM budgets WHERE id=%s'
 
+    if request_to_do == 'create_new_transaction':
+        query = 'INSERT INTO transactions (id, date, type, amount, origin_account, destination_account, budget, category, description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    if request_to_do == 'apply_transaction_to_budget':
+        query = """
+        UPDATE budgets 
+        SET amount = amount - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true) 
+        WHERE id = %s
+        """
+    if request_to_do == 'apply_transaction_to_accounts':
+        # tuple to list
+        additional_list = list(additional)
+        # transaction type & remove it from additional
+        type = additional[0]
+        additional_list.pop(0)
+
+        if type == 'credit':
+            # Remove origin account from additional and convert back to tuple
+            additional_list.pop(2)
+            additional = tuple(additional_list)
+            query = """
+            UPDATE accounts
+            SET balance = balance + %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
+            WHERE id = %s
+            """
+        if type == 'debit':
+            # Remove destination account from additional and convert back to tuple
+            additional_list.pop(3)
+            additional = tuple(additional_list)
+            query = """
+            UPDATE accounts
+            SET balance = balance - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
+            WHERE id = %s
+            """
+        if type == 'transfert':
+            # Extract values from additional
+            transaction_amount, transaction_id, origin_account, destination_account = additional
+
+            # Query to decrease balance of origin account and add transaction id to history
+            query1 = """
+            UPDATE accounts
+            SET balance = balance - %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
+            WHERE id = %s
+            """ % (transaction_amount, transaction_id, origin_account)
+
+            # Query to increase balance of destination account and add transaction id to history
+            query2 = """
+            UPDATE accounts
+            SET balance = balance + %s, history = jsonb_insert(history, '{transaction_ids}', to_jsonb(%s::text), true)
+            WHERE id = %s
+            """ % (transaction_amount, transaction_id, destination_account)
+
+            # Combine queries
+            query = query1 + query2
 
     # Get engine
     engine = connect_to_db()
@@ -149,4 +206,3 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
 
         except psycopg2.OperationalError as e:
             print(f"Could not connect to the database. Error: {e}")
-
