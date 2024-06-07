@@ -5,7 +5,6 @@ API - ACCOUNT ROUTER
 """
 LIB
 """
-import json
 from fastapi import APIRouter, Depends, HTTPException
 
 from api_db_connectors import query_for_informations, query_insert_values

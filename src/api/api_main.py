@@ -2,7 +2,7 @@
 API - MAIN
 """
 # Version : 0.2.0
-# Current state : Dev
+# Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
@@ -16,7 +16,7 @@ from fastapi import FastAPI
 """
 VARS
 """
-
+# N/C
 
 
 """

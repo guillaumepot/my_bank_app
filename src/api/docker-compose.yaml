@@ -1,5 +1,5 @@
 # Version : 0.2.0
-# Current state : Dev
+# Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
@@ -12,7 +12,7 @@ services:
     env_file:
       - api.env
     ports:
-      - "8000:8000" # If you change api.env PORT, change it here too like <new_port>:8001
+      - "8000:8000"
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]

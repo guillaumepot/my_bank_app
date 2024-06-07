@@ -2,8 +2,6 @@
 API - AUTH ROUTER
 """
 
-
-
 """
 LIB
 """
@@ -11,7 +9,6 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
-
 
 
 from api_db_connectors import query_for_informations

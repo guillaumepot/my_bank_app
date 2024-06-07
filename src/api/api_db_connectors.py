@@ -1,22 +1,3 @@
-#####
-# TEMPORARY VARIABLES
-#####
-#
-#
-#
-postgres_host="localhost"
-postgres_port=5432
-postgres_user="root"
-postgres_password= "root"
-postgres_db = 'bank_db'
-#
-#
-#
-#####
-# END OF TEMPORARY VARIABLES
-#####
-
-
 """
 PostGres Database connectors for the API
 """
@@ -34,14 +15,12 @@ from psycopg2.extras import DictCursor
 VARS
 """
 
-# REMOVE COMMENT WHEN TEMP VARS ARE REMOVED
-"""
-postgres_host = os.getenv('POSTGRES_HOST')
-postgres_port = os.getenv('POSTGRES_PORT')
-postgres_user = os.getenv('POSTGRES_USER')
-postgres_password = os.getenv('POSTGRES_PASSWORD')
-postgres_db = os.getenv('POSTGRES_DB')
-"""
+
+postgres_host = os.getenv('POSTGRES_HOST', 'localhost')
+postgres_port = os.getenv('POSTGRES_PORT', 5432)
+postgres_user = os.getenv('POSTGRES_USER', 'root')
+postgres_password = os.getenv('POSTGRES_PASSWORD', 'root')
+postgres_db = os.getenv('POSTGRES_DB', 'bank_db')
 
 
 """
@@ -64,16 +43,39 @@ def connect_to_db() -> psycopg2.extensions.connection:
 
 
 def transform_additional(additional):
+    """
+    Transforms the additional parameter into a tuple if it is a string.
+
+    Args:
+        additional (str or tuple): The additional parameter to be transformed.
+
+    Returns:
+        tuple: The transformed additional parameter.
+
+    """
     if isinstance(additional, str):
         return (additional,)
     else:
         return additional
 
 
-
-def query_for_informations(request_to_do:str=None, additional=None) -> dict:
+def query_for_informations(request_to_do: str = None, additional=None) -> dict:
     """
-    
+    Execute a database query based on the given request and additional parameters.
+
+    Args:
+        request_to_do (str): The type of request to execute. Possible values are:
+            - 'get_username_informations': Retrieve user information based on the username.
+            - 'get_existing_accounts': Retrieve all existing accounts.
+            - 'get_existing_budgets': Retrieve all existing budgets.
+            - 'get_existing_transactions': Retrieve all existing transactions.
+        additional: Additional parameters to be used in the query.
+
+    Returns:
+        dict: A dictionary containing the results of the query.
+
+    Raises:
+        psycopg2.OperationalError: If there is an error executing the query or connecting to the database.
     """
     additional = transform_additional(additional)
 
@@ -90,11 +92,8 @@ def query_for_informations(request_to_do:str=None, additional=None) -> dict:
     if request_to_do == 'get_existing_transactions':
         query = 'SELECT * FROM transactions'
 
-
-
     # Get engine
     engine = connect_to_db()
-
 
     # Apply Query
     with engine as conn:
@@ -104,10 +103,9 @@ def query_for_informations(request_to_do:str=None, additional=None) -> dict:
                     cur.execute(query, additional)
                     results = cur.fetchall()
                     print(f'results: {results}')
-                    if results == None:
+                    if results is None:
                         return {}
                     return results
-
 
                 except psycopg2.OperationalError as e:
                     print(f"Could not execute the query. Error: {e}")
@@ -116,11 +114,27 @@ def query_for_informations(request_to_do:str=None, additional=None) -> dict:
             print(f"Could not connect to the database. Error: {e}")
 
 
-
-
 def query_insert_values(request_to_do:str=None, additional=None) -> None:
     """
-    
+    Executes an SQL query to insert values into the database based on the given request.
+
+    Args:
+        request_to_do (str): The type of request to perform. Possible values are:
+            - 'create_new_account': Inserts a new account into the 'accounts' table.
+            - 'delete_account': Deletes an account from the 'accounts' table.
+            - 'create_new_budget': Inserts a new budget into the 'budgets' table.
+            - 'delete_budget': Deletes a budget from the 'budgets' table.
+            - 'create_new_transaction': Inserts a new transaction into the 'transactions' table.
+            - 'apply_transaction_to_budget': Updates the 'amount' field of a budget in the 'budgets' table.
+            - 'apply_transaction_to_accounts': Updates the 'balance' field of one or two accounts in the 'accounts' table.
+
+        additional (tuple): Additional parameters required for the query. The contents of the tuple depend on the request type.
+
+    Returns:
+        None: This function does not return any value.
+
+    Raises:
+        psycopg2.OperationalError: If there is an error executing the query or connecting to the database.
     """
     additional = transform_additional(additional)
 
@@ -143,6 +157,9 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
         SET amount = amount - %s
         WHERE id = %s
         """
+    if request_to_do == 'delete_transaction':
+        query = 'DELETE FROM transactions WHERE id=%s'
+
     if request_to_do == 'apply_transaction_to_accounts':
         # tuple to list
         additional_list = list(additional)

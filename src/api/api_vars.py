@@ -1,22 +1,3 @@
-#####
-# TEMPORARY VARIABLES
-#####
-#
-#
-#
-algorithm="HS256"
-access_token_expiration = 60
-crypt_context_scheme="argon2"
-authorized_users ="root"
-jwt_secret_key="root"
-authorized_users="root"
-#
-#
-#
-#####
-# END OF TEMPORARY VARIABLES
-#####
-
 """
 API - CONFIG VARS
 """
@@ -48,14 +29,14 @@ def generate_uuid():
 
 
 # Auth
-#crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
+crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
 pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
 
-#authorized_users = os.getenv("AUTHORIZED_USERS").split(',')
+access_token_expiration = int(os.getenv("ACCESS_TOKEN_EXPIRATION"))
+algorithm = os.getenv("ALGORITHM")
+jwt_secret_key = os.getenv("BANK_APP_API_TOKEN_SECRET_KEY")
 
-#access_token_expiration = int(os.getenv("ACCESS_TOKEN_EXPIRATION"))
-#algorithm = os.getenv("ALGORITHM")
-#jwt_secret_key = os.getenv("BANK_APP_API_TOKEN_SECRET_KEY")
+authorized_users = os.getenv("AUTHORIZED_USERS").split(',')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
 
