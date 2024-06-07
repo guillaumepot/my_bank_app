@@ -1,8 +1,8 @@
 """
-### STREAMLIT APP ###
+### STREAMLIT APP - Main file ###
 """
 # Version : 0.2.0
-# Current state : Dev
+# Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
@@ -15,22 +15,13 @@ import streamlit as st
 
 
 # VARS
-api_version = os.getenv("API_VERSION", "0.2.0")
-api_url = os.getenv("API_URL", "http://localhost:8000")
-
-
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 login_data = {}
 
 
-
-# Initialize session state
-if 'access_token' not in st.session_state:
-    st.session_state.access_token = None
-if "name" not in st.session_state:
-    st.session_state.name = ""
-if "amount" not in st.session_state:
-    st.session_state.amount = 0.0
+# API VARS
+api_version = os.getenv("API_VERSION", "0.2.0")
+api_url = os.getenv("API_URL", "http://localhost:8000")
 
 # API STATUS CHECKING
 url = f"{api_url}/api/{api_version}/status"
@@ -40,12 +31,23 @@ if response.status_code != 200:
     st.stop()
 
 
+# Initialize session state
+if 'access_token' not in st.session_state:
+    st.session_state.access_token = None
+if 'selected_account' not in st.session_state:
+    st.session_state['selected_account'] = {
+        'id': None,
+        'name': None,
+        'type': None,
+        'balance': None
+    }
 
 
-
-##### UI #####
 
 ### SIDEBAR ###
+
+# Navigation
+st.sidebar.title("Personal bank app")
 
 # Authentication panel
 st.sidebar.title("Authentication")
@@ -71,33 +73,27 @@ if st.session_state.access_token == None:
                 st.sidebar.success("Logged In Successfully!")
                 login_placeholder.empty()
                 st.session_state.access_token = access_token
+                st.sidebar.empty()
+
             else:
                 st.sidebar.error("Incorrect Username or Password.")
   
 else:
 # Logout button
     st.sidebar.empty()
-    if st.sidebar.button("Log Out"):
+    if st.sidebar.button("Log Out", key="sidebar_logout_button"):
         st.session_state.pop('access_token', None)
-    st.sidebar.empty()
+        st.rerun()
 
 
-
-# Navigation
-st.sidebar.title("Personal bank app")
-
-# Pages
+# Pages (Displayed only if logged in)
 if st.session_state.access_token == None:
     st.error("Please Log In to access the app.")
     st.stop()
-pages=["Overview", "Zoom-in", "Transactions", "Settings"]
+pages=["Overview", "Zoom-in", "Transactions", "Analytics", "Settings"]
 page=st.sidebar.radio("Navigation", pages)
 
-
 ## END OF SIDEBAR ##
-
-
-
 
 
 ### API HEADER AUTHORIZATION ###
@@ -109,306 +105,165 @@ st.session_state.headers = {
     }        
 
 
-### MAIN UI ###
-# Overview page
+
+### PAGES ###
+
+# Overview
 if page == pages[0]:
     st.title("Overview")
-   
+
+
     # Get account table
     url = f"{api_url}/api/{api_version}/table/account"
-    response = requests.get(url, headers=st.session_state.headers)
-    if response.status_code != 200:
-        st.error("Error while requesting API.")
-        response.status_code
-        st.stop()
-    else:
-        if response.json() == []:
-            st.warning("No data available.")
-            st.stop()
-        df = pd.DataFrame(response.json())
-        df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
-        df.drop(columns=["id", "history"], inplace=True)
-        # Save df to session state
-        st.session_state.df_accounts = df
+    account_table = requests.get(url, headers=st.session_state.headers)
+    account_table = dict(account_table.json())
+    account_table = account_table['account table']
+    # Generate DF
+    df_accounts = pd.DataFrame(account_table, columns=["id", "name", "type", "balance", "owner_id", "created_at", "updated_at"])
+    df_accounts["balance"] = df_accounts["balance"].apply(lambda x: f"{x:.2f} €")
+    df_accounts.drop(columns=["id", "owner_id"], inplace=True)
+    df_accounts["created_at"] = df_accounts["created_at"].str.split("T").str[0]
+    df_accounts["updated_at"] = df_accounts["updated_at"].str.split("T").str[0]
 
-        st.subheader("Accounts")
-        filter_col, sortby_col = st.columns(2)
 
-        # Filter button
-        with filter_col:
-            filters = [x for x in st.session_state.df_accounts.type.unique()]
-            filters.insert(0, "")
-            filter_value = st.selectbox('Filter type:', filters, key="filter_by_accounts")
-            if filter_value != "":
-                st.session_state.df_accounts = st.session_state.df_accounts[st.session_state.df_accounts["type"] == filter_value]
+    st.subheader("Accounts")
 
-        # Sort by button
-        with sortby_col:
-            sort_by = st.selectbox('Sort by:', st.session_state.df_accounts.columns, key="sort_by_accounts")
-            st.session_state.df_accounts = st.session_state.df_accounts.sort_values(sort_by)
+    # Filters
+    filter_col, sortby_col = st.columns(2)
 
-        st.table(st.session_state.df_accounts)
+    # Filter button
+    with filter_col:
+        filters = [x for x in df_accounts.type.unique()]
+        filters.insert(0, "")
+        filter_value = st.selectbox('Filter type:', filters, key="filter_by_accounts")
+        if filter_value != "":
+            df_accounts = df_accounts[df_accounts["type"] == filter_value]
 
+    # Sort by button
+    with sortby_col:
+        sort_by = st.selectbox('Sort by:', df_accounts.columns, key="sort_by_accounts")
+        df_accounts = df_accounts.sort_values(sort_by)
+
+    # Display accounts
+    st.table(df_accounts)
 
 
     # Get budget table
-    url = f"{api_url}/api/{api_version}/table/budget"    
-    response = requests.get(url, headers=st.session_state.headers)
-    if response.status_code != 200:
-        st.error("Error while requesting API.")
-        response.status_code
-        st.stop()
-    else: 
-        if response.json() == []:
-            st.warning("No data available.")
-            st.stop()
-        df = pd.DataFrame(response.json())
-        df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
-        df.drop(columns=["id", "history"], inplace=True)
-        # Save df to session state
-        st.session_state.df_budgets = df
+    url = f"{api_url}/api/{api_version}/table/budget"
+    budget_table = requests.get(url, headers=st.session_state.headers)
+    budget_table = budget_table.json()
+    budget_table = budget_table["budget table"]
+    # Generate DF
+    df_budgets = pd.DataFrame(budget_table, columns=["id", "name", "month", "amount","created_at", "updated_at"])
+    df_budgets["amount"] = df_budgets["amount"].apply(lambda x: f"{x:.2f} €")
+    df_budgets.drop(columns=["id"], inplace=True)
+    df_budgets["created_at"] = df_budgets["created_at"].str.split("T").str[0]
+    df_budgets["updated_at"] = df_budgets["updated_at"].str.split("T").str[0]
 
-        st.subheader("Budgets")
-        filter_col, sortby_col = st.columns(2)
-
-        # Filter button
-        with filter_col:
-            filters = [x for x in st.session_state.df_budgets.month.unique()]
-            filters.insert(0, "")
-            filter_value = st.selectbox('Filter month:', filters, key="filter_by_budgets")
-            if filter_value != "":
-                st.session_state.df_budgets = st.session_state.df_budgets[st.session_state.df_budgets["month"] == filter_value]
-
-        # Sort by button
-        with sortby_col:
-            sort_by = st.selectbox('Sort by:', st.session_state.df_budgets.columns, key="sort_by_budgets")
-            st.session_state.df_budgets = st.session_state.df_budgets.sort_values(sort_by)
-
-        st.table(st.session_state.df_budgets)
+    # Display accounts
+    st.subheader("Budgets")
+    st.table(df_budgets)
 
 
+### END OF PAGE: OVERVIEW ###
 
 
-# Zoom-in page
+# Zoom In
 if page == pages[1]: 
-    st.session_state.pop('df_budgets', None)
-    st.session_state.pop('df_accounts', None)
     st.title("Zoom In")
-    
-    choice = st.selectbox("Display", ["Accounts", "Budgets", "Transactions"], key='choice_display_object')
-
-    if choice == "Accounts":
-        # Get account table
-        url = f"{api_url}/api/{api_version}/table/account"
-        response = requests.get(url, headers=st.session_state.headers)
-        if response.status_code != 200:
-            st.error("Error while requesting API.")
-            response.status_code
-            st.stop()
-        else:
-            df = pd.DataFrame(response.json())
-            df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
-            # Save df to session state
-            st.session_state.df_accounts = df
-
-        account_choice = st.selectbox("Choose an account", st.session_state.df_accounts["name"].values)
-        account_to_display = st.session_state.df_accounts[st.session_state.df_accounts["name"] == account_choice]
-
-        st.write(account_to_display["name"].values[0])
-        for col in account_to_display.columns[1:4]:
-            st.write(f"{col}: {account_to_display[col].values[0]}")
-        st.write("**History**")
-        account_history = account_to_display["history"].values[0]
-        if account_history == []:
-            st.write("No history available.")
-            st.stop()
-        account_history_df = pd.DataFrame(account_history)
-        account_history_df["amount"] = account_history_df["amount"].apply(lambda x: f"{x:.2f} €")
-        st.dataframe(account_history_df)
-
-    if choice == "Budgets":
-        # Get budget table
-        url = f"{api_url}/api/{api_version}/table/budget"
-        response = requests.get(url, headers=st.session_state.headers)
-
-        # If status code is not 200
-        if response.status_code != 200:
-            st.error("Error while requesting API.")
-            response.status_code
-            st.stop()
-
-        # If status code is 200
-        else:
-            df = pd.DataFrame(response.json())
-            df["amount"] = df["amount"].apply(lambda x: f"{x:.2f} €")
-            # Save df to session state
-            st.session_state.df_budgets = df
-        
-
-        # Display budget
-        # Month Choice
-        available_months = st.session_state.df_budgets["month"].unique()
-        month_choice = st.selectbox("Choose a month", available_months)
-        st.session_state.df_budgets = st.session_state.df_budgets[st.session_state.df_budgets["month"] == month_choice]
-
-        # Budget Choice
-        budget_choice = st.selectbox("Choose a budget", st.session_state.df_budgets["name"].values)
-        budget_to_display = st.session_state.df_budgets[st.session_state.df_budgets["name"] == budget_choice]
-
-        st.write(budget_to_display["name"].values[0])
-        for col in budget_to_display.columns[1:4]:
-            st.write(f"{col}: {budget_to_display[col].values[0]}")
-        st.write("**History**")
-        budget_history = budget_to_display["history"].values[0]
-        if budget_history == []:
-            st.write("No history available.")
-            st.stop()
-        budget_history_df = pd.DataFrame(budget_history)
-        budget_history_df["amount"] = budget_history_df["amount"].apply(lambda x: f"{x:.2f} €")
-        st.dataframe(budget_history_df)
+    st.warning("Obsolete page")
 
 
+### END OF PAGE: ZOOM IN ###
 
-    if choice == "Transactions":
-        # Get transaction table
-        url = f"{api_url}/api/{api_version}/table/transaction"
-        response = requests.get(url, headers=st.session_state.headers)
-
-        # If status code is not 200
-        if response.status_code != 200:
-            st.error("Error while requesting API.")
-            response.status_code
-            st.stop()
-
-        # If status code is 200
-        else:
-            transaction_table = response
-            transaction_table = pd.DataFrame(transaction_table.json())
-            transaction_table["amount"] = transaction_table["amount"].apply(lambda x: f"{x:.2f} €")
-            st.subheader("Transaction table")
-            # Search bar for transaxction id
-            search = st.text_input("Search by transaction id")
-            if search:
-                transaction_table = transaction_table[transaction_table["id"] == search]
-            st.dataframe(transaction_table)
-
-
-
-
-# Transactions page
+# Transactions
 if page == pages[2]: 
-    st.session_state.pop('df_budgets', None)
-    st.session_state.pop('df_accounts', None)
-    if "transaction_datas" in st.session_state:
-        st.session_state.pop('transaction_datas', None)
-
-
     st.title("Transactions")
 
-    # Get available transaction types
-    url = f"{api_url}/api/{api_version}/available/transaction_types"
-    available_transaction_types = requests.get(url, headers=st.session_state.headers)
-    available_transaction_types = available_transaction_types.json()
-    available_transaction_types = [elt for elt in available_transaction_types]
-
-    # Get available accounts
-    url = f"{api_url}/api/{api_version}/get/account"
-    response = requests.get(url, headers=st.session_state.headers)
-    response_json = response.json()
-    available_accounts = [account.split('.pkl')[0] for account in response_json.get('available accounts', [])]
-    available_accounts.insert(0, None)
-
-    # Get available budgets
-    url = f"{api_url}/api/{api_version}/get/budget"
-    response = requests.get(url, headers=st.session_state.headers)
-    response_json = response.json()
-    available_budgets = [budget.split('.pkl')[0] for budget in response_json.get('available budgets', [])]
-    available_budgets.insert(0, None)
-
-
-    # Add a transactions
+    # Create transaction form
     with st.form(key="create_transaction_form"):
-        # Add transaction informations
+
+        # Get available transaction types
+        url = f"{api_url}/api/{api_version}/available/transaction_types"
+        available_transaction_types = requests.get(url, headers=st.session_state.headers)
+        available_transaction_types = available_transaction_types.json()
+
+        # Get available accounts
+        url = f"{api_url}/api/{api_version}/table/account"
+        account_table = requests.get(url, headers=st.session_state.headers)
+        account_table = account_table.json()
+        account_table = account_table["account table"]
+        account_names = [account[1] for account in account_table]
+        account_names.insert(0, "None")
+    
+        # Get available budgets
+        url = f"{api_url}/api/{api_version}/table/budget"
+        budget_table = requests.get(url, headers=st.session_state.headers)
+        budget_table = budget_table.json()
+        budget_table = budget_table["budget table"]
+        budget_names = [budget[1] for budget in budget_table]
+        budget_names.insert(0, "None")
+        budget_months = [budget[2] for budget in budget_table]
+        budget_months.insert(0, "None")
+
+
+        # Form
         st.subheader("Please fill in the form below to create a transaction.")
+
         transaction_date = st.date_input("Transaction date", key="transaction_date")
         transaction_date = str(transaction_date)
-        transaction_type = st.selectbox("Choose transaction type", available_transaction_types, key="transaction_type")
-        transaction_amount = st.number_input("Amount", format="%.2f", key="amount_account_input")
-
-        datas = {
-            "date": transaction_date,
-            "type": transaction_type,
-            "amount": transaction_amount
-            }
-
-        origin_account = st.selectbox("Choose origin account", available_accounts, key="origin_account")
-
-        if origin_account != None:
-            datas["origin_account"] = origin_account
-
-
-        destination_account = st.selectbox("Choose destination account", available_accounts, key="destination_account")
-
-        if destination_account:
-            datas["destination_account"] = destination_account
-
-
-        budget = st.selectbox("Choose budget", available_budgets, key="budget_transaction")
-        budget = None if budget == "None" else budget
-        if budget is not None:
-            budget_name = budget.split("_")[0]
-
-        budget_month = budget.split("_")[1] if budget != None else None
-
-        if budget:
-            datas["budget"] = budget_name
-            datas["budget_month"] = budget_month
-
-
-        description = st.text_input("description", key="transaction_description")
-
-        datas["description"] = description
-
+        transaction_type = st.selectbox("Choose transaction type", available_transaction_types, key="available_transaction_type")
+        transaction_amount = st.number_input("Amount", format="%.2f", key="amount_transaction_input")
+        transaction_origin_account = st.selectbox("Choose origin account", account_names, key="transaction_origin_account")
+        transaction_destination_account = st.selectbox("Choose destination account", account_names, key="transaction_destination_account")
+        budget_name = st.selectbox("Choose budget", budget_names, key="transaction_budget_name")
+        budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
+        category = st.text_input(label="Transaction Category")
+        description = st.text_input(label="Transaction Description")
 
         submit_button = st.form_submit_button(label='Create Transaction')
 
-    if submit_button:
-        # Request API
-        access_token = st.session_state.access_token
-        if access_token:
-            st.write(datas)
+
+        # Request API when submit button is clicked
+        if submit_button:
+
             url = f"{api_url}/api/{api_version}/create/transaction"
-            response = requests.post(url, headers=st.session_state.headers, params=datas)
-
-            # Add transaction to seesion_state
+            params = {
+                "transaction_date": transaction_date.strip(),
+                "transaction_type": transaction_type.strip(),
+                "transaction_amount": transaction_amount,
+                "origin_account": transaction_origin_account.strip(),
+                "destination_account": transaction_destination_account.strip(),
+                "budget_name": budget_name.strip(),
+                "budget_month": budget_month.strip(),
+                "category": category.strip(),
+                "description": description.strip()
+            }
+            response = requests.post(url, params=params, headers=st.session_state.headers)
             if response.status_code == 200:
-                st.session_state.transaction_datas = response.json()
-                st.success(f"Transaction created: \n {st.session_state.transaction_datas}")                             
-
-            # If status code is not 200
+                st.success(response.json())
             else:
-                st.write(response.json())
-         
-        # If no access token
-        else:
-            st.error("Please Log In to create a transaction.")
-            st.write(response.json())
+                st.error("An error occurred.")
 
 
-# Settings page
+### END OF PAGE: TRANSACTIONS ###
+
+
+### ANALYTICS ###
 if page == pages[3]: 
-    st.session_state.pop('df_budgets', None)
-    st.session_state.pop('df_accounts', None)
+    st.title("Analytics")
+    st.warning("Not implemented yet")
+
+### END OF PAGE: ANALYTICS ###
+
+
+
+### SETTINGS ###
+if page == pages[4]:
     st.title("Settings")
     st.write("This is the settings page, use the options below to change the settings of the app.")
 
-    # Get available account types
-    url = f"{api_url}/api/{api_version}/available/account_types"
-    available_account_types = requests.get(url, headers=st.session_state.headers)
-    available_account_types = available_account_types.json()
-    available_account_types = [elt for elt in available_account_types]
-
-    # Settings
+    # Check API Status button
     if st.button("Check API status", key="check_api_status_button"):
         # Request API
         url = f"{api_url}/api/{api_version}/status"
@@ -418,80 +273,95 @@ if page == pages[3]:
         else:
             st.error("An error occurred while checking the API status.")
 
-
+    # Divide in two columns, one for accounts and one for budgets
     col_account, col_budget = st.columns(2)
-    # Create | Delete account
+
+    # Account Column
     with col_account:
-        create_delete_choice_account = st.radio("Choose", ["Create Account", "Delete Account"])
+        # Button to choose : Create | Delete (account)
+        create_delete_choice_account = st.radio("Choose", ["Create Account", "Delete Account"], key="create_delete_choice_account")
+        
+        # Create account choice
         if create_delete_choice_account == "Create Account":
             with st.form(key="create_account_form"):
-                # Add account informations
+
+                # Get available account types
+                url = f"{api_url}/api/{api_version}/available/account_types"
+                available_account_types = requests.get(url, headers=st.session_state.headers)
+                available_account_types = available_account_types.json()
+                available_account_types = available_account_types["available account types"]
+
+
+                # Form
                 st.subheader("Please fill in the form below to create an account.")
-                st.write("Name is free text")
-                name = st.text_input(label="Account name")
+                account_name = st.text_input(label="Account name")
                 account_type = st.selectbox("Choose account type", available_account_types, key="account_type")
-                amount = st.number_input("Amount", format="%.2f", key="amount_account_input")
+                account_balance = st.number_input("Balance", format="%.2f", key="balance_account_input")
                 submit_button = st.form_submit_button(label='Create Account')
 
-            if submit_button:
-                # Request API
-                access_token = st.session_state.access_token
-                if access_token:
-                    url = f"{api_url}/api/{api_version}/create/account?name={name}&type={account_type}&amount={amount}"
+                # Request API when submit button is clicked
+                if submit_button:
+                    url = f"{api_url}/api/{api_version}/create/account?account_name={account_name}&account_type={account_type}&account_balance={account_balance}"
                     response = requests.post(url, headers=st.session_state.headers)
-                    
                     if response.status_code == 200:
                         st.success(response.json())
                     else:
                         st.error("An error occurred.")
                         st.write(response)
 
-                else:
-                    st.error("Please Log In to create an account.")
 
+        # Delete account choice
         if create_delete_choice_account == "Delete Account":
             with st.form(key="delete_account_form"):
-                # Add account informations
-                st.subheader("Please fill in the form below to delete an account.")
-                st.write("Name is free text")
-                name = st.text_input(label="Account name")
+
+                # Get available accounts
+                url = f"{api_url}/api/{api_version}/table/account"
+                account_table = requests.get(url, headers=st.session_state.headers)
+                account_table = account_table.json()
+                account_table = account_table["account table"]
+
+                if not account_table:
+                    st.warning("No Account found")
+
+
+                # Form
+                st.subheader("Please choose an account to delete in the list below.")
+                account_name_to_delete = st.selectbox("Choose account", [account[1] for account in account_table], key="account_name_delete")
                 submit_button = st.form_submit_button(label='Delete Account')
 
-            if submit_button:
-                # Request API
-                access_token = st.session_state.access_token
-                if access_token:
-                    url = f"{api_url}/api/{api_version}/delete/account?name={name}"
+
+                # Request API when submit button is clicked
+                if submit_button:
+                    account_id_to_delete = next((account[0] for account in account_table if account[1] == account_name_to_delete), None)
+                    url = f"{api_url}/api/{api_version}/delete/account?account_id={account_id_to_delete}"
                     response = requests.delete(url, headers=st.session_state.headers)
                     if response.status_code == 200:
                         st.success(response.json())
                     else:
                         st.error("An error occurred.")
                         st.write(response)
-
-                else:
-                    st.error("Please Log In to delete an account.")
+                    
 
 
-
-    # Create | Delete budget
+    # Budget Column
     with col_budget:
-        create_delete_choice_budget = st.radio("Choose", ["Create Budget", "Delete Budget"])
+        # Button to choose : Create | Delete (budget)
+        create_delete_choice_budget = st.radio("Choose", ["Create Budget", "Delete Budget"], key="create_delete_choice_budget")
+
+        # Create budget choice
         if create_delete_choice_budget == "Create Budget":
             with st.form(key="create_budget_form"):
-                # Add budget informations
+
+                # Form
                 st.subheader("Please fill in the form below to create a budget.")
-                st.write("Name is free text")
-                name = st.text_input(label="Budget name")
-                budget_month = st.selectbox("Choose month", months, key="budget_month")
-                amount = st.number_input("Amount", format="%.2f", key="amount_budget_input")
+                budget_name = st.text_input(label="Budget name")
+                budget_month = st.selectbox("Choose budget month", months, key="budget_month_create")
+                budget_amount = st.number_input("Amount", format="%.2f", key="amount_budget_input")
                 submit_button = st.form_submit_button(label='Create Budget')
 
-            if submit_button:
-                # Request API
-                access_token = st.session_state.access_token
-                if access_token:
-                    url = f"{api_url}/api/{api_version}/create/budget?name={name}&month={budget_month}&amount={amount}"
+                # Request API when submit button is clicked
+                if submit_button:
+                    url = f"{api_url}/api/{api_version}/create/budget?budget_name={budget_name}&budget_month={budget_month}&budget_amount={budget_amount}"
                     response = requests.post(url, headers=st.session_state.headers)
                     if response.status_code == 200:
                         st.success(response.json())
@@ -499,23 +369,56 @@ if page == pages[3]:
                         st.error("An error occurred.")
                         st.write(response)
 
-                else:
-                    st.error("Please Log In to create an account.")
 
+        # Delete budget choice
         if create_delete_choice_budget == "Delete Budget":
             with st.form(key="delete_budget_form"):
-                # Add budget informations
-                st.subheader("Please fill in the form below to delete a budget.")
-                st.write("Name is free text")
-                name = st.text_input(label="Budget name")
-                month = st.selectbox("Choose month", months, key="delete_budget_month")
+
+                # Get available budgets
+                url = f"{api_url}/api/{api_version}/table/budget"
+                budget_table = requests.get(url, headers=st.session_state.headers)
+                budget_table = budget_table.json()
+                budget_table = budget_table["budget table"]
+
+                if not budget_table:
+                    st.warning("No budget found")
+                    st.stop()
+
+                # Form
+                st.subheader("Please choose an account to delete in the list below.")
+                st.warning("This will delete all budget related transactions")
+                budget_name_to_delete, budget_month_to_delete = st.selectbox("Choose budget", [(budget[1], budget[2]) for budget in budget_table], key="budget_name_delete")
                 submit_button = st.form_submit_button(label='Delete Budget')
 
-            if submit_button:
-                # Request API
-                access_token = st.session_state.access_token
-                if access_token:
-                    url = f"{api_url}/api/{api_version}/delete/budget?name={name}&month={month}"
+
+                # Request API when submit button is clicked
+                if submit_button:
+
+                    # Get budget id to delete
+                    budget_id_to_delete = next((budget[0] for budget in budget_table if budget[1] == budget_name_to_delete), None)
+
+                    # Get transactions id to delete
+                    url = f"{api_url}/api/{api_version}/table/transaction"
+                    transaction_table = requests.get(url, headers=st.session_state.headers)
+                    transaction_table = transaction_table.json()
+                    transaction_table = transaction_table["transaction table"]
+                    transaction_id_related_budget = [transaction[0] for transaction in transaction_table if transaction[6] == budget_id_to_delete]           
+
+
+                    # Delete all related transactions
+                    for transaction_to_delete in transaction_id_related_budget:
+
+                        url = f"{api_url}/api/{api_version}/delete/transaction?transaction_id={transaction_to_delete}"
+                        response = requests.delete(url, headers=st.session_state.headers)
+                        if response.status_code == 200:
+                            st.success(response.json())
+                        else:
+                            st.error("An error occurred.")
+                            st.write(response)                    
+
+
+                    # Delete budget
+                    url = f"{api_url}/api/{api_version}/delete/budget?budget_id={budget_id_to_delete}"
                     response = requests.delete(url, headers=st.session_state.headers)
                     if response.status_code == 200:
                         st.success(response.json())
@@ -523,9 +426,8 @@ if page == pages[3]:
                         st.error("An error occurred.")
                         st.write(response)
 
-                else:
-                    st.error("Please Log In to delete a budget.")
 
+### END OF PAGE: SETTINGS ###
 
 
 ### SIDEBAR FOOTER ###
