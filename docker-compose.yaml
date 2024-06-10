@@ -1,0 +1,73 @@
+# Version : 0.2.1
+# Current state : Prod
+# Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
+
+
+services:
+  # PostGres Container
+  container_postgres:
+    image: postgres:14
+    container_name: bank_app_postgres
+    env_file:
+      - .env
+    volumes:
+      - ../../storage/postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - bank_app_network
+
+  # API Container
+  container_api:
+    image: Unclad3610/personal_bank_app_api:latest
+    container_name: bank_app_api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - serviceName: container_postgres
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - bank_app_network
+
+
+  # STREAMLIT Container
+  container_streamlit:
+    image: Unclad3610/personal_bank_app_streamlit:latest
+    container_name: bank_app_streamlit
+    environment:
+      - API_VERSION="0.2.0"
+      - API_URL="http://bank_app_api:8000"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - serviceName: container_api
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://container_api:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - bank_app_network
+
+
+# Networks
+networks:
+  bank_app_network:
+    external: true

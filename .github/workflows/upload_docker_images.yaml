@@ -1,26 +1,22 @@
-# Version : 0.1.4
+# Version : 0.1.5
 # Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
-
 # Name of the workflow 
-name : Upload Docker images
+name: Upload Docker images
 
 # Trigger
 on:
   pull_request:
     branches: ["main"]
 
-
 # Jobs
 jobs:
   # Job - Push Streamlit image
-  Push and push Streamlit image:
+  push_streamlit_image:
+    name: Push Streamlit image
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      secrets: read
 
     # Actions to execute
     steps:
@@ -34,6 +30,12 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      # Get version from .env file
+      - name: Load .env file
+        uses: c-py/action-dotenv-to-setenv@v2
+        with:
+          env-file: .github/workflows/.env
+
       # Build & Push Docker Image
       - name: Build and push Docker Image
         uses: docker/build-push-action@v2
@@ -43,14 +45,10 @@ jobs:
           push: true
           tags: Unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, Unclad3610/personal_bank_app_streamlit:latest
 
-
-  
   # Job - Push FastAPI image
-  Push and push FastAPI image:
+  push_fastapi_image:
+    name: Push FastAPI image
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      secrets: read
 
     # Actions to execute
     steps:
