@@ -43,7 +43,7 @@ jobs:
           context: ./src/streamlit
           file: ./src/streamlit/Dockerfile
           push: true
-          tags: Unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, Unclad3610/personal_bank_app_streamlit:latest
+          tags: unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, unclad3610/personal_bank_app_streamlit:latest
 
   # Job - Push FastAPI image
   push_fastapi_image:
@@ -75,4 +75,4 @@ jobs:
           context: ./src/api
           file: ./src/api/Dockerfile
           push: true
-          tags: Unclad3610/personal_bank_app_api:${{ env.api_version }}, Unclad3610/personal_bank_app_api:latest
+          tags: unclad3610/personal_bank_app_api:${{ env.api_version }}, unclad3610/personal_bank_app_api:latest

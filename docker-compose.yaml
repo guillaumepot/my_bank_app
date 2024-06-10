@@ -26,7 +26,7 @@ services:
 
   # API Container
   container_api:
-    image: Unclad3610/personal_bank_app_api:latest
+    image: unclad3610/personal_bank_app_api:latest
     container_name: bank_app_api
     env_file:
       - .env
@@ -47,7 +47,7 @@ services:
 
   # STREAMLIT Container
   container_streamlit:
-    image: Unclad3610/personal_bank_app_streamlit:latest
+    image: unclad3610/personal_bank_app_streamlit:latest
     container_name: bank_app_streamlit
     environment:
       - API_VERSION="0.2.0"
