@@ -6,14 +6,14 @@
 services:
   # PostGres Container
   container_postgres:
-    image: postgres:13
+    image: postgres:14
     container_name: bank_app_postgres
     env_file:
       - postgres.env
     volumes:
       - ../../storage/postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]

@@ -7,7 +7,7 @@
 services:
   # API Container
   container_api:
-    image: personal_bank_app_api:latest
+    image: Unclad3610/personal_bank_app_api:latest
     container_name: bank_app_api
     env_file:
       - api.env
