@@ -33,11 +33,13 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Generate tables using the script 'generate_tables'
 - Add a user using the script 'generate_user_credentials'
 
+
 ### API
 - Configure API variables in `api.env`.
 - Add usernames as AUTHORIZED_USERS.
 - Change storage path in docker-compose if needed.
 - Use setup & remove scripts to easily start & stop the API container.
+
 
 
 ### Streamlit
@@ -46,6 +48,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 
 
+## Additional Information
 
 
 ### POSTGRES
@@ -64,6 +67,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 ### API
 - API version: 0.1.0
 - Current state: Prod
+
 
 #### Changelogs
 0.1.0 :
@@ -92,8 +96,6 @@ This is a personal project to check my bank accounts. It is currently in develop
         
 #### Todo
 - 
-
-
 
 ## Roadmap
 [Done]
