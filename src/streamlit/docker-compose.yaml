@@ -1,10 +1,10 @@
-# Version : 0.2.0
+# Version : 0.2.1
 # Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
 services:
-  # API Container
+  # STREAMLIT Container
   container_streamlit:
     image: Unclad3610/personal_bank_app_streamlit:latest
     container_name: bank_app_streamlit
