@@ -1,4 +1,4 @@
-# Version : 0.1.1
+# Version : 0.1.2
 # Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
@@ -46,7 +46,10 @@ jobs:
           context: ./src/streamlit
           file: ./src/streamlit/Dockerfile
           push: true
-    tags: Unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, Unclad3610/personal_bank_app_streamlit:latest
+          tags: Unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, Unclad3610/personal_bank_app_streamlit:latest
+
+
+  
   # Job - Push FastAPI image
   Push and push FastAPI image:
     runs-on: ubuntu-latest
