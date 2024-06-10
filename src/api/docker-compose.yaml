@@ -1,17 +1,18 @@
+# Version : 0.2.0
+# Current state : Prod
+# Author : Guillaume Pot
+# Contact : guillaumepot.pro@outlook.com
+
+
 services:
   # API Container
   container_api:
-    image: personal_bank_app_api:latest
+    image: Unclad3610/personal_bank_app_api:latest
     container_name: bank_app_api
     env_file:
       - api.env
     ports:
-      - "8000:8000" # If you change api.env PORT, change it here too like <new_port>:8001
-    volumes:
-      - ../../storage/accounts:/app/storage/accounts
-      - ../../storage/budgets:/app/storage/budgets
-      - ../../storage/transactions:/app/storage/transactions
-      - ../../storage/users.json:/app/storage/users.json
+      - "8000:8000"
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]

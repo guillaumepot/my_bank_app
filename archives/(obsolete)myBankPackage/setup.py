@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 # Version : 0.1.0
-# Current state : Prod
+# Current state : Deprecated
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
