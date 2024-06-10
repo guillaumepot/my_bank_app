@@ -8,7 +8,6 @@ Generate table in a PostgreSQL database
 
 import argparse
 import psycopg2
-import json
 import uuid
 
 # Args parser

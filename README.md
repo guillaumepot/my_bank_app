@@ -23,7 +23,8 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ### Requirements
 [TODO]
-
+- Docker
+- 
 
 ### User Account
 - Use `generate_user_credentials.py` to generate a user account. Your username should be added in `api.env` (AUTHORIZED_USERS).
@@ -54,37 +55,49 @@ This is a personal project to check my bank accounts. It is currently in develop
 -
 
 ### POSTGRES
-POSTGRES version: 13
-Current state: Dev
+POSTGRES version: 0.1.1 (postgres 14)
+Current state: Prod
 
 #### Changelogs
-N/C
+0.1.0 :
+    - Docker compose creation
+0.1.1 :
+    - Update postgres:13 to postgres:14
+    - Docker compose minor update (add env var POSTGRES_PORT)
+
+
+
 
 ### API
 API version: 0.1.0
-Current state: Dev
+Current state: Prod
 
 #### Changelogs
 0.1.0 :
     - API creation
+0.2.0 :
+    - Major update
+        - API code refactorization
+        - Code migration (package to PostgresDB)
 *
 #### Todo
 - Add logger
-- -> Migrate functions to query the database
-- /create/account should check if an account already exists instead of erasing it
-- /create/budget should check if a budget already exists instead of erasing it
 
 ### Streamlit
-Streamlit version: 0.1.0
-Current state: Dev
+Streamlit version: 0.2.0
+Current state: Prod
 
 
 #### Changelogs
 0.1.0 :
     - Streamlit creation
+0.2.0 :
+    - Major Update:
+        - Streamlit code refactorization
+        
 
 #### Todo
-- Add analytics page
+- 
 
 
 ### Data (Storage)
@@ -95,16 +108,16 @@ Current state: Dev
 
 
 ## Roadmap
-Done:
+[Done]
 - First version of the app containing an API & a Streamlit interface
+- Refactor API files (cleaning & readability)
+- Refactor Streamlit files (cleaning & readability)
 
-Todo:
+[Todo]
 - Add analytics (charts)
 - Add a ML pipeline to analyze temporal charts
 - Add more unit tests, e.g., API tests
 - Add Container tests (Github Actions)
-- Refactor API files (cleaning & readability)
-- Refactor Streamlit files (cleaning & readability)
 - Add a logger (API)
 - Update API security (max requests, etc.)
 
