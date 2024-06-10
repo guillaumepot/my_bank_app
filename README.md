@@ -19,8 +19,6 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Setup Streamlit container
 
 
-
-
 ### Requirements
 [TODO]
 - Docker
@@ -48,15 +46,11 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 
 
-## Additional Information
 
-
-#### Todo
--
 
 ### POSTGRES
-POSTGRES version: 0.1.1 (postgres 14)
-Current state: Prod
+- POSTGRES version: 0.1.1 (postgres 14)
+- Current state: Prod
 
 #### Changelogs
 0.1.0 :
@@ -67,10 +61,9 @@ Current state: Prod
 
 
 
-
 ### API
-API version: 0.1.0
-Current state: Prod
+- API version: 0.1.0
+- Current state: Prod
 
 #### Changelogs
 0.1.0 :
@@ -79,14 +72,16 @@ Current state: Prod
     - Major update
         - API code refactorization
         - Code migration (package to PostgresDB)
-*
+
 #### Todo
 - Add logger
 
-### Streamlit
-Streamlit version: 0.2.0
-Current state: Prod
 
+
+
+### Streamlit
+- Streamlit version: 0.2.0
+- Current state: Prod
 
 #### Changelogs
 0.1.0 :
@@ -95,15 +90,8 @@ Current state: Prod
     - Major Update:
         - Streamlit code refactorization
         
-
 #### Todo
 - 
-
-
-### Data (Storage)
-
-#### Todo
-- [Done] Database migration 
 
 
 
