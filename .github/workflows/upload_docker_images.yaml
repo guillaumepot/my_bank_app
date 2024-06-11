@@ -43,11 +43,12 @@ jobs:
           context: ./src/streamlit
           file: ./src/streamlit/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64/v8
           tags: unclad3610/personal_bank_app_streamlit:${{ env.streamlit_version }}, unclad3610/personal_bank_app_streamlit:latest
 
   # Job - Push FastAPI image
   push_fastapi_image:
-    name: Push FastAPI image
+    name: Push API image
     runs-on: ubuntu-latest
 
     # Actions to execute
@@ -75,4 +76,5 @@ jobs:
           context: ./src/api
           file: ./src/api/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64/v8
           tags: unclad3610/personal_bank_app_api:${{ env.api_version }}, unclad3610/personal_bank_app_api:latest
