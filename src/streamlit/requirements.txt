@@ -16,9 +16,6 @@ jsonschema-specifications
 markdown-it-py 
 MarkupSafe 
 mdurl 
-#mkl-fft 
-#mkl-random 
-#mkl-service==2.4.0
 numexpr 
 numpy 
 packaging 
