@@ -10,7 +10,7 @@ fastapi
 greenlet 
 h11 
 idna
-jwt
+PyJWT
 passlib==1.7.4
 psycopg2 
 pycparser 
