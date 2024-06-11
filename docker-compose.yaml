@@ -33,8 +33,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - serviceName: container_postgres
-        condition: service_healthy
+      - container_postgres
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
@@ -55,8 +54,7 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - serviceName: container_api
-        condition: service_healthy
+      - container_api
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://container_api:8000"]
