@@ -18,7 +18,7 @@ VARS
 """
 # API metadatas
 api_version = "0.2.0"
-current_state = "Dev"
+current_state = "Prod"
 
 # UUID Generation
 def generate_uuid():

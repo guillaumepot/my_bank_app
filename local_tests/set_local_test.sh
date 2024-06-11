@@ -10,7 +10,6 @@
 
 ### Step 0 - Add Docker network & Use conda env ###
 docker network create bank_app_network
-conda activate bank-app
 
 ### Step 1 - Start Postgres ###
 
