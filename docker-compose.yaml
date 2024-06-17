@@ -1,5 +1,5 @@
 # Version : 0.1.0
-# Current state : Prod
+# Current state : prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
@@ -14,7 +14,7 @@ services:
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -49,7 +49,7 @@ services:
     image: unclad3610/personal_bank_app_streamlit:latest
     container_name: bank_app_streamlit
     environment:
-      - API_VERSION=0.2.0
+      - API_VERSION=0.1.0
       - API_URL=http://bank_app_api:8000
     ports:
       - "8001:8001"

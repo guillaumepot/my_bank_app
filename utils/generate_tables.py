@@ -74,9 +74,8 @@ def main(params):
             type VARCHAR(255) NOT NULL,
             balance FLOAT NOT NULL,  
             owner UUID REFERENCES users(id),
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
     """)
 
 
@@ -88,9 +87,8 @@ def main(params):
             name VARCHAR(255) NOT NULL,
             month VARCHAR(255) NOT NULL,
             amount FLOAT NOT NULL,
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
     """)
 
     # Add budget with ID 0 and month "N/A" for the default budget (no budget)

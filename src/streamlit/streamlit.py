@@ -119,12 +119,10 @@ if page == pages[0]:
     account_table = dict(account_table.json())
     account_table = account_table['account table']
     # Generate DF
-    df_accounts = pd.DataFrame(account_table, columns=["id", "name", "type", "balance", "owner_id", "created_at", "updated_at"])
+    df_accounts = pd.DataFrame(account_table, columns=["id", "name", "type", "balance", "owner_id", "created_at"])
     df_accounts["balance"] = df_accounts["balance"].apply(lambda x: f"{x:.2f} €")
     df_accounts.drop(columns=["id", "owner_id"], inplace=True)
     df_accounts["created_at"] = df_accounts["created_at"].str.split("T").str[0]
-    df_accounts["updated_at"] = df_accounts["updated_at"].str.split("T").str[0]
-
 
     st.subheader("Accounts")
 
@@ -154,15 +152,54 @@ if page == pages[0]:
     budget_table = budget_table.json()
     budget_table = budget_table["budget table"]
     # Generate DF
-    df_budgets = pd.DataFrame(budget_table, columns=["id", "name", "month", "amount","created_at", "updated_at"])
+    df_budgets = pd.DataFrame(budget_table, columns=["id", "name", "month", "amount","created_at"])
     df_budgets["amount"] = df_budgets["amount"].apply(lambda x: f"{x:.2f} €")
     df_budgets.drop(columns=["id"], inplace=True)
     df_budgets["created_at"] = df_budgets["created_at"].str.split("T").str[0]
-    df_budgets["updated_at"] = df_budgets["updated_at"].str.split("T").str[0]
-
     # Display accounts
     st.subheader("Budgets")
     st.table(df_budgets)
+
+
+
+    # Get transaction table
+    url = f"{api_url}/api/{api_version}/table/transaction"
+    transaction_table = requests.get(url, headers=st.session_state.headers)
+    transaction_table = dict(transaction_table.json())
+    transaction_table = transaction_table['transaction table']
+    # Generate DF
+    df_transactions = pd.DataFrame(transaction_table, columns=["id", "date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"])
+    df_transactions["date"] = df_transactions["date"].str.split("T").str[0]
+    df_transactions["amount"] = df_transactions["amount"].apply(lambda x: f"{x:.2f} €")
+    df_transactions.drop(columns=["id"], inplace=True)
+
+    st.subheader("Transactions")
+
+    # Filters
+    filter_col, sortby_col = st.columns(2)
+
+    # Filter button
+    with filter_col:
+        filters = [x for x in df_transactions.type.unique()]
+        filters.insert(0, "")
+        filter_value = st.selectbox('Filter type:', filters, key="filter_by_transactions")
+        if filter_value != "":
+            df_transactions = df_transactions[df_transactions["type"] == filter_value]
+
+    # Sort by button
+    with sortby_col:
+        sort_by = st.selectbox('Sort by:', df_transactions.columns, key="sort_by_transactions")
+        df_transactions = df_transactions.sort_values(sort_by)
+
+    # Display accounts
+    st.table(df_transactions)
+
+
+
+
+
+
+
 
 
 ### END OF PAGE: OVERVIEW ###

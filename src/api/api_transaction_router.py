@@ -119,6 +119,7 @@ def app_create_transaction(transaction_date: str,
     values_to_apply = (transaction_id, transaction_date, transaction_type, transaction_amount, origin_account, destination_account, budget_id, category, recipient, description)
     query_insert_values(request_to_do='create_new_transaction', additional=values_to_apply)
 
+
     # Apply the transaction to the account
     values_to_apply = (transaction_type, transaction_amount, origin_account, destination_account)   
     query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
