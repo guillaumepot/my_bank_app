@@ -72,7 +72,7 @@ def main(params):
             id UUID PRIMARY KEY NOT NULL,
             name VARCHAR(255) NOT NULL,
             type VARCHAR(255) NOT NULL,
-            balance FLOAT CHECK(balance >= 0) NOT NULL,  
+            balance FLOAT NOT NULL,  
             owner UUID REFERENCES users(id),
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -116,9 +116,9 @@ def main(params):
             origin_account VARCHAR(255),
             destination_account VARCHAR(255),
             budget UUID REFERENCES budgets(id),
+            recipient VARCHAR(255) NOT NULL,
             category VARCHAR(255),
-            description TEXT,
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            description TEXT
                 )
     """)
 

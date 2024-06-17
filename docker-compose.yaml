@@ -1,4 +1,4 @@
-# Version : 0.2.1
+# Version : 0.1.0
 # Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
@@ -13,8 +13,8 @@ services:
       - .env
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
-    #ports:
-    #  - "${POSTGRES_PORT}:5432"
+    ports:
+      - "${POSTGRES_PORT}:5432"
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -30,8 +30,8 @@ services:
     container_name: bank_app_api
     env_file:
       - .env
-    #ports:
-    #  - "8000:8000"
+    ports:
+      - "8000:8000"
     depends_on:
       - container_postgres
     restart: always

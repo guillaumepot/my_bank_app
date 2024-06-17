@@ -1,7 +1,7 @@
 """
 ### STREAMLIT APP - Main file ###
 """
-# Version : 0.2.0
+# Version : 0.1.0
 # Current state : Prod
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
@@ -20,7 +20,7 @@ login_data = {}
 
 
 # API VARS
-api_version = os.getenv("API_VERSION", "0.2.0")
+api_version = os.getenv("API_VERSION", "0.1.0")
 api_url = os.getenv("API_URL", "http://localhost:8000")
 
 # API STATUS CHECKING
@@ -218,6 +218,7 @@ if page == pages[2]:
         transaction_destination_account = st.selectbox("Choose destination account", account_names, key="transaction_destination_account")
         budget_name = st.selectbox("Choose budget", budget_names, key="transaction_budget_name")
         budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
+        transaction_recipient = st.text_input(label="Transaction Recipient")
         category = st.text_input(label="Transaction Category")
         description = st.text_input(label="Transaction Description")
 
@@ -236,6 +237,7 @@ if page == pages[2]:
                 "destination_account": transaction_destination_account.strip(),
                 "budget_name": budget_name.strip(),
                 "budget_month": budget_month.strip(),
+                "recipient": transaction_recipient.strip(),
                 "category": category.strip(),
                 "description": description.strip()
             }
