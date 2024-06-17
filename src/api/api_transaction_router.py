@@ -60,6 +60,8 @@ def app_load_transaction_table(current_user: str = Depends(get_current_user)) ->
     return {'transaction table': transaction_table}
 
 
+
+
 # Create Transaction
 @transaction_router.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['transaction'])
 def app_create_transaction(transaction_date: str,
@@ -69,33 +71,12 @@ def app_create_transaction(transaction_date: str,
                            destination_account: str = None,
                            budget_name: str = None,
                            budget_month: str = None,
-                           category: str = "",
+                           category: str = "Unknown",
+                           recipient:str = "Unknown",
                            description: str = "",
                            current_user: str = Depends(get_current_user)) -> dict:
     """
-    Create a new transaction and apply it to the accounts and budget.
 
-    Parameters:
-    - transaction_date (str): The date of the transaction in the format 'YYYY-MM-DD'.
-    - transaction_type (str): The type of the transaction.
-    - transaction_amount (float): The amount of the transaction.
-    - origin_account (str, optional): The account from which the transaction is made (required for debit transactions).
-    - destination_account (str, optional): The account to which the transaction is made (required for credit transactions).
-    - budget_name (str, optional): The name of the budget to which the transaction is applied.
-    - budget_month (str, optional): The month of the budget to which the transaction is applied.
-    - category (str, optional): The category of the transaction.
-    - description (str, optional): The description of the transaction.
-    - current_user (str, optional): The current user making the transaction.
-
-    Returns:
-    - dict: A dictionary with a message indicating the success of the transaction creation and application.
-
-    Raises:
-    - HTTPException: If the transaction amount is not positive and greater than 0.
-    - HTTPException: If the transaction type is invalid.
-    - HTTPException: If the origin account is not provided for debit transactions.
-    - HTTPException: If the destination account is not provided for credit transactions.
-    - HTTPException: If the origin and destination accounts are not provided for transfer transactions.
     """
 
     # Check if balance <= 0
@@ -118,10 +99,14 @@ def app_create_transaction(transaction_date: str,
     results = query_for_informations(request_to_do='get_existing_budgets', additional=None)
 
     if budget_name is None:
-        budget_id = str([budget[0] for budget in results if budget[1] == 'default'][0])
+        # Get default budget ID
+        default_budget_info = next((budget for budget in results if budget['name'].strip().lower() == 'default'), None)
+        budget_id = default_budget_info.get('id') if default_budget_info else None
         default_budget = True
     else:
-        budget_id = str([budget[0] for budget in results if budget[1] == budget_name][0])
+        # get the budget ID
+        budget_info = next((budget for budget in results if budget['name'].strip().lower() == budget_name.strip().lower() and budget['month'].strip().lower() == budget_month.strip().lower()), None)
+        budget_id = budget_info.get('id') if budget_info else None
         default_budget = False
 
     # Convert date to timestamp
@@ -131,7 +116,7 @@ def app_create_transaction(transaction_date: str,
     transaction_id = generate_uuid()
 
     # Add the transaction in the table
-    values_to_apply = (transaction_id, transaction_date, transaction_type, transaction_amount, origin_account, destination_account, budget_id, category, description)
+    values_to_apply = (transaction_id, transaction_date, transaction_type, transaction_amount, origin_account, destination_account, budget_id, category, recipient, description)
     query_insert_values(request_to_do='create_new_transaction', additional=values_to_apply)
 
     # Apply the transaction to the account
@@ -150,7 +135,7 @@ def app_create_transaction(transaction_date: str,
 @transaction_router.delete(f"/api/{api_version}/delete/transaction", name="delete_transaction", tags=['transaction'])
 def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_current_user)) -> dict:
     """
-
+    
     """
     query_insert_values(request_to_do='delete_transaction', additional=transaction_id)
     return {"message": f"Transaction with id {transaction_id} deleted successfully."}
