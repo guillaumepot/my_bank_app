@@ -77,8 +77,9 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Refactor Streamlit files (cleaning & readability)
 
 [Todo]
-- Add analytics (charts)
-- Add a ML pipeline to analyze temporal charts
+- Create an ETL pipline to get transaction datas
+- Add analytics charts (based on transactions) -> Analytics page ; Streamlit
+- Use a ML pipeline to predict things (budgets, ..)
 - Add more unit tests, e.g., API tests
 - Add Container tests (Github Actions)
 - Add a logger (API)

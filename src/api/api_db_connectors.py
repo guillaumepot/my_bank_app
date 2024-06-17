@@ -158,7 +158,7 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
     if request_to_do == 'apply_transaction_to_budget':
         query = """
         UPDATE budgets 
-        SET amount = amount - %s, updated_at = CURRENT_TIMESTAMP
+        SET amount = amount - %s
         WHERE id = %s
         """
 
@@ -175,7 +175,7 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
             additional = tuple(additional_list)
             query = """
             UPDATE accounts
-            SET balance = balance + %s, updated_at = CURRENT_TIMESTAMP
+            SET balance = balance + %s
             WHERE name = %s
             """
         if type == 'debit':
@@ -184,7 +184,7 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
             additional = tuple(additional_list)
             query = """
             UPDATE accounts
-            SET balance = balance - %s, updated_at = CURRENT_TIMESTAMP
+            SET balance = balance - %s
             WHERE name = %s
             """
         if type == 'transfert':
@@ -194,8 +194,8 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
             query = """
             UPDATE accounts
             SET balance = CASE 
-                WHEN name = %s THEN balance - %s, updated_at = CURRENT_TIMESTAMP
-                WHEN name = %s THEN balance + %s, updated_at = CURRENT_TIMESTAMP
+                WHEN name = %s THEN balance - %s
+                WHEN name = %s THEN balance + %s
                 ELSE balance
             END
             WHERE name IN (%s, %s)
