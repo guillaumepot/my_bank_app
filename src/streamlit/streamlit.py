@@ -341,11 +341,6 @@ if page == pages[0]:
                         df_transactions = df_transactions[df_transactions["category"].isin(filter_value)]
 
 
-
-
-
-
-
     # Interactive display of transactions
     with st.expander("View Transactions"):
         st.dataframe(df_transactions)
