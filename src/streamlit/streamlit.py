@@ -354,9 +354,11 @@ if page == pages[0]:
 
 
 
+### TRANSACTIONS ###
+
 
 # Transactions
-if page == pages[2]: 
+if page == pages[1]: 
     st.title("Transactions")
 
     # Create transaction form
@@ -431,7 +433,7 @@ if page == pages[2]:
 
 
 ### ANALYTICS ###
-if page == pages[3]: 
+if page == pages[2]: 
     st.title("Analytics")
     st.warning("Not implemented yet")
 
@@ -439,8 +441,10 @@ if page == pages[3]:
 
 
 
+
+
 ### SETTINGS ###
-if page == pages[4]:
+if page == pages[3]:
     st.title("Settings")
     st.write("This is the settings page, use the options below to change the settings of the app.")
 
