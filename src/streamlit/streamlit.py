@@ -92,7 +92,7 @@ else:
 if st.session_state.access_token == None:
     st.error("Please Log In to access the app.")
     st.stop()
-pages=["Overview", "Zoom-in", "Transactions", "Analytics", "Settings"]
+pages=["Overview", "Transactions", "Analytics", "Settings"]
 page=st.sidebar.radio("Navigation", pages)
 
 ## END OF SIDEBAR ##
@@ -354,14 +354,6 @@ if page == pages[0]:
 
 
 
-
-# Zoom In
-if page == pages[1]: 
-    st.title("Zoom In")
-    st.warning("Obsolete page")
-
-
-### END OF PAGE: ZOOM IN ###
 
 # Transactions
 if page == pages[2]: 
