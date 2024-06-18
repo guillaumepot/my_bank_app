@@ -135,6 +135,7 @@ This is a personal project to check my bank accounts. It is currently in develop
     - New display for Overviw page
     - Added filters
     - Transaction DF now display budget name instead of budget id
+    - Removed obsolted "Zoom-in" page
 - 0.1.0 :
     - Streamlit creation
 
