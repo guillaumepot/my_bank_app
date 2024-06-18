@@ -58,7 +58,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 
 ### Streamlit
-- Streamlit version: 0.2.0
+- Streamlit version: 0.1.0
 - Current state: Prod
 
 #### Changelogs
