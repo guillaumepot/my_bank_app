@@ -11,8 +11,79 @@ This is a personal project to check my bank accounts. It is currently in develop
 - [Roadmap](#roadmap)
 
 ## Repository Architecture
-[TODO]
-
+├── .github
+│   │
+│   └── workflows
+|           |
+|           ├── .env
+|           |
+|           └── upload_docker_images.yaml
+|   
+├── archives
+|       |
+|       └── (obsolete)myBankPackage
+|        
+├── local_tests
+|       |
+|       ├── set_local_test.sh
+|       |
+|       └── remove_local_test.sh
+|
+├── src
+|    |
+|    ├── api
+|    |    |
+|    |    ├── api_account_router.py
+|    |    |
+|    |    ├── api_auth_router.py
+|    |    |
+|    |    ├── api_budget_router.py
+|    |    |
+|    |    ├── api_db_connectors.py
+|    |    |
+|    |    ├── api_main.py
+|    |    |
+|    |    ├── api_transaction_router.py
+|    |    |
+|    |    ├── api_vars.py
+|    |    |
+|    |    ├── Dockerfile
+|    |    |
+|    |    ├── generate_secret_key.py
+|    |    |
+|    |    ├── generate_secret_key.sh
+|    |    |
+|    |    └── requirements.txt
+|    |
+|    └── streamlit
+|         |
+|         ├── Dockerfile
+|         |
+|         ├── requirements.txt
+|         |
+|         └── streamlit.py
+|
+├── storage
+|     |
+|     └── postgres_data
+|
+├── utils
+|     |
+|     ├── generate_requirements.py
+|     |
+|     ├── generate_tables.py
+|     |
+|     ├── generate_user_credentials.py
+|     |
+|     └── requirements.txt
+|
+├── .env
+|
+├── .gitignore
+│
+├── docker-compose.yaml
+│
+└── README.md
 
 
 
@@ -20,8 +91,6 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Python
 - Docker
 - Docker Compose
-
-
 
 
 ## Installation
