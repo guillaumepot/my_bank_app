@@ -1,8 +1,8 @@
 """
 ### STREAMLIT APP - Main file ###
 """
-# Version : 0.1.0
-# Current state : Prod
+# Version : 0.1.1
+# Current state : Dev
 # Author : Guillaume Pot
 # Contact : guillaumepot.pro@outlook.com
 
