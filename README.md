@@ -127,12 +127,17 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 
 ### Streamlit
-- Streamlit version: 0.1.0
+- Streamlit version: 0.1.1
 - Current state: Prod
 
 #### Changelogs
-0.1.0 :
+- 0.1.1 :
+    - New display for Overviw page
+    - Added filters
+    - Transaction DF now display budget name instead of budget id
+- 0.1.0 :
     - Streamlit creation
+
 
 #### Todo
 - 

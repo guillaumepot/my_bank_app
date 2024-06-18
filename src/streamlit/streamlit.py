@@ -10,6 +10,7 @@
 # LIBS
 import os
 import requests
+import calendar
 import pandas as pd
 import streamlit as st
 
@@ -17,6 +18,7 @@ import streamlit as st
 # VARS
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 login_data = {}
+elt_to_display = ["All", "1", "5", "10", "15", "30", "50"]
 
 
 # API VARS
@@ -96,6 +98,7 @@ page=st.sidebar.radio("Navigation", pages)
 ## END OF SIDEBAR ##
 
 
+
 ### API HEADER AUTHORIZATION ###
 st.session_state.headers = {
     "accept": "application/json",
@@ -106,11 +109,15 @@ st.session_state.headers = {
 
 
 
+
 ### PAGES ###
 
 # Overview
 if page == pages[0]:
     st.title("Overview")
+
+
+    ## Get Tables
 
 
     # Get account table
@@ -124,27 +131,6 @@ if page == pages[0]:
     df_accounts.drop(columns=["id", "owner_id"], inplace=True)
     df_accounts["created_at"] = df_accounts["created_at"].str.split("T").str[0]
 
-    st.subheader("Accounts")
-
-    # Filters
-    filter_col, sortby_col = st.columns(2)
-
-    # Filter button
-    with filter_col:
-        filters = [x for x in df_accounts.type.unique()]
-        filters.insert(0, "")
-        filter_value = st.selectbox('Filter type:', filters, key="filter_by_accounts")
-        if filter_value != "":
-            df_accounts = df_accounts[df_accounts["type"] == filter_value]
-
-    # Sort by button
-    with sortby_col:
-        sort_by = st.selectbox('Sort by:', df_accounts.columns, key="sort_by_accounts")
-        df_accounts = df_accounts.sort_values(sort_by)
-
-    # Display accounts
-    st.table(df_accounts)
-
 
     # Get budget table
     url = f"{api_url}/api/{api_version}/table/budget"
@@ -154,12 +140,12 @@ if page == pages[0]:
     # Generate DF
     df_budgets = pd.DataFrame(budget_table, columns=["id", "name", "month", "amount","created_at"])
     df_budgets["amount"] = df_budgets["amount"].apply(lambda x: f"{x:.2f} €")
+
+    # Create a dictionary mapping from id to name in df_budgets (used for df_transactions)
+    budget_id_to_name = pd.Series(df_budgets.name.values, index=df_budgets.id).to_dict()
+
     df_budgets.drop(columns=["id"], inplace=True)
     df_budgets["created_at"] = df_budgets["created_at"].str.split("T").str[0]
-    # Display accounts
-    st.subheader("Budgets")
-    st.table(df_budgets)
-
 
 
     # Get transaction table
@@ -171,38 +157,207 @@ if page == pages[0]:
     df_transactions = pd.DataFrame(transaction_table, columns=["id", "date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"])
     df_transactions["date"] = df_transactions["date"].str.split("T").str[0]
     df_transactions["amount"] = df_transactions["amount"].apply(lambda x: f"{x:.2f} €")
-    df_transactions.drop(columns=["id"], inplace=True)
 
+    # Map each budget id in df_transactions to its corresponding name using the dictionary
+    df_transactions["budget_name"] = df_transactions["budget"].map(budget_id_to_name).fillna("None")
+    df_transactions.drop(columns=["id", "budget"], inplace=True)
+    df_transactions.rename(columns={"budget_name": "budget"}, inplace=True)
+    df_transactions = df_transactions[["date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"]]
+
+
+
+
+    ## Display Accounts
+    st.subheader("Accounts")
+
+    # Filters
+    with st.expander("Account Filters"):
+        elt_to_display_col, filter_col, sortby_col = st.columns(3)
+
+        # Elt to display button
+        with elt_to_display_col:
+            filters = [x for x in elt_to_display]
+            filter_value = st.selectbox('Display:', filters, key="nb_elts_to_display_by_accounts")
+            if filter_value != "All":
+                df_accounts = df_accounts.head(int(filter_value))
+
+        # Filter button
+        with filter_col:
+            filters = [x for x in df_accounts.type.unique()]
+            filters.insert(0, "")
+            filter_value = st.selectbox('Filter type:', filters, key="filter_by_accounts")
+            if filter_value != "":
+                df_accounts = df_accounts[df_accounts["type"] == filter_value]
+
+        # Sort by button
+        with sortby_col:
+            sort_by = st.selectbox('Sort by:', df_accounts.columns, key="sort_by_accounts")
+            df_accounts = df_accounts.sort_values(sort_by)
+
+    # Interactive display of accounts
+    with st.expander("View Accounts"):
+        st.dataframe(df_accounts)
+        total_displayed_accounts_amount = df_accounts["balance"].apply(lambda x: float(x.split(" ")[0])).sum()
+        st.markdown(f"**Total amount in displayed accounts:** {total_displayed_accounts_amount:.2f} €", unsafe_allow_html=True)
+
+
+
+
+    ## Display Budgets
+    st.subheader("Budgets")
+
+    
+    # Filters
+    with st.expander("Budget Filters"):
+        elt_to_display_col, filter_col, sortby_col = st.columns(3)
+
+        # Elt to display button
+        with elt_to_display_col:
+            filters = [x for x in elt_to_display]
+            filter_value = st.selectbox('Display:', filters, key="nb_elts_to_display_by_budgets")
+            if filter_value != "All":
+                df_budgets = df_budgets.head(int(filter_value))
+
+        # Filter button
+        with filter_col:
+            filters = ["name", "month"]
+            filters.insert(0, "")
+            filter_value = st.selectbox('Filter by:', filters, key="filter_by_budgets")
+
+            if filter_value == "name":
+                available_budget_names = df_budgets["name"].unique()
+                filter_value = st.selectbox('Filter by name:', available_budget_names, key="filter_by_budgets_name")
+                df_budgets = df_budgets[df_budgets["name"] == filter_value]
+
+
+            if filter_value == "month":
+                filter_value = st.selectbox('Filter by month:', months, key="filter_by_budgets_month")
+                df_budgets = df_budgets[df_budgets["month"] == filter_value]
+
+
+        # Sort by button
+        with sortby_col:
+            sort_by = st.selectbox('Sort by:', df_budgets.columns, key="sort_by_budgets")
+            df_budgets = df_budgets.sort_values(sort_by)
+
+    # Interactive display of budgets
+    with st.expander("View Budgets"):
+        st.dataframe(df_budgets)
+        total_displayed_budgets_amount = df_budgets["amount"].apply(lambda x: float(x.split(" ")[0])).sum()
+        st.markdown(f"**Total amount in displayed budgets:** {total_displayed_budgets_amount:.2f} €", unsafe_allow_html=True)
+
+
+
+    ## Display Transactions
     st.subheader("Transactions")
 
     # Filters
-    filter_col, sortby_col = st.columns(2)
+    with st.expander("Transaction Filters"):
+        elt_to_display_col, sortby_col, filter_col = st.columns(3)
 
-    # Filter button
-    with filter_col:
-        filters = [x for x in df_transactions.type.unique()]
-        filters.insert(0, "")
-        filter_value = st.selectbox('Filter type:', filters, key="filter_by_transactions")
-        if filter_value != "":
-            df_transactions = df_transactions[df_transactions["type"] == filter_value]
-
-    # Sort by button
-    with sortby_col:
-        sort_by = st.selectbox('Sort by:', df_transactions.columns, key="sort_by_transactions")
-        df_transactions = df_transactions.sort_values(sort_by)
-
-    # Display accounts
-    st.table(df_transactions)
+        # Elt to display button
+        with elt_to_display_col:
+            filters = [x for x in elt_to_display]
+            filter_value = st.selectbox('Display:', filters, key="nb_elts_to_display_by_transactions")
+            if filter_value != "All":
+                df_transactions = df_transactions.head(int(filter_value))
 
 
+        # Sort by button
+        with sortby_col:
+            sort_by = st.selectbox('Sort by:', df_transactions.columns, key="sort_by_transactions")
+            df_transactions = df_transactions.sort_values(sort_by)
+
+
+        # Filter button
+        with filter_col:
+            # Initialize available filters
+            selected_filters = {
+                "month": None,
+                "type": None,
+                "origin_account": None,
+                "destination_account": None,
+                "budget": None,
+                "recipient": None,
+                "category": None
+            }
+
+            # Display checkboxes for each filter
+            for filter_name in selected_filters.keys():
+                if st.checkbox(f'Filter by {filter_name}', key=f'checkbox_{filter_name}'):
+                    # Display filter options based on filter_name
+                    if filter_name == "month":
+                        df_transactions["date"] = pd.to_datetime(df_transactions["date"])
+                        df_transactions["month"] = df_transactions["date"].dt.month
+                        unique_months = df_transactions["month"].unique()
+                        unique_months.sort()
+                        unique_months_names = [calendar.month_name[month] for month in unique_months]
+                        selected_filters[filter_name] = st.multiselect('Select month(s):', unique_months_names, key=f'select_{filter_name}')
+
+                    if filter_name == "type":
+                        selected_filters[filter_name] = st.multiselect('Filter by type:', df_transactions["type"].unique(), key=f'select_{filter_name}')
+
+                    if filter_name == "origin_account":
+                        selected_filters[filter_name] = st.multiselect('Filter by origin account:', df_transactions["origin_account"].unique(), key=f'select_{filter_name}')
+
+                    if filter_name == "destination_account":
+                        selected_filters[filter_name] = st.multiselect('Filter by destination account:', df_transactions["destination_account"].unique(), key=f'select_{filter_name}')
+
+                    if filter_name == "budget":
+                        selected_filters[filter_name] = st.multiselect('Filter by budget:', df_transactions["budget"].unique(), key=f'select_{filter_name}')
+
+                    if filter_name == "recipient":
+                        selected_filters[filter_name] = st.multiselect('Filter by recipient:', df_transactions["recipient"].unique(), key=f'select_{filter_name}')
+
+                    if filter_name == "category":
+                        selected_filters[filter_name] = st.multiselect('Filter by category:', df_transactions["category"].unique(), key=f'select_{filter_name}')
+
+
+            # Apply filters sequentially
+            for filter_name, filter_value in selected_filters.items():
+                if filter_value:
+                    # Apply filter based on filter_name
+                    if filter_name == "month":
+                        month_to_num = {month: index for index, month in enumerate(calendar.month_name) if month}
+                        filter_value_nums = [month_to_num[month] for month in filter_value]
+                        df_transactions = df_transactions[df_transactions["month"].isin(filter_value_nums)]
+
+                    if filter_name == "type":
+                        df_transactions = df_transactions[df_transactions["type"].isin(filter_value)]
+                    
+                    if filter_name == "origin_account":
+                        df_transactions = df_transactions[df_transactions["origin_account"].isin(filter_value)]
+                    
+                    if filter_name == "destination_account":
+                        df_transactions = df_transactions[df_transactions["destination_account"].isin(filter_value)]
+                    
+                    if filter_name == "budget":
+                        df_transactions = df_transactions[df_transactions["budget"].isin(filter_value)]
+                    
+                    if filter_name == "recipient":
+                        df_transactions = df_transactions[df_transactions["recipient"].isin(filter_value)]
+
+                    if filter_name == "category":
+                        df_transactions = df_transactions[df_transactions["category"].isin(filter_value)]
 
 
 
 
+
+
+
+    # Interactive display of transactions
+    with st.expander("View Transactions"):
+        st.dataframe(df_transactions)
+        total_displayed_transactions_amount = df_transactions["amount"].apply(lambda x: float(x.split(" ")[0])).sum()
+        st.markdown(f"**Total amount in displayed accounts:** {total_displayed_transactions_amount:.2f} €", unsafe_allow_html=True)
 
 
 
 ### END OF PAGE: OVERVIEW ###
+
+
+
 
 
 # Zoom In
