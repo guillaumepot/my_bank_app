@@ -1,5 +1,10 @@
 # Personal Bank App
 
+
+<img src="./media/bank_app_img.jpeg" width="350" height="350">
+
+
+
 This is a personal project to check my bank accounts. It is currently in development, with plans to add new features in the future.
 
 ---
@@ -51,6 +56,10 @@ This is a personal project to check my bank accounts. It is currently in develop
 |       ├── set_local_test.sh
 |       |
 |       └── remove_local_test.sh
+|
+├── media
+|       |
+|       └── bank_app_img.jpeg
 |
 ├── src
 |    |
