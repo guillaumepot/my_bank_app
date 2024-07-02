@@ -1,11 +1,6 @@
 """
 API - MAIN
 """
-# Version : 0.1.0
-# Current state : Prod
-# Author : Guillaume Pot
-# Contact : guillaumepot.pro@outlook.com
-
 
 """
 LIB

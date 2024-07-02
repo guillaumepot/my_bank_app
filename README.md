@@ -3,14 +3,35 @@
 This is a personal project to check my bank accounts. It is currently in development, with plans to add new features in the future.
 
 
+<img src="./media/bank_app_img.jpeg" width="350" height="350">
+
+
+---
+
+
+## Project Information
+
+- **Version**: 0.1.2 - Repo Update
+- **Development Stage**: Development
+- **Author**: Guillaume Pot
+- **Contact Information**: guillaumepot.pro@outlook.com
+
+---
+
+
 ## Table of Contents
 - [Repository Architecture](#repository-architecture)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Logs](#logs)
+- [Changelogs](#Changelogs)
 - [Roadmap](#roadmap)
 
+---
+
+
 ## Repository Architecture
+
+```
 ├── .github
 │   │
 │   └── workflows
@@ -23,11 +44,21 @@ This is a personal project to check my bank accounts. It is currently in develop
 |       |
 |       └── (obsolete)myBankPackage
 |        
+├── changelogs
+|       |
+|       ├── 0.1.0.md
+|       ├── 0.1.0.md
+|       └── 0.1.2.md
+|        
 ├── local_tests
 |       |
 |       ├── set_local_test.sh
 |       |
 |       └── remove_local_test.sh
+|
+├── media
+|       |
+|       └── bank_app_img.jpeg
 |
 ├── src
 |    |
@@ -84,14 +115,16 @@ This is a personal project to check my bank accounts. It is currently in develop
 ├── docker-compose.yaml
 │
 └── README.md
+```
 
-
+---
 
 ## Requirements
 - Python
 - Docker
 - Docker Compose
 
+---
 
 ## Installation
 - Add a folder for the postgres volume (default: ./storage/postgres_data)
@@ -104,58 +137,44 @@ This is a personal project to check my bank accounts. It is currently in develop
 - Use generate_tables.py to generate postgres Database
 - Use generate_user_credentials.py to generate new users
 
+---
+
+## Changelogs
+
+[v0.1.2](./changelogs/0.1.2.md)  
+[v0.1.1](./changelogs/0.1.1.md)  
+[v0.1.0](./changelogs/0.1.0.md)
 
 
-## Logs
 
-### POSTGRES
-- POSTGRES version 14
-- Current state: Prod
-
-
-
-### API
-- API version: 0.1.0
-- Current state: Prod
-
-#### Changelogs
-0.1.0 :
-    - API creation
-
-#### Todo
-- Add logger
-
-
-### Streamlit
-- Streamlit version: 0.1.1
-- Current state: Prod
-
-#### Changelogs
-- 0.1.1 :
-    - New display for Overview page
-    - Added filters
-    - Transaction DF now display budget name instead of budget id
-    - Removed obsolete "Zoom-in" page
-- 0.1.0 :
-    - Streamlit creation
-
-
-#### Todo
-- 
-
-
+---
 
 ## Roadmap
-[Done]
+
+**[Done]**
+```
+0.1.2 - Repo Update
+- Review README.MD
+0.1.0
 - First version of the app containing an API & a Streamlit interface
+0.1.1
 - Refactor API files (cleaning & readability)
 - Refactor Streamlit files (cleaning & readability)
+```
 
-[Todo]
-- Create an ETL pipline to get transaction datas
-- Add analytics charts (based on transactions) -> Analytics page ; Streamlit
-- Use a ML pipeline to predict things (budgets, ..)
-- Add more unit tests, e.g., API tests
-- Add Container tests (Github Actions)
-- Add a logger (API)
+
+**[Todo]**  
+```
+0.1.3
+- Add a simple logger (API)
 - Update API security (max requests, etc.)
+- Add Container tests (Github Actions)
+- Add more unit tests, e.g., API tests
+
+0.2.0
+- Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
+- Add analytics charts (based on transactions) -> Analytics page ; Streamlit
+
+0.3.0
+- Use a ML pipeline to predict things (budgets, ..)
+```

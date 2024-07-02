@@ -1,11 +1,6 @@
 """
 Generate user credentials & add it to PostgreSQL database.
 """
-# Version : 0.1.0
-# Current state : Prod
-# Author : Guillaume Pot
-# Contact : guillaumepot.pro@outlook.com
-
 
 # LIBS
 import uuid

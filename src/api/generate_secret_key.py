@@ -2,13 +2,6 @@
 Generate a secret key and store it in a file
 """
 
-# Version : 0.1.0
-# Current state : Prod
-# Author : Guillaume Pot
-# Contact : guillaumepot.pro@outlook.com
-
-
-
 from cryptography.fernet import Fernet
 
 def generate_secret_key() -> None:
