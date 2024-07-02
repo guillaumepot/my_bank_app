@@ -11,7 +11,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ## Project Information
 
-- **Version**: 0.1.2
+- **Version**: 0.1.2 - Repo Update
 - **Development Stage**: Development
 - **Author**: Guillaume Pot
 - **Contact Information**: guillaumepot.pro@outlook.com
@@ -153,7 +153,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 **[Done]**
 ```
-0.1.2
+0.1.2 - Repo Update
 - Review README.MD
 0.1.0
 - First version of the app containing an API & a Streamlit interface
@@ -165,7 +165,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 **[Todo]**  
 ```
-0.1.2
+0.1.3
 - Add a simple logger (API)
 - Update API security (max requests, etc.)
 - Add Container tests (Github Actions)
