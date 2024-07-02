@@ -1,10 +1,6 @@
 """
 Generate table in a PostgreSQL database
 """
-# Version : 0.1.0
-# Current state : Prod
-# Author : Guillaume Pot
-# Contact : guillaumepot.pro@outlook.com
 
 import argparse
 import psycopg2
