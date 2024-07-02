@@ -1,11 +1,10 @@
 # Personal Bank App
 
+This is a personal project to check my bank accounts. It is currently in development, with plans to add new features in the future.
+
 
 <img src="./media/bank_app_img.jpeg" width="350" height="350">
 
-
-
-This is a personal project to check my bank accounts. It is currently in development, with plans to add new features in the future.
 
 ---
 
