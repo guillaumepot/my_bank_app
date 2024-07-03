@@ -339,8 +339,10 @@ if page == pages[0]:
     # Interactive display of transactions
     with st.expander("View Transactions"):
         st.dataframe(df_transactions)
-        total_displayed_transactions_amount = df_transactions["amount"].apply(lambda x: float(x.split(" ")[0])).sum()
-        st.markdown(f"**Total amount in displayed accounts:** {total_displayed_transactions_amount:.2f} €", unsafe_allow_html=True)
+        credit_amount = df_transactions[df_transactions["type"] == "credit"]["amount"].apply(lambda x: float(x.split(" ")[0])).sum()
+        debit_amount = df_transactions[df_transactions["type"] == "debit"]["amount"].apply(lambda x: float(x.split(" ")[0])).sum()
+        evaluated_amount = credit_amount - debit_amount
+        st.markdown(f"**Evaluated amount in transactions:** {evaluated_amount:.2f} €", unsafe_allow_html=True)
 
 
 
