@@ -141,6 +141,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ## Changelogs
 
+[v0.1.2](./changelogs/0.1.3.md)  
 [v0.1.2](./changelogs/0.1.2.md)  
 [v0.1.1](./changelogs/0.1.1.md)  
 [v0.1.0](./changelogs/0.1.0.md)
@@ -153,6 +154,9 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 **[Done]**
 ```
+0.1.3 - Security update
+-
+-
 0.1.2 - Repo Update
 - Review README.MD
 0.1.0
