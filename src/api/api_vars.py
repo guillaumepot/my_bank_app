@@ -17,7 +17,7 @@ from fastapi.security import OAuth2PasswordBearer
 VARS
 """
 # API metadatas
-api_version = "0.1.0"
+api_version = "0.1.2"
 current_state = "Prod"
 
 # UUID Generation
