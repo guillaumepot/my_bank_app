@@ -141,7 +141,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ## Changelogs
 
-[v0.1.2](./changelogs/0.1.3.md)  
+[v0.1.3](./changelogs/0.1.3.md)  
 [v0.1.2](./changelogs/0.1.2.md)  
 [v0.1.1](./changelogs/0.1.1.md)  
 [v0.1.0](./changelogs/0.1.0.md)
@@ -154,31 +154,35 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 **[Done]**
 ```
-0.1.3 - Security update
--
--
+0.1.3 - Mini Analytics update
+- Streamlit Analytics page now display charts based on transactions
+- Clean Streamlit code
+
 0.1.2 - Repo Update
 - Review README.MD
-0.1.0
-- First version of the app containing an API & a Streamlit interface
+
 0.1.1
 - Refactor API files (cleaning & readability)
 - Refactor Streamlit files (cleaning & readability)
+
+0.1.0
+- First version of the app containing an API & a Streamlit interface
 ```
 
 
 **[Todo]**  
 ```
-0.1.3
+0.1.4 - Api security
 - Add a simple logger (API)
 - Update API security (max requests, etc.)
+0.1.5 - Streamlit code
+- Streamlit refactorization
+0.1.6 - CI Update
 - Add Container tests (Github Actions)
 - Add more unit tests, e.g., API tests
-
 0.2.0
 - Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
-
 0.3.0
 - Use a ML pipeline to predict things (budgets, ..)
 ```

@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy files
 COPY ./requirements.txt /app
 COPY ./streamlit.py /app
-
+COPY ./api_requests_functions.py /app
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
