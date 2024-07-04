@@ -3,29 +3,22 @@
 """
 
 # LIBS
-import os
-import requests
 import calendar
 import pandas as pd
+import requests
 import streamlit as st
 
-
+from api_requests_functions import api_version, api_url
+from api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
+from api_requests_functions import get_bar_chart, get_time_series
 # VARS
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-login_data = {}
 elt_to_display = ["All", "1", "5", "10", "15", "30", "50"]
+login_data = {}
 
-
-# API VARS
-api_version = os.getenv("API_VERSION", "0.1.0")
-api_url = os.getenv("API_URL", "http://localhost:8000")
 
 # API STATUS CHECKING
-url = f"{api_url}/api/{api_version}/status"
-response = requests.get(url)
-if response.status_code != 200:
-    st.error("Error while checking API status.")
-    st.stop()
+get_api_status()
 
 
 # Initialize session state
@@ -47,48 +40,40 @@ if 'selected_account' not in st.session_state:
 st.sidebar.title("Personal bank app")
 
 # Authentication panel
-st.sidebar.title("Authentication")
+st.sidebar.subheader("Authentication")
 if st.session_state.access_token == None:
-    # Login button
-        login_placeholder = st.sidebar.empty()
-        login_username = st.sidebar.text_input("Username")
-        login_password = st.sidebar.text_input("Password", type="password")
-        if st.sidebar.button("Log In"):
-            login_data = {
-                "grant_type": "",
-                "username": login_username,
-                "password": login_password,
-                "scope": "",
-                "client_id": "",
-                "client_secret": ""
-            }
-            # Request API
-            url = f"{api_url}/api/{api_version}/login"
-            response = requests.post(url, data=login_data)
-            if response.status_code == 200:
-                access_token = response.json().get("access_token")
-                st.sidebar.success("Logged In Successfully!")
-                login_placeholder.empty()
-                st.session_state.access_token = access_token
-                st.sidebar.empty()
 
-            else:
-                st.sidebar.error("Incorrect Username or Password.")
-  
+    # Display error message if not logged in on the main page
+    st.error("Please Log In to access the app.")
+
+    # Username & Password inputs
+    login_username = st.sidebar.text_input("Username")
+    login_password = st.sidebar.text_input("Password", type="password")
+
+    # Define login_data
+    login_data = {
+        "grant_type": "",
+        "username": login_username,
+        "password": login_password,
+        "scope": "",
+        "client_id": "",
+        "client_secret": ""
+    }
+
+    # Request API on submitted Log In button
+    st.sidebar.button("Log In", on_click=validate_credentials, args=(login_data,))
+    st.stop()
+
+
 else:
-# Logout button
+    # Logout button
     st.sidebar.empty()
     if st.sidebar.button("Log Out", key="sidebar_logout_button"):
         st.session_state.pop('access_token', None)
         st.rerun()
 
-
-# Pages (Displayed only if logged in)
-if st.session_state.access_token == None:
-    st.error("Please Log In to access the app.")
-    st.stop()
-pages=["Overview", "Transactions", "Analytics", "Settings"]
-page=st.sidebar.radio("Navigation", pages)
+    pages=["Overview", "Transactions", "Analytics", "Settings"]
+    page=st.sidebar.radio("Navigation", pages)
 
 ## END OF SIDEBAR ##
 
@@ -102,63 +87,19 @@ st.session_state.headers = {
     "Authorization": f"Bearer {st.session_state.access_token}"
     }        
 
-
-
-
 ### PAGES ###
 
 # Overview
 if page == pages[0]:
     st.title("Overview")
 
-
     ## Get Tables
-
-
     # Get account table
-    url = f"{api_url}/api/{api_version}/table/account"
-    account_table = requests.get(url, headers=st.session_state.headers)
-    account_table = dict(account_table.json())
-    account_table = account_table['account table']
-    # Generate DF
-    df_accounts = pd.DataFrame(account_table, columns=["id", "name", "type", "balance", "owner_id", "created_at"])
-    df_accounts["balance"] = df_accounts["balance"].apply(lambda x: f"{x:.2f} €")
-    df_accounts.drop(columns=["id", "owner_id"], inplace=True)
-    df_accounts["created_at"] = df_accounts["created_at"].str.split("T").str[0]
-
-
+    df_accounts = get_account_table()
     # Get budget table
-    url = f"{api_url}/api/{api_version}/table/budget"
-    budget_table = requests.get(url, headers=st.session_state.headers)
-    budget_table = budget_table.json()
-    budget_table = budget_table["budget table"]
-    # Generate DF
-    df_budgets = pd.DataFrame(budget_table, columns=["id", "name", "month", "amount","created_at"])
-    df_budgets["amount"] = df_budgets["amount"].apply(lambda x: f"{x:.2f} €")
-
-    # Create a dictionary mapping from id to name in df_budgets (used for df_transactions)
-    budget_id_to_name = pd.Series(df_budgets.name.values, index=df_budgets.id).to_dict()
-
-    df_budgets.drop(columns=["id"], inplace=True)
-    df_budgets["created_at"] = df_budgets["created_at"].str.split("T").str[0]
-
-
+    df_budgets, budget_id_to_name = get_budget_table()
     # Get transaction table
-    url = f"{api_url}/api/{api_version}/table/transaction"
-    transaction_table = requests.get(url, headers=st.session_state.headers)
-    transaction_table = dict(transaction_table.json())
-    transaction_table = transaction_table['transaction table']
-    # Generate DF
-    df_transactions = pd.DataFrame(transaction_table, columns=["id", "date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"])
-    df_transactions["date"] = df_transactions["date"].str.split("T").str[0]
-    df_transactions["amount"] = df_transactions["amount"].apply(lambda x: f"{x:.2f} €")
-
-    # Map each budget id in df_transactions to its corresponding name using the dictionary
-    df_transactions["budget_name"] = df_transactions["budget"].map(budget_id_to_name).fillna("None")
-    df_transactions.drop(columns=["id", "budget"], inplace=True)
-    df_transactions.rename(columns={"budget_name": "budget"}, inplace=True)
-    df_transactions = df_transactions[["date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"]]
-
+    df_transactions = get_transaction_table(budget_id_to_name)
 
 
 
@@ -201,7 +142,6 @@ if page == pages[0]:
     ## Display Budgets
     st.subheader("Budgets")
 
-    
     # Filters
     with st.expander("Budget Filters"):
         elt_to_display_col, filter_col, sortby_col = st.columns(3)
@@ -432,7 +372,78 @@ if page == pages[1]:
 ### ANALYTICS ###
 if page == pages[2]: 
     st.title("Analytics")
-    st.warning("Not implemented yet")
+    st.warning("WORK IN PROGRESS")
+
+
+    # Get transaction table
+    df_budgets, budget_id_to_name = get_budget_table()
+    df_transactions = get_transaction_table(budget_id_to_name)
+
+    df_cat = df_transactions[["date", "type", "amount", "category", "recipient"]]
+    df_cat["amount"] = df_cat["amount"].apply(lambda x: float(x.split(" ")[0])).astype(float) # Convert amount to float
+    df_cat["year"] = pd.to_datetime(df_cat["date"]).dt.year.astype(str)
+    df_cat["month"] = pd.to_datetime(df_cat["date"]).dt.month_name()
+    df_cat["weekday"] = pd.to_datetime(df_cat["date"]).dt.weekday.apply(lambda x: calendar.day_name[x])
+    df_time_series = df_cat.copy()
+
+    # Build charts
+    with st.expander("Bar plots"):
+
+        plot_choice_col, transaction_type_col = st.columns(2)
+        with plot_choice_col:
+            plot_choice = st.selectbox("Plot choice:", ["Category", "Recipient", "Temporal"], key="plot_choice_analytics")
+        with transaction_type_col:
+            transaction_type = st.selectbox("Transaction type:", ["debit", "credit"], key="transaction_type_analytics")
+
+            df_cat = df_cat[df_cat["type"] == transaction_type]
+
+        if plot_choice == "Category" or plot_choice == "Recipient":
+            temporal_choice = st.selectbox("Temporal choice:", ["", "Year", "Month", "Weekday"], key="temporal_choice_analytics")
+            if temporal_choice == "Year":
+                available_years_df_cat = [elt for elt in df_cat["year"].unique()]
+                available_years_df_cat.insert(0, "")
+                year_choice = st.selectbox("Choose year:", available_years_df_cat, key="year_choice_analytics")
+                if year_choice != "":
+                    df_cat = df_cat[df_cat["year"] == year_choice]
+
+            if temporal_choice == "Month":
+                available_months_df_cat = [elt for elt in df_cat["month"].unique()]
+                available_months_df_cat.insert(0, "")
+                month_choice = st.selectbox("Choose month:", available_months_df_cat, key="month_choice_analytics")
+                if month_choice != "":
+                    df_cat = df_cat[df_cat["month"] == month_choice]
+
+            if temporal_choice == "Weekday":
+                available_weekdays_df_cat = [elt for elt in df_cat["weekday"].unique()]
+                available_weekdays_df_cat.insert(0, "")
+                weekday_choice = st.selectbox("Choose weekday:", available_weekdays_df_cat, key="weekday_choice_analytics")
+                if weekday_choice != "":
+                    df_cat = df_cat[df_cat["weekday"] == weekday_choice]
+
+        if plot_choice == "Category":
+            df_cat = df_cat.groupby("category").agg({"amount": "sum"}).sort_values("amount", ascending=False).reset_index()
+            get_bar_chart(df_cat, "category", "amount")
+
+        elif plot_choice == "Recipient":
+            df_cat = df_cat.groupby("recipient").agg({"amount": "sum"}).sort_values("amount", ascending=False).reset_index()
+            get_bar_chart(df_cat, "recipient", "amount")
+
+        elif plot_choice == "Temporal":
+            display_by_temporal = st.selectbox("Display by:", ["", "Year", "Month", "Weekday"], key="display_by_temporal_analytics")
+            if display_by_temporal == "Year":
+                df_cat = df_cat.groupby(["year", "category"]).agg({"amount": "sum"}).sort_values("amount", ascending=False).reset_index()
+                get_bar_chart(df_cat, "year", "amount", legend=df_cat["category"].unique())
+
+            if display_by_temporal == "Month":
+                df_cat = df_cat.groupby(["month", "category"]).agg({"amount": "sum"}).sort_values("amount", ascending=False).reset_index()
+                get_bar_chart(df_cat, "month", "amount", legend=df_cat["category"].unique())
+
+            if display_by_temporal == "Weekday":
+                df_cat = df_cat.groupby(["weekday", "category"]).agg({"amount": "sum"}).sort_values("amount", ascending=False).reset_index()
+                get_bar_chart(df_cat, "weekday", "amount", legend=df_cat["category"].unique())
+
+    with st.expander("Time series"):
+        get_time_series(df_time_series)
 
 ### END OF PAGE: ANALYTICS ###
 
