@@ -5,8 +5,13 @@ API - MAIN
 """
 LIB
 """
-from fastapi import FastAPI
-
+from fastapi import FastAPI, Request
+import logging
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from starlette.responses import JSONResponse, Response
+from starlette.middleware.base import BaseHTTPMiddleware
 
 """
 VARS
@@ -48,13 +53,69 @@ app = FastAPI(
     ]
 )
 
+
+# LIMITER
+limiter = Limiter(key_func=get_remote_address)
+
+# Limiter Middleware
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
+    status_code=429,
+    content={"detail": "Rate limit exceeded"}
+))
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    response = await call_next(request)
+    return response
+
+
 ######################################################################################
 """
 API Logger
 """
+# Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("api_logger")
 
-# LOGGER WIP
+# File handler
+# Create a file handler
+file_handler = logging.FileHandler('api_logs.log')
+file_handler.setLevel(logging.INFO)
+# Create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
 
+logger.addHandler(file_handler)
+
+
+# Middleware to sanitize sensitive information
+class SanitizeLoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Extract client IP
+        client_ip = request.client.host
+
+        # Extract request body
+        body = await request.body()
+        body_str = body.decode("utf-8")
+
+        # Sanitize sensitive information
+        if "password" in body_str:
+            body_str = body_str.replace("password", "****")
+
+        # Log sanitized request details
+        logger.info(f"Request: {request.method} {request.url} from {client_ip} with body: {body_str}")
+
+        # Process request
+        response = await call_next(request)
+
+        # Log response status
+        logger.info(f"Response status: {response.status_code}\n")
+        return response
+
+
+# Add middleware to the FastAPI application
+app.add_middleware(SanitizeLoggingMiddleware)
 
 
 ######################################################################################

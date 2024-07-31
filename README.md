@@ -158,11 +158,10 @@ This is a personal project to check my bank accounts. It is currently in develop
 ## Roadmap
 
 ```
-- Add a simple logger (API)
-- Update API security (max requests, etc.)
 - Streamlit refactorization
 - Add Container tests (Github Actions)
 - Add more unit tests, e.g., API tests
+
 - Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
 - Use a ML pipeline to predict things (budgets, ..)

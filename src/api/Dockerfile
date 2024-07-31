@@ -27,9 +27,8 @@ RUN chmod +x ./generate_secret_key.sh
 # Port to expose
 EXPOSE 8000
 
-# Start uvicorn server
-CMD uvicorn api_main:app --host $UVICORN_HOST --port $UVICORN_PORT
-
-
 # Define the entrypoint
 ENTRYPOINT ["./generate_secret_key.sh"]
+
+# Start uvicorn server
+CMD uvicorn api_main:app --host $UVICORN_HOST --port $UVICORN_PORT

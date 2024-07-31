@@ -5,10 +5,11 @@ API - AUTH ROUTER
 """
 LIB
 """
-import jwt
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import datetime, timedelta
+import jwt
+from slowapi.decorator import limiter
 
 
 from api_db_connectors import query_for_informations
@@ -53,7 +54,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 @auth_router.post(f"/api/{api_version}/login", name="login", tags=['auth'])
-def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
+@limiter.limit("5/hour") 
+async def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
     Authenticates the user based on the provided credentials and generates an access token.
 
@@ -68,7 +70,7 @@ def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
     """
 
     # Load existing user datas from table
-    results = query_for_informations(request_to_do='get_username_informations', additional = credentials.username)
+    results = await query_for_informations(request_to_do='get_username_informations', additional = credentials.username)
 
 
     # CREDENTIALS CONTROL

@@ -17,7 +17,8 @@ pycparser
 pydantic 
 pydantic_core 
 setuptools==69.5.1
-six 
+six
+slowapi
 sniffio 
 SQLAlchemy 
 starlette 
