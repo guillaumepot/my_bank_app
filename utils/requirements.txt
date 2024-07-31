@@ -3,10 +3,10 @@ argon2-cffi-bindings
 bcrypt 
 cffi 
 cryptography 
-passlib==1.7.4
+passlib
 psycopg2 
 pycparser 
-setuptools==69.5.1
+setuptools
 six 
 typing_extensions 
-wheel==0.43.0
+wheel

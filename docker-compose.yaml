@@ -7,8 +7,8 @@ services:
       - .env
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    #ports:
+      #- "5432:5432"
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -57,6 +57,23 @@ services:
       retries: 3
     networks:
       - bank_app_network
+
+
+
+  # Optional: PG Admin
+  # container_pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=mail@mail.com
+  #     - PGADMIN_DEFAULT_PASSWORD=password
+  #   ports:
+  #     - "5050:80"
+  #   restart: always
+  #   networks:
+  #     - bank_app_network
+
+
 
 
 # Networks

@@ -8,7 +8,7 @@ import streamlit as st
 
 
 # API VARS
-api_version = os.getenv("API_VERSION", "0.1.2")
+api_version = os.getenv("API_VERSION", "0.1.4")
 api_url = os.getenv("API_URL", "http://localhost:8000")
 
 login_placeholder = st.sidebar.empty()
@@ -45,7 +45,10 @@ def validate_credentials(login_data: dict) -> None:
 
 def get_account_table() -> pd.DataFrame:
     """
+    Retrieves the account table from the API and returns it as a pandas DataFrame.
 
+    Returns:
+        pd.DataFrame: The account table with columns: "name", "type", "balance", and "created_at".
     """
     # Request API
     url = f"{api_url}/api/{api_version}/table/account"
@@ -61,9 +64,14 @@ def get_account_table() -> pd.DataFrame:
 
     return df_accounts
 
+
 def get_budget_table() -> pd.DataFrame:
     """
-    
+    Retrieves the budget table from the API and returns it as a pandas DataFrame.
+
+    Returns:
+        df_budgets (pd.DataFrame): The budget table as a pandas DataFrame.
+        budget_id_to_name (dict): A dictionary mapping budget IDs to budget names.
     """
     # Request API
     url = f"{api_url}/api/{api_version}/table/budget"
@@ -86,13 +94,21 @@ def get_budget_table() -> pd.DataFrame:
 
 def get_transaction_table(budget_id_to_name) -> pd.DataFrame:
     """
-    
+    Retrieves the transaction table from the API and returns it as a pandas DataFrame.
+
+    Parameters:
+    - budget_id_to_name (dict): A dictionary mapping budget IDs to their corresponding names.
+
+    Returns:
+    - df_transactions (pd.DataFrame): The transaction table as a pandas DataFrame, with columns for date, type, amount, origin account, destination account, budget, recipient, category, and description.
     """
+
     # Request API
     url = f"{api_url}/api/{api_version}/table/transaction"
     transaction_table = requests.get(url, headers=st.session_state.headers)
     transaction_table = dict(transaction_table.json())
     transaction_table = transaction_table['transaction table']
+
     # Generate DF
     df_transactions = pd.DataFrame(transaction_table, columns=["id", "date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"])
     df_transactions["date"] = df_transactions["date"].str.split("T").str[0]
@@ -108,9 +124,64 @@ def get_transaction_table(budget_id_to_name) -> pd.DataFrame:
 
 
 
+def post_transaction_creation(transaction_data: dict) -> None:
+    """
+    Sends a POST request to create a new transaction.
+
+    Args:
+        transaction_data (dict): A dictionary containing the transaction data.
+
+    Returns:
+        None
+
+    Raises:
+        None
+
+    """
+    url = f"{api_url}/api/{api_version}/create/transaction"
+
+    response = requests.post(url, params=transaction_data, headers=st.session_state.headers)
+    if response.status_code == 200:
+        st.success(response.json())
+    else:
+        st.error("An error occurred.")
+
+
+def delete_transaction(transaction_id_to_remove: str) -> None:
+    """
+    Deletes a transaction with the specified transaction ID.
+
+    Parameters:
+        transaction_id_to_remove (str): The ID of the transaction to be deleted.
+
+    Returns:
+        None
+
+    Raises:
+        None
+    """
+    url = f"{api_url}/api/{api_version}/delete/transaction?transaction_id={transaction_id_to_remove}"
+    response = requests.delete(url, headers=st.session_state.headers)
+    if response.status_code == 200:
+        st.success(response.json())
+    else:
+        st.error("An error occurred.")
+        st.write(response)
+
+
+
 def get_bar_chart(df, name, amount, legend=None):
     """
-    
+    Generate a bar chart based on the given DataFrame.
+
+    Parameters:
+    - df (pandas.DataFrame): The DataFrame containing the data for the chart.
+    - name (str): The name of the column to be used as the x-axis.
+    - amount (str): The name of the column to be used as the y-axis.
+    - legend (list, optional): A list of labels for the legend. Default is None.
+
+    Returns:
+    None
     """
     x = df[name]
     y = df[amount]
@@ -119,13 +190,12 @@ def get_bar_chart(df, name, amount, legend=None):
 
     bars = plt.bar(x, y, color=colors)
 
-    #if legend is None:
     for bar in bars:
         height = bar.get_height()
         plt.text(bar.get_x() + bar.get_width() / 2, height - (height*0.05), f'{height}'+"€", ha='center', va='top', color='white') 
 
     plt.title(f"{name} expenses")
-    plt.xlabel(name, fontweight='bold')
+    plt.xlabel(name, fontweight='bold', rotation = 90)
     plt.ylabel(amount, fontweight='bold')
 
     if legend is not None:
@@ -137,7 +207,13 @@ def get_bar_chart(df, name, amount, legend=None):
 
 def get_time_series(df):
     """
+    Calculate the cumulative sum of expenses over time and plot the results.
     
+    Parameters:
+    - df (pandas.DataFrame): The input DataFrame containing the expenses data.
+    
+    Returns:
+    None
     """
     # Convert 'date' to datetime format
     df['date'] = pd.to_datetime(df['date'])
@@ -153,6 +229,6 @@ def get_time_series(df):
     plt.plot(df['year_month'].astype(str), df["cumsum"], color="blue")  # Convert 'year_month' to string for plotting
     plt.fill_between(df['year_month'].astype(str), df["cumsum"], color="blue", alpha=0.3)
     plt.title("Cumulative expenses over time")
-    plt.xlabel("Date", fontweight='bold')
+    plt.xlabel("Date", fontweight='bold', rotation=90)
     plt.ylabel("Amount", fontweight='bold')
     st.pyplot(fig)

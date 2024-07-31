@@ -75,14 +75,31 @@ def app_create_transaction(transaction_date: str,
                            recipient:str = "Unknown",
                            description: str = "",
                            current_user: str = Depends(get_current_user)) -> dict:
+    
     """
+    Create a new transaction and apply it to the accounts and budget.
 
+    Args:
+        transaction_date (str): The date of the transaction in the format 'YYYY-MM-DD'.
+        transaction_type (str): The type of the transaction.
+        transaction_amount (float): The amount of the transaction.
+        origin_account (str, optional): The origin account for debit transactions. Defaults to None.
+        destination_account (str, optional): The destination account for credit transactions. Defaults to None.
+        budget_name (str, optional): The name of the budget. Defaults to None.
+        budget_month (str, optional): The month of the budget. Defaults to None.
+        category (str, optional): The category of the transaction. Defaults to "Unknown".
+        recipient (str, optional): The recipient of the transaction. Defaults to "Unknown".
+        description (str, optional): The description of the transaction. Defaults to "".
+        current_user (str, optional): The current user. Defaults to Depends(get_current_user).
+
+    Returns:
+        dict: A dictionary with a message indicating the success of the transaction creation and application.
     """
-
+    
     # Check if balance <= 0
     if transaction_amount <= 0:
         raise HTTPException(status_code=400, detail="Transaction amount must be positive and greater than 0")
-    
+
     # Check if transaction type is valid
     if transaction_type not in available_transactions_types:
         raise HTTPException(status_code=400, detail="Invalid transaction type.")
@@ -90,9 +107,9 @@ def app_create_transaction(transaction_date: str,
     # Check if account is provided for debit, credit, and transfer transactions
     if transaction_type == "debit" and origin_account is None:
         raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
-    if transaction_type == "credit" and destination_account is None:
+    elif transaction_type == "credit" and destination_account is None:
         raise HTTPException(status_code=400, detail="Destination account is required for credit transactions.")
-    if transaction_type == "transfer" and (origin_account is None or destination_account is None):
+    elif transaction_type == "transfer" and (origin_account is None or destination_account is None):
         raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
 
     # If budget None, convert to default budget ID, else get budget ID
@@ -103,6 +120,7 @@ def app_create_transaction(transaction_date: str,
         default_budget_info = next((budget for budget in results if budget['name'].strip().lower() == 'default'), None)
         budget_id = default_budget_info.get('id') if default_budget_info else None
         default_budget = True
+        
     else:
         # get the budget ID
         budget_info = next((budget for budget in results if budget['name'].strip().lower() == budget_name.strip().lower() and budget['month'].strip().lower() == budget_month.strip().lower()), None)
@@ -128,7 +146,7 @@ def app_create_transaction(transaction_date: str,
     if not default_budget:
         values_to_apply = (transaction_amount, budget_id)
         query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
-
+    
     return {"message": "Transaction created & applied successfully."}
 
 
@@ -136,7 +154,47 @@ def app_create_transaction(transaction_date: str,
 @transaction_router.delete(f"/api/{api_version}/delete/transaction", name="delete_transaction", tags=['transaction'])
 def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_current_user)) -> dict:
     """
-    
+    Deletes a transaction from the database and updates the corresponding accounts and budget.
+
+    Args:
+        transaction_id (str): The ID of the transaction to be deleted.
+        current_user (str, optional): The current user. Defaults to Depends(get_current_user).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
     """
+    # Get transaction information
+    results = query_for_informations(request_to_do="get_transaction_by_id", additional=transaction_id)
+    transaction_info = next((transaction for transaction in results if transaction['id'] == transaction_id), None)
+    transaction_type = transaction_info.get('type')
+    transaction_amount = transaction_info.get('amount')
+    origin_account = transaction_info.get('origin_account')
+    destination_account = transaction_info.get('destination_account')
+    budget_id = transaction_info.get('budget')
+
+    # If transaction type is debit, add the amount back to the account
+    if transaction_type == 'debit':
+        values_to_apply = ('credit', transaction_amount, origin_account)
+        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+
+    # If transaction type is credit, remove the amount from the account
+    elif transaction_type == 'credit':
+        values_to_apply = ('debit', transaction_amount, destination_account)
+        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+
+    # If transaction type is transfer, add the amount back to the origin account and remove it from the destination account
+    elif transaction_type == 'transfer':
+        values_to_apply = ('transfert', transaction_amount, origin_account, destination_account)
+        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+
+    # Apply the transaction to the budget (add the amount back)
+    transaction_amount = -transaction_amount
+    values_to_apply = (transaction_amount, budget_id)
+    query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
+
+    # Delete transaction
     query_insert_values(request_to_do='delete_transaction', additional=transaction_id)
+
+    
     return {"message": f"Transaction with id {transaction_id} deleted successfully."}
