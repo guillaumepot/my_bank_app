@@ -6,6 +6,7 @@ __pycache__/
 
 # Ignore .venv
 .venv/
+test_venv/
 
 # Ignore build and egg-info directories
 build/

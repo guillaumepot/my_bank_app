@@ -126,7 +126,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 ---
 
 ## Requirements
-- Python
+- Python with psycopg2, passlib
 - Docker
 - Docker Compose
 
