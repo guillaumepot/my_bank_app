@@ -305,6 +305,15 @@ if page == pages[0]:
 if page == pages[1]: 
     st.title("Transactions")
 
+    # Get transaction table
+    df_transactions = get_transaction_table(budget_id_to_name)
+    transaction_id_list = sorted(df_transactions.index.tolist())
+    current_transaction_categories = [category for category in df_transactions["category"].unique()]
+    current_transaction_categories.insert(0, "New Category")
+
+
+
+
 
     # Button to choose : Create | Delete (transaction)
     create_delete_choice_transaction = st.radio("Choose", ["Create Transaction", "Delete Transaction"], key="create_delete_choice_transaction")
@@ -349,7 +358,12 @@ if page == pages[1]:
             budget_name = st.selectbox("Choose budget", budget_names, key="transaction_budget_name")
             budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
             transaction_recipient = st.text_input(label="Transaction Recipient")
-            category = st.text_input(label="Transaction Category")
+            
+            #category = st.text_input(label="Transaction Category") # OLD
+            category = st.selectbox("Choose category", current_transaction_categories, key="transaction_category")
+            if category == "New Category":
+                category = st.text_input(label="New Category")
+
             description = st.text_input(label="Transaction Description")
 
 
@@ -378,10 +392,6 @@ if page == pages[1]:
 
     # Delete transaction choice
     if create_delete_choice_transaction == "Delete Transaction":
-        # Get transaction table
-        df_transactions = get_transaction_table(budget_id_to_name)
-        transaction_id_list = sorted(df_transactions.index.tolist())
-
 
         with st.form(key="delete_transaction_form"):
             st.subheader("Select transaction id to remove:")
