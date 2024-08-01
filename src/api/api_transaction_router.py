@@ -60,6 +60,19 @@ def app_load_transaction_table(current_user: str = Depends(get_current_user)) ->
     return {'transaction table': transaction_table}
 
 
+# Display existing categories
+@transaction_router.get(f"/api/{api_version}/transaction/categories", name="get_existing_transaction_categories", tags=['transaction'])
+def app_get_existing_transaction_categories(current_user: str = Depends(get_current_user)) -> dict:
+    """
+    Retrieve the existing transaction categories from the database.
+
+    Returns:
+        A dictionary containing the existing categories as a list.
+    """
+    results = query_for_informations(request_to_do='get_existing_categories', additional=None)
+    existing_categories = [category for category in results]
+
+    return {"existing categories": existing_categories}
 
 
 # Create Transaction
@@ -173,14 +186,18 @@ def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_
     destination_account = transaction_info.get('destination_account')
     budget_id = transaction_info.get('budget')
 
+    # Change the sign of amount
+    transaction_amount = -transaction_amount
+
+
     # If transaction type is debit, add the amount back to the account
     if transaction_type == 'debit':
-        values_to_apply = ('credit', transaction_amount, origin_account)
+        values_to_apply = ('debit', transaction_amount, origin_account, destination_account)
         query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # If transaction type is credit, remove the amount from the account
     elif transaction_type == 'credit':
-        values_to_apply = ('debit', transaction_amount, destination_account)
+        values_to_apply = ('credit', transaction_amount, origin_account, destination_account)
         query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # If transaction type is transfer, add the amount back to the origin account and remove it from the destination account
@@ -189,7 +206,6 @@ def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_
         query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # Apply the transaction to the budget (add the amount back)
-    transaction_amount = -transaction_amount
     values_to_apply = (transaction_amount, budget_id)
     query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
 

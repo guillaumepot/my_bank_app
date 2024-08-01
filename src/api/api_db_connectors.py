@@ -95,6 +95,9 @@ def query_for_informations(request_to_do: str = None, additional=None) -> dict:
     if request_to_do == 'get_transaction_by_id':
         query = 'SELECT * FROM transactions WHERE id=%s'
 
+    if request_to_do == 'get_existing_categories':
+        query = 'SELECT DISTINCT category FROM transactions'
+
     # Get engine
     engine = connect_to_db()
 
