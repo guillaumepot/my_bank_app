@@ -1,7 +1,7 @@
 annotated-types 
 anyio 
-argon2-cffi 
-argon2-cffi-bindings 
+argon2-cffi
+argon2-cffi-bindings
 bcrypt 
 cffi 
 click 

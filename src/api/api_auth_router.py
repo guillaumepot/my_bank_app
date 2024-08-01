@@ -13,6 +13,7 @@ from slowapi.decorator import limiter
 
 
 from api_db_connectors import query_for_informations
+from api_main import limiter
 
 
 """

@@ -27,7 +27,6 @@ def generate_uuid():
     return id
 
 
-
 # Auth
 crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
 pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
@@ -39,8 +38,6 @@ jwt_secret_key = os.getenv("BANK_APP_API_TOKEN_SECRET_KEY") # Key is generated b
 
 if jwt_secret_key is None:
     raise ValueError("The environment variable BANK_APP_API_TOKEN_SECRET_KEY is not set. This is required for JWT token generation.")
-
-
 
 
 authorized_users = os.getenv("AUTHORIZED_USERS").split(',')

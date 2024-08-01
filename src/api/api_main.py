@@ -13,6 +13,7 @@ from slowapi.errors import RateLimitExceeded
 from starlette.responses import JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 """
 VARS
 """

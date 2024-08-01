@@ -37,12 +37,12 @@ services:
       - POSTGRES_DB=bank_db
       - ALGORITHM="HS256"
       - ACCESS_TOKEN_EXPIRATION=60
-      - CRYPT_CONTEXT_SCHEME="argon2"
+      - CRYPT_CONTEXT_SCHEME=argon2
       - UVICORN_HOST=0.0.0.0
       - UVICORN_PORT=8000
       - API_VERSION=0.1.4
       - API_STATE=TEST
-      - AUTHORIZED_USERS ="root"
+      - AUTHORIZED_USERS=root
     ports:
       - "8000:8000"
     depends_on:
@@ -50,7 +50,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 30s
+      interval: 120s
       timeout: 10s
       retries: 3
     networks:
