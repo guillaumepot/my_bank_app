@@ -1,7 +1,8 @@
 annotated-types 
-anyio 
+anyio
 argon2-cffi
 argon2-cffi-bindings
+asyncpg
 bcrypt 
 cffi 
 click 
@@ -15,7 +16,8 @@ passlib==1.7.4
 psycopg2 
 pycparser 
 pydantic 
-pydantic_core 
+pydantic_core
+python-multipart
 setuptools==69.5.1
 six
 slowapi

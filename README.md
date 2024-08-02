@@ -40,27 +40,21 @@ This is a personal project to check my bank accounts. It is currently in develop
 ```
 ├── .github
 │   │
-│   └── workflows
+│   └── workflows < Contains Workflows
 |           |
 |           ├── .env
 |           |
 |           └── upload_docker_images.yaml
 |   
-├── archives
+├── archives < Contains old code files
 |       |
 |       └── (obsolete)myBankPackage
+|
+├── build   < Contains builds
 |        
-├── changelogs
-|       |
-|       ├── 0.1.0.md
-|       ├── 0.1.0.md
-|       └── 0.1.2.md
+├── changelogs < Changelogs for each new version
 |        
-├── local_tests
-|       |
-|       ├── set_local_test.sh
-|       |
-|       └── remove_local_test.sh
+├── dev_test < Development test branch
 |
 ├── media
 |       |
@@ -104,7 +98,9 @@ This is a personal project to check my bank accounts. It is currently in develop
 |     |
 |     └── postgres_data
 |
-├── utils
+├── unit_tests < Contains unit tests
+|
+├── utils < Contains utils py scripts
 |     |
 |     ├── generate_requirements.py
 |     |
@@ -121,6 +117,22 @@ This is a personal project to check my bank accounts. It is currently in develop
 ├── docker-compose.yaml
 │
 └── README.md
+```
+
+---
+
+## Branch logic
+
+```
+
+├── main    # Main branch, contains releases
+|   
+├── build   # Used to build releases
+|
+├── debug   # Debug branch
+|
+└── develop # New features development branch
+
 ```
 
 ---

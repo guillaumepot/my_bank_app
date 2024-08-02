@@ -6,10 +6,12 @@ PostGres Database connectors for the API
 """
 LIBS
 """
+import asyncpg
 import os
-import psycopg2
-from psycopg2.extras import DictCursor
 
+# OLD (v1.0.3)
+# import psycopg2
+# from psycopg2.extras import DictCursor
 
 """
 VARS
@@ -26,23 +28,32 @@ postgres_db = os.getenv('POSTGRES_DB', 'bank_db')
 """
 FUCNTIONS
 """
-def connect_to_db() -> psycopg2.extensions.connection:
+async def connect_to_db() -> asyncpg.connection:
     """
     Connects to the database using the provided credentials.
 
     Returns:
-        psycopg2.extensions.connection: A connection object representing the database connection.
+        asyncpg.connection: The connection object representing the connection to the database.
     """
-    engine = psycopg2.connect(dbname=postgres_db,
-                            user=postgres_user,
-                            password=postgres_password,
-                            host=postgres_host,
-                            port=postgres_port)
-    
-    return engine
+    # OLD (v1.0.3)
+    # return psycopg2.connect(dbname=postgres_db,
+    #                         user=postgres_user,
+    #                         password=postgres_password,
+    #                         host=postgres_host,
+    #                         port=postgres_port)
 
 
-def transform_additional(additional):
+    # NEW (v1.0.4)
+    return await asyncpg.connect(user=postgres_user,
+                                   password=postgres_password,
+                                   database=postgres_db,
+                                   host=postgres_host,
+                                   port=postgres_port)
+
+
+
+
+def transform_additional(additional) -> tuple:
     """
     Transforms the additional parameter into a tuple if it is a string.
 
@@ -59,115 +70,109 @@ def transform_additional(additional):
         return additional
 
 
-def query_for_informations(request_to_do: str = None, additional=None) -> dict:
+
+async def query_for_informations(request_to_do: str = None,
+                                 additional = None) -> dict:
     """
-    Execute a database query based on the given request and additional parameters.
+    Executes a database query based on the given request_to_do and additional parameters.
 
     Args:
-        request_to_do (str): The type of request to execute. Possible values are:
-            - 'get_username_informations': Retrieve user information based on the username.
-            - 'get_existing_accounts': Retrieve all existing accounts.
-            - 'get_existing_budgets': Retrieve all existing budgets.
-            - 'get_existing_transactions': Retrieve all existing transactions.
+        request_to_do (str): The type of query to execute.
         additional: Additional parameters to be used in the query.
 
     Returns:
-        dict: A dictionary containing the results of the query.
+        dict: A dictionary containing the query results.
 
     Raises:
-        psycopg2.OperationalError: If there is an error executing the query or connecting to the database.
+        ValueError: If an invalid request_to_do is provided.
+
     """
     additional = transform_additional(additional)
 
+    queries = {
+        'get_username_informations': "SELECT * FROM users WHERE username=$1",
+        'get_existing_accounts': 'SELECT * FROM accounts',
+        'get_existing_budgets': 'SELECT * FROM budgets',
+        'get_existing_transactions': 'SELECT * FROM transactions',
+        'get_transaction_by_id': 'SELECT * FROM transactions WHERE id=$1',
+        'get_existing_categories': 'SELECT DISTINCT category FROM transactions'
+    }
+
     # Initialize query
-    if request_to_do == 'get_username_informations':
-        query = "SELECT * FROM users WHERE username=%s"
-
-    if request_to_do == 'get_existing_accounts':
-        query = 'SELECT * FROM accounts'
-
-    if request_to_do == 'get_existing_budgets':
-        query = 'SELECT * FROM budgets'
-
-    if request_to_do == 'get_existing_transactions':
-        query = 'SELECT * FROM transactions'
-
-    if request_to_do == 'get_transaction_by_id':
-        query = 'SELECT * FROM transactions WHERE id=%s'
-
-    if request_to_do == 'get_existing_categories':
-        query = 'SELECT DISTINCT category FROM transactions'
+    query = queries.get(request_to_do)
+    if not query:
+        raise ValueError(f"Invalid request_to_do: {request_to_do}")
 
     # Get engine
-    engine = connect_to_db()
+    engine = await connect_to_db()
 
-    # Apply Query
-    with engine as conn:
-        try:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                try:
-                    cur.execute(query, additional)
-                    results = cur.fetchall()
-                    print(f'results: {results}')
-                    if results is None:
-                        return {}
-                    return results
-
-                except psycopg2.OperationalError as e:
-                    print(f"Could not execute the query. Error: {e}")
-
-        except psycopg2.OperationalError as e:
-            print(f"Could not connect to the database. Error: {e}")
+    # Try connection & apply query
+    try:
+        async with engine.transaction():
+            results = await engine.fetch(query, *additional)
+            return [dict(record) for record in results]
+        
+    except Exception as e:
+        print(f"Could not execute the query. Error: {e}")
+        return {}
+    
+    finally:
+        await engine.close()
 
 
-def query_insert_values(request_to_do:str=None, additional=None) -> None:
+
+
+async def query_insert_values(request_to_do: str = None, additional=None) -> None:
     """
-    Executes an SQL query to insert values into the database based on the given request.
+    Executes an SQL insert query based on the given request_to_do and additional parameters.
 
     Args:
-        request_to_do (str): The type of request to perform. Possible values are:
+        request_to_do (str): The type of request to execute. Must be one of the following:
             - 'create_new_account': Inserts a new account into the 'accounts' table.
             - 'delete_account': Deletes an account from the 'accounts' table.
             - 'create_new_budget': Inserts a new budget into the 'budgets' table.
             - 'delete_budget': Deletes a budget from the 'budgets' table.
             - 'create_new_transaction': Inserts a new transaction into the 'transactions' table.
-            - 'apply_transaction_to_budget': Updates the 'amount' field of a budget in the 'budgets' table.
-            - 'apply_transaction_to_accounts': Updates the 'balance' field of one or two accounts in the 'accounts' table.
+            - 'delete_transaction': Deletes a transaction from the 'transactions' table.
+            - 'apply_transaction_to_budget': Updates the amount of a budget based on a transaction.
+            - 'apply_transaction_to_accounts': Updates the balances of accounts based on a transaction.
 
-        additional (tuple): Additional parameters required for the query. The contents of the tuple depend on the request type.
-
-    Returns:
-        None: This function does not return any value.
+        additional (tuple): Additional parameters required for the specific request_to_do.
+            The structure of the tuple depends on the request_to_do value.
 
     Raises:
-        psycopg2.OperationalError: If there is an error executing the query or connecting to the database.
+        ValueError: If an invalid request_to_do value is provided.
+
+    Returns:
+        None
     """
     additional = transform_additional(additional)
 
-    # initialize query
-    if request_to_do == 'create_new_account':
-        query = 'INSERT INTO accounts (id, name, type, balance, owner) VALUES (%s, %s, %s, %s, %s)'
-    if request_to_do == 'delete_account':
-        query = 'DELETE FROM accounts WHERE id=%s'
-
-    if request_to_do == 'create_new_budget':
-        query = 'INSERT INTO budgets (id, name, month, amount) VALUES (%s, %s, %s, %s)'
-    if request_to_do == 'delete_budget':
-        query = 'DELETE FROM budgets WHERE id=%s'
-
-    if request_to_do == 'create_new_transaction':
-        query = 'INSERT INTO transactions (id, date, type, amount, origin_account, destination_account, budget, category, recipient, description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-    
-    if request_to_do == 'delete_transaction':
-        query = 'DELETE FROM transactions WHERE id=%s'
-
-    if request_to_do == 'apply_transaction_to_budget':
-        query = """
-        UPDATE budgets 
-        SET amount = amount - %s
-        WHERE id = %s
+    queries = {
+        'create_new_account': 'INSERT INTO accounts (id, name, type, balance, owner) VALUES ($1, $2, $3, $4, $5)',
+        'delete_account': 'DELETE FROM accounts WHERE id=$1',
+        'create_new_budget': 'INSERT INTO budgets (id, name, month, amount) VALUES ($1, $2, $3, $4)',
+        'delete_budget': 'DELETE FROM budgets WHERE id=$1',
+        'create_new_transaction': 'INSERT INTO transactions (id, date, type, amount, origin_account, destination_account, budget, category, recipient, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+        'delete_transaction': 'DELETE FROM transactions WHERE id=$1',
+        'apply_transaction_to_budget': 'UPDATE budgets SET amount = amount - $1 WHERE id = $2',
+        'apply_transaction_to_accounts': """
+            UPDATE accounts
+            SET balance = CASE 
+                WHEN name = $1 THEN balance - $2
+                WHEN name = $3 THEN balance + $4
+                ELSE balance
+            END
+            WHERE name IN ($1, $3)
         """
+    }
 
+    # Initialize query
+    query = queries.get(request_to_do)
+    if not query:
+        raise ValueError(f"Invalid request_to_do: {request_to_do}")
+
+    # Apply transaction to accounts specific case
     if request_to_do == 'apply_transaction_to_accounts':
         # tuple to list
         additional_list = list(additional)
@@ -207,21 +212,14 @@ def query_insert_values(request_to_do:str=None, additional=None) -> None:
             WHERE name IN (%s, %s)
             """ 
 
-
     # Get engine
-    engine = connect_to_db()
+    engine = await connect_to_db()
 
-
-    # Apply Query
-    with engine as conn:
-        try:
-            with conn.cursor(cursor_factory=DictCursor) as cur:
-                try:
-                    cur.execute(query, additional)
-                    conn.commit()
-
-                except psycopg2.OperationalError as e:
-                    print(f"Could not execute the query. Error: {e}")
-
-        except psycopg2.OperationalError as e:
-            print(f"Could not connect to the database. Error: {e}")
+    # Try connection & apply query
+    try:
+        async with engine.transaction():
+            await engine.execute(query, *additional)
+    except Exception as e:
+        print(f"Could not execute the query. Error: {e}")
+    finally:
+        await engine.close()

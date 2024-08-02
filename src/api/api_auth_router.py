@@ -6,11 +6,9 @@ API - AUTH ROUTER
 LIB
 """
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 import jwt
-from slowapi.decorator import limiter
-
 
 from api_db_connectors import query_for_informations
 from api_main import limiter
@@ -56,7 +54,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
 @auth_router.post(f"/api/{api_version}/login", name="login", tags=['auth'])
 @limiter.limit("5/hour") 
-async def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
+async def log_user(request: Request, credentials: OAuth2PasswordRequestForm = Depends()):
     """
     Authenticates the user based on the provided credentials and generates an access token.
 
@@ -72,12 +70,12 @@ async def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
 
     # Load existing user datas from table
     results = await query_for_informations(request_to_do='get_username_informations', additional = credentials.username)
-
+    print(results) # TEST
 
     # CREDENTIALS CONTROL
 
     # Check if the username exists
-    if credentials.username not in results[0][1]:
+    if credentials.username != results[0]['username']:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     
     # The username should be in "authorized users" value var
@@ -90,7 +88,6 @@ async def log_user(credentials: OAuth2PasswordRequestForm = Depends()):
 
 
     # SET TOKEN
-        
     token_expiration = timedelta(minutes=access_token_expiration)
     expire = datetime.now() + token_expiration
     data__to_encode = {"sub": credentials.username, "exp": expire}
