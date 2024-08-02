@@ -1,13 +1,13 @@
 altair 
 attrs 
 blinker 
-Bottleneck 
-Brotli 
+Bottleneck # ???
+Brotli # ???
 cachetools 
 certifi 
 charset-normalizer 
 click 
-gitdb 
+gitdb # ???
 GitPython 
 idna 
 Jinja2 
@@ -17,7 +17,7 @@ markdown-it-py
 MarkupSafe 
 matplotlib
 mdurl 
-numexpr 
+numexpr # ???
 numpy 
 packaging 
 pandas 
@@ -26,15 +26,15 @@ protobuf==3.20.3
 pyarrow 
 pydeck 
 Pygments 
-PySocks 
+PySocks # ??? 
 python-dateutil 
 pytz 
-PyYAML 
+PyYAML # ???
 referencing 
 requests 
 rich 
 rpds-py 
-setuptools==69.5.1
+setuptools==69.5.1 # ???
 six 
 smmap 
 streamlit 
@@ -46,4 +46,4 @@ typing_extensions
 tzdata 
 urllib3 
 watchdog 
-wheel==0.43.0
+wheel==0.43.0 # ???

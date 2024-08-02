@@ -8,22 +8,22 @@ cffi
 click 
 cryptography 
 fastapi 
-greenlet 
+greenlet # ?
 h11 
 idna
 PyJWT
 passlib==1.7.4
-psycopg2 
+psycopg2 # unneeded
 pycparser 
 pydantic 
 pydantic_core
 python-multipart
-setuptools==69.5.1
-six
+setuptools==69.5.1 # ??
+six # ??
 slowapi
 sniffio 
-SQLAlchemy 
+SQLAlchemy # ?? 
 starlette 
 typing_extensions 
 uvicorn 
-wheel==0.43.0
+wheel==0.43.0 # ??

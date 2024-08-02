@@ -1,11 +1,17 @@
+x-common-environment:
+  &common-env
+  API_VERSION: 0.1.4
+  API_STATE: TEST
+  API_URL: http://bank_app_api:8000
+
+
 services:
   # PostGres Container
-  container_postgres:
+  bank_app_postgres:
     image: postgres:14
     container_name: bank_app_postgres
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
-    # Comment ports if you don't want to access the database from the host
     ports:
       - "5432:5432"
     restart: on-failure
@@ -19,26 +25,18 @@ services:
 
 
   # API Container
-  container_api:
+  bank_app_api:
     image: personal_bank_app_api:test
     build:
       context: ../src/api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_test
     container_name: bank_app_api
+    env_file:
+      - api.env
     environment:
-      - POSTGRES_HOST=bank_app_postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=bank_db
-      - ALGORITHM="HS256"
-      - ACCESS_TOKEN_EXPIRATION=60
-      - CRYPT_CONTEXT_SCHEME=argon2
-      - UVICORN_HOST=0.0.0.0
-      - UVICORN_PORT=8000
-      - API_VERSION=0.1.4
-      - API_STATE=TEST
-      - AUTHORIZED_USERS=root
+      <<: *common-env
+    volumes:
+      - ../src/api:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -54,15 +52,16 @@ services:
 
 
   # Streamlit Container
-  container_streamlit:
+  bank_app_streamlit:
     image: personal_bank_app_streamlit:test
     build:
       context: ../src/streamlit
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_test
     container_name: bank_app_streamlit
     environment:
-      - API_VERSION=0.1.4
-      - API_URL=http://bank_app_api:8000
+      <<: *common-env
+    volumes:
+      - ../src/streamlit:/app
     ports:
       - "8001:8001"
     depends_on:
@@ -78,17 +77,17 @@ services:
 
 
   # Optional - PG Admin
-  container_pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=test@test.com
-      - PGADMIN_DEFAULT_PASSWORD=root
-    ports:
-      - "5050:80"
-    restart: always
-    networks:
-      - bank_app_network
+  # container_pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=test@test.com
+  #     - PGADMIN_DEFAULT_PASSWORD=root
+  #   ports:
+  #     - "5050:80"
+  #   restart: always
+  #   networks:
+  #     - bank_app_network
 
 
 # Networks

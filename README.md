@@ -56,10 +56,6 @@ This is a personal project to check my bank accounts. It is currently in develop
 |        
 ├── Common < Common files for each version
 |      |
-|      ├── storage
-|      |      |
-|      |      └── postgres_data
-|      |
 |      └── utils < Contains utils py scripts
 |            |
 |            ├── generate_requirements.py
