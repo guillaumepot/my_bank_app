@@ -54,6 +54,22 @@ This is a personal project to check my bank accounts. It is currently in develop
 |        
 ├── changelogs < Changelogs for each new version
 |        
+├── Common < Common files for each version
+|      |
+|      ├── storage
+|      |      |
+|      |      └── postgres_data
+|      |
+|      └── utils < Contains utils py scripts
+|            |
+|            ├── generate_requirements.py
+|            |
+|            ├── generate_tables.py
+|            |
+|            ├── generate_user_credentials.py
+|            |
+|            └── requirements.txt
+|        
 ├── dev_test < Development test branch
 |
 ├── media
@@ -94,21 +110,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 |         |
 |         └── streamlit.py
 |
-├── storage
-|     |
-|     └── postgres_data
-|
 ├── unit_tests < Contains unit tests
-|
-├── utils < Contains utils py scripts
-|     |
-|     ├── generate_requirements.py
-|     |
-|     ├── generate_tables.py
-|     |
-|     ├── generate_user_credentials.py
-|     |
-|     └── requirements.txt
 |
 ├── .env
 |
