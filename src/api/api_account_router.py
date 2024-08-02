@@ -137,7 +137,7 @@ async def app_create_account(account_name: str,
         account_id = generate_uuid()
 
         # Get current user ID
-        results = query_for_informations(request_to_do='get_username_informations', additional=current_user)
+        results = await query_for_informations(request_to_do='get_username_informations', additional=current_user)
         current_user_id = results[0][0]
 
         # Insert new account into accounts table

@@ -88,6 +88,10 @@ async def query_for_informations(request_to_do: str = None,
 
     """
     additional = transform_additional(additional)
+    # Ensure additional is an iterable
+    if additional is None:
+        additional = []
+
 
     queries = {
         'get_username_informations': "SELECT * FROM users WHERE username=$1",
@@ -147,6 +151,11 @@ async def query_insert_values(request_to_do: str = None, additional=None) -> Non
         None
     """
     additional = transform_additional(additional)
+    # Ensure additional is an iterable
+    if additional is None:
+        additional = []
+
+
 
     queries = {
         'create_new_account': 'INSERT INTO accounts (id, name, type, balance, owner) VALUES ($1, $2, $3, $4, $5)',
