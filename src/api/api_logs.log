@@ -1,0 +1,125 @@
+2024-08-02 10:49:27,989 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 10:49:27,993 - api_logger - INFO - Response status: 200
+
+2024-08-02 10:49:28,169 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 10:49:28,212 - api_logger - INFO - Response status: 200
+
+2024-08-02 10:49:34,194 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/status from 172.18.0.1 with body: 
+2024-08-02 10:49:34,194 - api_logger - INFO - Response status: 200
+
+2024-08-02 10:49:41,423 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:06:09,652 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 11:06:09,656 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:06:09,875 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 11:06:09,907 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:06:14,094 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:07:19,704 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:07:19,705 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:09:19,734 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:09:19,734 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:09:55,295 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:10:18,188 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=test&****=test
+2024-08-02 11:10:18,264 - api_logger - INFO - Response status: 400
+
+2024-08-02 11:11:19,767 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:11:19,767 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:11:44,726 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:13:19,797 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:13:19,798 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:13:40,011 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:15:19,827 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:15:19,828 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:15:46,712 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 11:15:46,713 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:15:46,890 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 11:15:46,921 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:15:50,903 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:15:51,033 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:15:57,383 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=test&****=test
+2024-08-02 11:15:57,387 - api_logger - INFO - Response status: 400
+
+2024-08-02 11:16:02,573 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=****&username=root&****=root
+2024-08-02 11:16:02,696 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:17:43,371 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:17:43,371 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:18:18,059 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 11:18:18,060 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:18:18,256 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 11:18:18,268 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:18:30,346 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=test&password=%2A%2A%2A%2A&client_id=string&client_secret=string
+2024-08-02 11:18:30,349 - api_logger - INFO - Response status: 400
+
+2024-08-02 11:18:36,190 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=%2A%2A%2A%2A&client_id=string&client_secret=string
+2024-08-02 11:18:36,268 - api_logger - INFO - Response status: 400
+
+2024-08-02 11:18:41,502 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=eaaa&password=%2A%2A%2A%2A&client_id=string&client_secret=string
+2024-08-02 11:18:41,506 - api_logger - INFO - Response status: 400
+
+2024-08-02 11:18:48,114 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=%2A%2A%2A%2A&client_id=string&client_secret=string
+2024-08-02 11:18:48,234 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:19:45,328 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=%2A%2A%2A%2A
+2024-08-02 11:19:45,402 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:19:49,374 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/status from 172.18.0.1 with body: 
+2024-08-02 11:19:49,376 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:19:56,246 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/available/account_types from 172.18.0.1 with body: 
+2024-08-02 11:19:56,251 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:20:02,492 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/get/account from 172.18.0.1 with body: 
+2024-08-02 11:20:05,924 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:20:05,925 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:22:05,955 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:22:05,956 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:22:35,711 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/get/account from 172.18.0.1 with body: 
+2024-08-02 11:22:39,844 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 11:22:39,858 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:22:40,080 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 11:22:40,082 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:22:44,257 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=%2A%2A%2A%2A
+2024-08-02 11:22:44,262 - api_logger - INFO - Response status: 429
+
+2024-08-02 11:24:05,987 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:24:05,987 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:26:45,886 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:26:45,887 - api_logger - INFO - Response status: 404
+
+2024-08-02 11:28:13,547 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-02 11:28:13,548 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:28:13,749 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-02 11:28:13,780 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:28:17,960 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-02 11:28:18,038 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:28:22,317 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/available/account_types from 172.18.0.1 with body: 
+2024-08-02 11:28:22,320 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:28:27,996 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/get/account from 172.18.0.1 with body: 
+2024-08-02 11:28:28,061 - api_logger - INFO - Response status: 200
+
+2024-08-02 11:28:35,161 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/account from 172.18.0.1 with body: 
+2024-08-02 11:28:45,921 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-02 11:28:45,921 - api_logger - INFO - Response status: 404
+

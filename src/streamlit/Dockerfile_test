@@ -14,9 +14,9 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Copy files
-COPY ./requirements.txt /app
+COPY ./requirements_streamlit.txt /app
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_streamlit.txt
 
 # Port to expose
 EXPOSE 8001

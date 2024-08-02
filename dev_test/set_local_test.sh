@@ -36,10 +36,11 @@ if [ ! -d "test_venv" ]; then
     python3 -m venv test_venv
     source test_venv/bin/activate
     pip install -r ./requirements_test_env.txt
+
+else
+    source test_venv/bin/activate
 fi
 echo "Test venv is ready"
-
-
 
 # Set up Docker network
 echo "Setting up Docker network"
@@ -51,9 +52,6 @@ fi
 # Start Postgres container
 echo "Starting Postgres container"
 docker compose -f docker-compose.yaml up -d bank_app_postgres
-echo "Waiting for Postgres to start"
-sleep 10
-echo "Postgres container is up"
 
 
 
@@ -68,14 +66,7 @@ if [ -z "$TEST_BANK_APP_TABLE_AND_USER_GENERATION" ]; then
 fi
 
 
-# Stop the script if only Postgres and API containers are to be run
-if [ $choice -eq 2 ]; then
-    echo "Local test environment is ready"
-    docker container ls | grep bank_app
-    exit 0
-fi
 
-# Else run all containers
 
 # Start API container
 echo "Starting API container"
@@ -84,6 +75,17 @@ docker compose -f docker-compose.yaml up -d bank_app_api
 echo "Waiting for API to start"
 sleep 15
 echo "API container is up"
+
+
+
+# Stop the script if only Postgres and API containers are to be run
+if [ $choice -eq 2 ]; then
+    echo "Local test environment is ready"
+    docker container ls | grep bank_app
+    exit 0
+fi
+
+# Else run all containers
 
 
 # Start Streamlit container

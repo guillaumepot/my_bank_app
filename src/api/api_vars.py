@@ -28,6 +28,8 @@ def generate_uuid():
 
 
 # Auth
+auth_limit = os.getenv("AUTH_LIMIT", "25/hour")
+
 crypt_context_scheme = os.getenv("CRYPT_CONTEXT_SCHEME")
 pwd_context = CryptContext(schemes=[crypt_context_scheme], deprecated="auto")
 
@@ -43,6 +45,7 @@ if jwt_secret_key is None:
 authorized_users = os.getenv("AUTHORIZED_USERS").split(',')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
+
 
 
 # Value Locks

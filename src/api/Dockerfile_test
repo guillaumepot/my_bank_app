@@ -17,7 +17,7 @@ WORKDIR /app
 COPY ./requirements_api.txt /app
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_api.txt
 
 # Port to expose
 EXPOSE 8000
@@ -27,3 +27,7 @@ ENTRYPOINT ["./generate_secret_key.sh"]
 
 # Start uvicorn server
 CMD uvicorn api_main:app --host $UVICORN_HOST --port $UVICORN_PORT
+
+# Metadatas to the image
+LABEL version="1.0.0"
+LABEL description="This is a Dockerfile template"

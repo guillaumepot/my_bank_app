@@ -51,7 +51,8 @@ app = FastAPI(
             'name': 'transaction',
             'description': 'Transaction'
         }   
-    ]
+    ],
+    debug=True # DEBUG MODE
 )
 
 
@@ -101,11 +102,10 @@ class SanitizeLoggingMiddleware(BaseHTTPMiddleware):
         body_str = body.decode("utf-8")
 
         # Sanitize sensitive information
-        if "password" in body_str:
-            body_str = body_str.replace("password", "****")
+        sanitized_body_str = self.sanitize_body(body_str)
 
         # Log sanitized request details
-        logger.info(f"Request: {request.method} {request.url} from {client_ip} with body: {body_str}")
+        logger.info(f"Request: {request.method} {request.url} from {client_ip} with body: {sanitized_body_str}")
 
         # Process request
         response = await call_next(request)
@@ -113,6 +113,20 @@ class SanitizeLoggingMiddleware(BaseHTTPMiddleware):
         # Log response status
         logger.info(f"Response status: {response.status_code}\n")
         return response
+
+    def sanitize_body(self, body_str: str) -> str:
+        import urllib.parse
+
+        # Parse the body string into a dictionary
+        parsed_body = urllib.parse.parse_qs(body_str)
+
+        # Replace the value of the "password" key with asterisks
+        if "password" in parsed_body:
+            parsed_body["password"] = ["masked_from_logs"]
+
+        # Recompose the body string
+        sanitized_body_str = urllib.parse.urlencode(parsed_body, doseq=True)
+        return sanitized_body_str
 
 
 # Add middleware to the FastAPI application
