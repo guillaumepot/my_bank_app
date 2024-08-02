@@ -78,7 +78,6 @@ async def log_user(request: Request, credentials: OAuth2PasswordRequestForm = De
 
     # Load existing user datas from table
     results = await query_for_informations(request_to_do='get_username_informations', additional = credentials.username)
-    print(results) # TEST
 
     # Check if the username is correct
     if credentials.username != results[0]['username']:
