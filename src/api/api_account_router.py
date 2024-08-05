@@ -61,8 +61,8 @@ async def app_get_existing_accounts(current_user: str = Depends(get_current_user
     try:
         # Load existing accounts from accounts table
         results = await query_for_informations(request_to_do='get_existing_accounts', additional=None)
-        existing_accounts = [account[1] for account in results]
-        return {'available accounts': existing_accounts}
+        existing_account_names = [account['name'] for account in results]
+        return {'available accounts': existing_account_names}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -142,7 +142,7 @@ async def app_create_account(account_name: str,
 
         # Insert new account into accounts table
         account_informations = (account_id, account_name, account_type, account_balance, current_user_id)
-        query_insert_values(request_to_do='create_new_account', additional=account_informations)
+        await query_insert_values(request_to_do='create_new_account', additional=account_informations)
 
 
         return {"message": f"Account {account_name} created successfully." \

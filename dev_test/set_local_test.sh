@@ -70,7 +70,7 @@ fi
 
 # Start API container
 echo "Starting API container"
-cd ../dev_tests
+cd ../dev_test
 docker compose -f docker-compose.yaml up -d bank_app_api
 echo "Waiting for API to start"
 sleep 15
