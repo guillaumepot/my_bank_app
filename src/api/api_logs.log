@@ -2662,3 +2662,6 @@
 2024-08-05 18:34:28,117 - api_logger - INFO - Request: GET http://bank_app_api:8000/api/0.2.0/status from 172.18.0.4 with body: 
 2024-08-05 18:34:28,118 - api_logger - INFO - Response status: 200
 
+2024-08-05 18:35:23,882 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 18:35:23,883 - api_logger - INFO - Response status: 404
+
