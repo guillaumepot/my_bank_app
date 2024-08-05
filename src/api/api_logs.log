@@ -339,3 +339,189 @@
 2024-08-05 09:10:19,534 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/get/account from 172.18.0.1 with body: 
 2024-08-05 09:10:19,567 - api_logger - INFO - Response status: 200
 
+2024-08-05 09:17:39,809 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:17:39,810 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:17:39,990 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:17:40,003 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:17:43,520 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 09:17:43,645 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:17:55,966 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/budget?budget_name=test&budget_month=August&budget_amount=1000 from 172.18.0.1 with body: 
+2024-08-05 09:19:35,042 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:19:35,042 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:21:35,078 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:21:35,078 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:22:55,686 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:22:55,689 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:22:55,855 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:22:55,867 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:22:59,985 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 09:23:00,119 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:23:10,315 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/budget?budget_name=test&budget_month=August&budget_amount=10000 from 172.18.0.1 with body: 
+2024-08-05 09:23:10,424 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:23:18,148 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/budget?budget_name=test2&budget_month=September&budget_amount=10000 from 172.18.0.1 with body: 
+2024-08-05 09:23:18,287 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:23:31,739 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:24:51,786 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:24:51,786 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:26:19,053 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:26:19,054 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:19,207 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:26:19,224 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:23,343 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 09:26:23,449 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:27,405 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/get/budget from 172.18.0.1 with body: 
+2024-08-05 09:26:27,480 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:32,327 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:26:32,405 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:48,042 - api_logger - INFO - Request: DELETE http://localhost:8000/api/0.1.4/delete/budget?budget_id=0b3a034d-1b5f-4f1b-9394-5fa286607159 from 172.18.0.1 with body: 
+2024-08-05 09:26:48,081 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:52,968 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:26:52,969 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:26:53,169 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:26:53,170 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:31:43,534 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:31:43,536 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:31:43,733 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:31:43,765 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:31:47,762 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 09:31:47,892 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:31:57,378 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/available/transaction_types from 172.18.0.1 with body: 
+2024-08-05 09:31:57,381 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:01,896 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:32:01,973 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:06,367 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 09:32:06,450 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:24,180 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-05&transaction_type=debit&transaction_amount=100&origin_account=test&category=Unknown&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:32:24,349 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:34,547 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:32:34,622 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:38,948 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 09:32:39,054 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:32:47,589 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/account from 172.18.0.1 with body: 
+2024-08-05 09:32:47,621 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:33:39,304 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:33:39,304 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:35:02,193 - api_logger - INFO - Request: DELETE http://localhost:8000/api/0.1.4/delete/transaction?transaction_id=f50bffe8-297c-4d1d-8bf6-9e12ac8d4a5e from 172.18.0.1 with body: 
+2024-08-05 09:35:39,334 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:35:39,336 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:37:50,077 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 09:37:50,078 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:37:50,206 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 09:37:50,217 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:37:53,888 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 09:37:53,973 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:37:58,163 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/available/transaction_types from 172.18.0.1 with body: 
+2024-08-05 09:37:58,166 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:02,694 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:38:02,725 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:13,680 - api_logger - INFO - Request: DELETE http://localhost:8000/api/0.1.4/delete/transaction?transaction_id=f50bffe8-297c-4d1d-8bf6-9e12ac8d4a5e from 172.18.0.1 with body: 
+2024-08-05 09:38:13,808 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:18,779 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:38:18,854 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:23,128 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 09:38:23,202 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:30,797 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/account from 172.18.0.1 with body: 
+2024-08-05 09:38:30,831 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:38:52,036 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-05&transaction_type=debit&transaction_amount=1000&origin_account=test&category=Unknown&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:38:52,175 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:39:11,178 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-06&transaction_type=credit&transaction_amount=400&destination_account=test&category=category_test&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:39:11,335 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:39:16,086 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 09:39:16,151 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:39:28,663 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:39:28,736 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:39:32,801 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/account from 172.18.0.1 with body: 
+2024-08-05 09:39:32,879 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:39:47,386 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:39:47,386 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:39:53,054 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:39:53,085 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:40:07,735 - api_logger - INFO - Request: DELETE http://localhost:8000/api/0.1.4/delete/budget?budget_id=feb8e0a6-ddda-48c7-97fe-258c28587dbe from 172.18.0.1 with body: 
+2024-08-05 09:40:07,816 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:40:09,834 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:40:09,872 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:40:43,361 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-07&transaction_type=debit&transaction_amount=500&origin_account=test&budget_name=test&budget_month=August&category=test_budget&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:40:43,486 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:40:47,872 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:40:47,901 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:40:56,819 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/transaction from 172.18.0.1 with body: 
+2024-08-05 09:40:56,851 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:10,693 - api_logger - INFO - Request: DELETE http://localhost:8000/api/0.1.4/delete/transaction?transaction_id=0da3f08f-4ab3-4682-b5c8-f15acc73aae6 from 172.18.0.1 with body: 
+2024-08-05 09:41:10,830 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:15,849 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:41:15,879 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:23,189 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-07&transaction_type=debit&transaction_amount=500&origin_account=test&budget_name=test&budget_month=August&category=test1&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:41:23,316 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:33,229 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-07&transaction_type=debit&transaction_amount=500&origin_account=test&budget_name=test1&budget_month=August&category=erreur_budget&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:41:33,351 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:43,831 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:41:43,863 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:47,420 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 09:41:47,421 - api_logger - INFO - Response status: 404
+
+2024-08-05 09:41:53,288 - api_logger - INFO - Request: POST http://localhost:8000/api/0.1.4/create/transaction?transaction_date=2024-08-07&transaction_type=debit&transaction_amount=500&origin_account=test&budget_name=test1&budget_month=August&category=erreur_budget&recipient=Unknown from 172.18.0.1 with body: 
+2024-08-05 09:41:53,411 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:41:56,932 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/table/budget from 172.18.0.1 with body: 
+2024-08-05 09:41:57,008 - api_logger - INFO - Response status: 200
+
+2024-08-05 09:42:07,196 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 09:42:07,272 - api_logger - INFO - Response status: 200
+

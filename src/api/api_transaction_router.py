@@ -27,7 +27,7 @@ TRANSACTION ROUTES
 
 # Get available transaction types
 @transaction_router.get(f"/api/{api_version}/available/transaction_types", name="get_available_transaction_types", tags=['transaction'])
-def app_get_available_transaction_types(current_user: str = Depends(get_current_user)):
+async def app_get_available_transaction_types(current_user: str = Depends(get_current_user)):
     """
     Retrieves the available transaction types for the current user.
 
@@ -43,7 +43,7 @@ def app_get_available_transaction_types(current_user: str = Depends(get_current_
 
 # Load Transaction Table
 @transaction_router.get(f"/api/{api_version}/table/transaction", name="load_transaction_table", tags=['transaction'])
-def app_load_transaction_table(current_user: str = Depends(get_current_user)) -> dict:
+async def app_load_transaction_table(current_user: str = Depends(get_current_user)) -> dict:
     """
     Load the existing transactions with all information from the transaction table.
 
@@ -55,21 +55,22 @@ def app_load_transaction_table(current_user: str = Depends(get_current_user)) ->
 
     """
     # Load existing transactions with all information from the transaction table
-    results = query_for_informations(request_to_do='get_existing_transactions', additional=None)
+    results = await query_for_informations(request_to_do='get_existing_transactions', additional=None)
     transaction_table = [transaction for transaction in results]
     return {'transaction table': transaction_table}
 
 
 # Display existing categories
 @transaction_router.get(f"/api/{api_version}/transaction/categories", name="get_existing_transaction_categories", tags=['transaction'])
-def app_get_existing_transaction_categories(current_user: str = Depends(get_current_user)) -> dict:
+async def app_get_existing_transaction_categories(current_user: str = Depends(get_current_user)) -> dict:
     """
     Retrieve the existing transaction categories from the database.
 
     Returns:
         A dictionary containing the existing categories as a list.
     """
-    results = query_for_informations(request_to_do='get_existing_categories', additional=None)
+    results = await query_for_informations(request_to_do='get_existing_categories', additional=None)
+    print(results) # DEBUG
     existing_categories = [category for category in results]
 
     return {"existing categories": existing_categories}
@@ -77,7 +78,7 @@ def app_get_existing_transaction_categories(current_user: str = Depends(get_curr
 
 # Create Transaction
 @transaction_router.post(f"/api/{api_version}/create/transaction", name="create_transaction", tags=['transaction'])
-def app_create_transaction(transaction_date: str,
+async def app_create_transaction(transaction_date: str,
                            transaction_type: str,
                            transaction_amount: float,
                            origin_account: str = None,
@@ -126,7 +127,8 @@ def app_create_transaction(transaction_date: str,
         raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
 
     # If budget None, convert to default budget ID, else get budget ID
-    results = query_for_informations(request_to_do='get_existing_budgets', additional=None)
+    results = await query_for_informations(request_to_do='get_existing_budgets', additional=None)
+    print(results) # DEBUG
 
     if budget_name is None:
         # Get default budget ID
@@ -144,28 +146,28 @@ def app_create_transaction(transaction_date: str,
     transaction_date = datetime.strptime(transaction_date, '%Y-%m-%d')
 
     # Generate transaction id
-    transaction_id = generate_uuid()
+    transaction_id = await generate_uuid()
 
     # Add the transaction in the table
     values_to_apply = (transaction_id, transaction_date, transaction_type, transaction_amount, origin_account, destination_account, budget_id, category, recipient, description)
-    query_insert_values(request_to_do='create_new_transaction', additional=values_to_apply)
+    await query_insert_values(request_to_do='create_new_transaction', additional=values_to_apply)
 
 
     # Apply the transaction to the account
     values_to_apply = (transaction_type, transaction_amount, origin_account, destination_account)   
-    query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+    await query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # Apply the transaction to the budget
     if not default_budget:
         values_to_apply = (transaction_amount, budget_id)
-        query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
+        await query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
     
     return {"message": "Transaction created & applied successfully."}
 
 
 # Delete Transaction
 @transaction_router.delete(f"/api/{api_version}/delete/transaction", name="delete_transaction", tags=['transaction'])
-def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_current_user)) -> dict:
+async def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_current_user)) -> dict:
     """
     Deletes a transaction from the database and updates the corresponding accounts and budget.
 
@@ -178,8 +180,9 @@ def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_
 
     """
     # Get transaction information
-    results = query_for_informations(request_to_do="get_transaction_by_id", additional=transaction_id)
-    transaction_info = next((transaction for transaction in results if transaction['id'] == transaction_id), None)
+    results = await query_for_informations(request_to_do="get_transaction_by_id", additional=transaction_id)
+    
+    transaction_info = results[0] if results else None
     transaction_type = transaction_info.get('type')
     transaction_amount = transaction_info.get('amount')
     origin_account = transaction_info.get('origin_account')
@@ -193,24 +196,24 @@ def app_delete_transaction(transaction_id: str, current_user: str = Depends(get_
     # If transaction type is debit, add the amount back to the account
     if transaction_type == 'debit':
         values_to_apply = ('debit', transaction_amount, origin_account, destination_account)
-        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+        await query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # If transaction type is credit, remove the amount from the account
     elif transaction_type == 'credit':
         values_to_apply = ('credit', transaction_amount, origin_account, destination_account)
-        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+        await query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # If transaction type is transfer, add the amount back to the origin account and remove it from the destination account
     elif transaction_type == 'transfer':
         values_to_apply = ('transfert', transaction_amount, origin_account, destination_account)
-        query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
+        await query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # Apply the transaction to the budget (add the amount back)
     values_to_apply = (transaction_amount, budget_id)
-    query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
+    await query_insert_values(request_to_do='apply_transaction_to_budget', additional=values_to_apply)
 
     # Delete transaction
-    query_insert_values(request_to_do='delete_transaction', additional=transaction_id)
+    await query_insert_values(request_to_do='delete_transaction', additional=transaction_id)
 
     
     return {"message": f"Transaction with id {transaction_id} deleted successfully."}

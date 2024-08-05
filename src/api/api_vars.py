@@ -21,7 +21,7 @@ api_version = os.getenv("API_VERSION", "0.1.4")
 current_state = os.getenv("API_STATE", "Test")
 
 # UUID Generation
-def generate_uuid():
+async def generate_uuid():
     id = uuid.uuid4()
     id = str(id)
     return id

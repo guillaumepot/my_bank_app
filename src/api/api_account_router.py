@@ -134,7 +134,7 @@ async def app_create_account(account_name: str,
     
 
         # Generate unique ID for account
-        account_id = generate_uuid()
+        account_id = await generate_uuid()
 
         # Get current user ID
         results = await query_for_informations(request_to_do='get_username_informations', additional=current_user)

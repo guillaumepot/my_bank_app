@@ -127,35 +127,9 @@ async def query_for_informations(request_to_do: str = None,
 
 
 async def query_insert_values(request_to_do: str = None, additional=None) -> None:
-    """
-    Executes an SQL insert query based on the given request_to_do and additional parameters.
-
-    Args:
-        request_to_do (str): The type of request to execute. Must be one of the following:
-            - 'create_new_account': Inserts a new account into the 'accounts' table.
-            - 'delete_account': Deletes an account from the 'accounts' table.
-            - 'create_new_budget': Inserts a new budget into the 'budgets' table.
-            - 'delete_budget': Deletes a budget from the 'budgets' table.
-            - 'create_new_transaction': Inserts a new transaction into the 'transactions' table.
-            - 'delete_transaction': Deletes a transaction from the 'transactions' table.
-            - 'apply_transaction_to_budget': Updates the amount of a budget based on a transaction.
-            - 'apply_transaction_to_accounts': Updates the balances of accounts based on a transaction.
-
-        additional (tuple): Additional parameters required for the specific request_to_do.
-            The structure of the tuple depends on the request_to_do value.
-
-    Raises:
-        ValueError: If an invalid request_to_do value is provided.
-
-    Returns:
-        None
-    """
     additional = transform_additional(additional)
-    # Ensure additional is an iterable
     if additional is None:
         additional = []
-
-
 
     queries = {
         'create_new_account': 'INSERT INTO accounts (id, name, type, balance, owner) VALUES ($1, $2, $3, $4, $5)',
@@ -176,55 +150,46 @@ async def query_insert_values(request_to_do: str = None, additional=None) -> Non
         """
     }
 
-    # Initialize query
     query = queries.get(request_to_do)
     if not query:
         raise ValueError(f"Invalid request_to_do: {request_to_do}")
 
-    # Apply transaction to accounts specific case
     if request_to_do == 'apply_transaction_to_accounts':
-        # tuple to list
         additional_list = list(additional)
-        # transaction type & remove it from additional
         type = additional[0]
         additional_list.pop(0)
 
         if type == 'credit':
-            # Remove origin account from additional and convert back to tuple
             additional_list.pop(1)
             additional = tuple(additional_list)
             query = """
             UPDATE accounts
-            SET balance = balance + %s
-            WHERE name = %s
+            SET balance = balance + $1
+            WHERE name = $2
             """
         if type == 'debit':
-            # Remove destination account from additional and convert back to tuple
             additional_list.pop(2)
             additional = tuple(additional_list)
             query = """
             UPDATE accounts
-            SET balance = balance - %s
-            WHERE name = %s
+            SET balance = balance - $1
+            WHERE name = $2
             """
         if type == 'transfert':
-            # Extract values from additional
             transaction_amount, origin_account, destination_account = additional_list
             additional = (origin_account, transaction_amount, destination_account, transaction_amount, origin_account, destination_account)
             query = """
             UPDATE accounts
             SET balance = CASE 
-                WHEN name = %s THEN balance - %s
-                WHEN name = %s THEN balance + %s
+                WHEN name = $1 THEN balance - $2
+                WHEN name = $3 THEN balance + $4
                 ELSE balance
             END
-            WHERE name IN (%s, %s)
+            WHERE name IN ($5, $6)
             """ 
 
-    # Get engine
     engine = await connect_to_db()
 
-    # Try connection & apply query
     try:
         async with engine.transaction():
             await engine.execute(query, *additional)

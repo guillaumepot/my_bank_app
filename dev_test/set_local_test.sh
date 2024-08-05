@@ -4,6 +4,30 @@
 # This will launch all the containers and services needed to run the test.
 
 
+echo "User credentials for app already generated?"
+echo "1. Yes"
+echo "2. No"
+read -p "Enter your choice: " user_credentials_choice
+
+case $user_credentials_choice in
+    1)
+        echo "User credentials for app already generated, generation disabled"
+        ;;
+    2)
+        echo "User credentials for app not generated, generation will be enable suring Postgres container start"
+        ;;
+    *)
+        echo "Invalid choice. Exiting"
+        exit 1
+        ;;
+esac
+
+
+if [ $user_credentials_choice -eq 1 ]; then
+    export TEST_BANK_APP_TABLE_AND_USER_GENERATION=1
+fi
+
+
 
 echo "Select containers to run"
 echo "1. All containers"
@@ -61,7 +85,6 @@ if [ -z "$TEST_BANK_APP_TABLE_AND_USER_GENERATION" ]; then
     cd ../common/utils
     python3 generate_tables.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
     python3 generate_user_credentials.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
-    export TEST_BANK_APP_TABLE_AND_USER_GENERATION=1
     echo "Tables and test user credentials are ready"
 fi
 
