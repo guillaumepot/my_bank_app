@@ -164,7 +164,7 @@ async def query_insert_values(request_to_do: str = None, additional=None) -> Non
             SET balance = balance - $1
             WHERE name = $2
             """
-        if type == 'transfert':
+        if type == 'transfer':
             transaction_amount, origin_account, destination_account = additional_list
             additional = (origin_account, transaction_amount, destination_account, transaction_amount, origin_account, destination_account)
             query = """

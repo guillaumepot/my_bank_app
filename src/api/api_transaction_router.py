@@ -119,18 +119,22 @@ async def app_create_transaction(transaction_date: str,
         raise HTTPException(status_code=400, detail="Invalid transaction type.")
     
     # Check if account is provided for debit, credit, and transfer transactions
-    if transaction_type == "debit" and origin_account is None:
-        raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
-    elif transaction_type == "credit" and destination_account is None:
+    if transaction_type == "debit" and origin_account == "None":
+            raise HTTPException(status_code=400, detail="Origin account is required for debit transactions.")
+    elif transaction_type == "credit" and destination_account == "None":
         raise HTTPException(status_code=400, detail="Destination account is required for credit transactions.")
-    elif transaction_type == "transfer" and (origin_account is None or destination_account is None):
+    elif transaction_type == "transfer" and (origin_account == "None" or destination_account == "None"):
         raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
+
+
+    #if origin_account =="None" or destination_account == "None":
+
 
     # If budget None, convert to default budget ID, else get budget ID
     results = await query_for_informations(request_to_do='get_existing_budgets', additional=None)
     print(results) # DEBUG
 
-    if budget_name is None:
+    if budget_name is "None":
         # Get default budget ID
         default_budget_info = next((budget for budget in results if budget['name'].strip().lower() == 'default'), None)
         budget_id = default_budget_info.get('id') if default_budget_info else None
@@ -205,7 +209,7 @@ async def app_delete_transaction(transaction_id: str, current_user: str = Depend
 
     # If transaction type is transfer, add the amount back to the origin account and remove it from the destination account
     elif transaction_type == 'transfer':
-        values_to_apply = ('transfert', transaction_amount, origin_account, destination_account)
+        values_to_apply = ('transfer', transaction_amount, origin_account, destination_account)
         await query_insert_values(request_to_do='apply_transaction_to_accounts', additional=values_to_apply)
 
     # Apply the transaction to the budget (add the amount back)

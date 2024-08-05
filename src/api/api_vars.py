@@ -50,4 +50,4 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/{api_version}/login")
 
 # Value Locks
 available_account_types = ("checking", "saving", "investment")
-available_transactions_types = ("debit", "credit", "transfert")
+available_transactions_types = ("debit", "credit", "transfer")
