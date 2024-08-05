@@ -8,10 +8,10 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from api_requests_functions import api_version, api_url
-from api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
-from api_requests_functions import post_transaction_creation, delete_transaction
-from api_requests_functions import get_bar_chart, get_time_series
+from streamlit.streamlit_api_requests_functions import api_version, api_url
+from streamlit.streamlit_api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
+from streamlit.streamlit_api_requests_functions import post_transaction_creation, delete_transaction
+from streamlit.streamlit_api_requests_functions import get_bar_chart, get_time_series
 
 
 # VARS
