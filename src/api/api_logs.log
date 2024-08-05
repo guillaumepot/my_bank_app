@@ -525,3 +525,60 @@
 2024-08-05 09:42:07,196 - api_logger - INFO - Request: GET http://localhost:8000/api/0.1.4/transaction/categories from 172.18.0.1 with body: 
 2024-08-05 09:42:07,272 - api_logger - INFO - Response status: 200
 
+2024-08-05 17:03:51,729 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:03:51,731 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:07:01,862 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:07:01,863 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:09:01,893 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:09:01,894 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:11:01,926 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:11:01,927 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:13:01,957 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:13:01,958 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:15:01,988 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:15:01,989 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:17:02,019 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:17:02,019 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:19:02,050 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:19:02,051 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:21:02,082 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:21:02,083 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:23:02,114 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:23:02,115 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:23:16,665 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 17:23:16,666 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:23:16,797 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 17:23:16,812 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:23:21,135 - api_logger - INFO - Request: POST http://localhost:8000/api/0.2.0/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 17:23:21,253 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:23:27,565 - api_logger - INFO - Request: GET http://localhost:8000/api/0.2.0/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 17:23:27,645 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:25:02,146 - api_logger - INFO - Request: GET http://localhost:8000/ from 127.0.0.1 with body: 
+2024-08-05 17:25:02,146 - api_logger - INFO - Response status: 404
+
+2024-08-05 17:25:19,420 - api_logger - INFO - Request: GET http://localhost:8000/docs from 172.18.0.1 with body: 
+2024-08-05 17:25:19,421 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:25:19,540 - api_logger - INFO - Request: GET http://localhost:8000/openapi.json from 172.18.0.1 with body: 
+2024-08-05 17:25:19,570 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:25:23,945 - api_logger - INFO - Request: POST http://localhost:8000/api/0.2.0/login from 172.18.0.1 with body: grant_type=password&username=root&password=masked_from_logs
+2024-08-05 17:25:24,094 - api_logger - INFO - Response status: 200
+
+2024-08-05 17:25:30,867 - api_logger - INFO - Request: GET http://localhost:8000/api/0.2.0/transaction/categories from 172.18.0.1 with body: 
+2024-08-05 17:25:30,942 - api_logger - INFO - Response status: 200
+

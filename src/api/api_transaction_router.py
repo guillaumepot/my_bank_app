@@ -70,8 +70,7 @@ async def app_get_existing_transaction_categories(current_user: str = Depends(ge
         A dictionary containing the existing categories as a list.
     """
     results = await query_for_informations(request_to_do='get_existing_categories', additional=None)
-    print(results) # DEBUG
-    existing_categories = [category for category in results]
+    existing_categories = [category['category'] for category in results]
 
     return {"existing categories": existing_categories}
 
@@ -125,9 +124,6 @@ async def app_create_transaction(transaction_date: str,
         raise HTTPException(status_code=400, detail="Destination account is required for credit transactions.")
     elif transaction_type == "transfer" and (origin_account == "None" or destination_account == "None"):
         raise HTTPException(status_code=400, detail="Origin and destination accounts are required for transfer transactions.")
-
-
-    #if origin_account =="None" or destination_account == "None":
 
 
     # If budget None, convert to default budget ID, else get budget ID
