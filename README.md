@@ -143,7 +143,19 @@ This is a personal project to check my bank accounts. It is currently in develop
 ---
 
 ## Installation
-- Add a folder for the postgres volume (default: ./storage/postgres_data)
+Each step is notified as a comment you can find in the files.
+
+
+- Step 1: Create a directory for postgres data and attach it as a volume for the postgres container (Step1)
+- Step 2: Update the docker-compose file according to your needs.
+- Step 3 : Update api.env file according to your needs.
+
+
+
+- Step X: Comment port exposure for postgres container
+
+
+
 - Add the usernames to AUTHORIZED_USERS var in .env file
 - Configure POSTGRES variables in .env file.
 - Configure API variables in .env file.

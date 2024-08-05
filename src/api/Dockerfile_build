@@ -1,11 +1,21 @@
-# API image
-FROM python:3.10
+# API Python image
+ARG PYTHON_VERSION=3.10.12
+FROM python:${PYTHON_VERSION}
+
+
+# Prevents Python from writing pyc files.
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Keeps Python from buffering stdout and stderr to avoid situations where
+# the application crashes without emitting any logs due to buffering.
+ENV PYTHONUNBUFFERED=1
+
 
 # Define Workdir
 WORKDIR /app
 
 # Copy files
-COPY ./requirements.txt /app
+COPY ./requirements_api.txt /app
 COPY ./api_main.py /app
 COPY ./api_vars.py /app
 COPY ./api_db_connectors.py /app
@@ -14,13 +24,12 @@ COPY ./api_account_router.py /app
 COPY ./api_budget_router.py /app
 COPY ./api_transaction_router.py /app
 
-
 COPY ./generate_secret_key.py /app
 COPY ./generate_secret_key.sh /app
 
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_api.txt
 RUN chmod +x ./generate_secret_key.sh
 
 
@@ -32,3 +41,7 @@ ENTRYPOINT ["./generate_secret_key.sh"]
 
 # Start uvicorn server
 CMD uvicorn api_main:app --host $UVICORN_HOST --port $UVICORN_PORT
+
+# Metadatas to the image
+LABEL version="0.2.0"
+LABEL description="API image v0.2.0, latest"
