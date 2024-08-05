@@ -10,3 +10,6 @@ test_venv/
 
 # Ignore build and egg-info directories
 *.egg-info/
+
+# Ignore log files
+*.log
