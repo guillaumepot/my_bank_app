@@ -8,10 +8,10 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from streamlit.streamlit_api_requests_functions import api_version, api_url
-from streamlit.streamlit_api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
-from streamlit.streamlit_api_requests_functions import post_transaction_creation, delete_transaction
-from streamlit.streamlit_api_requests_functions import get_bar_chart, get_time_series
+from streamlit_api_requests_functions import api_version, api_url
+from streamlit_api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
+from streamlit_api_requests_functions import post_transaction_creation, delete_transaction
+from streamlit_api_requests_functions import get_bar_chart, get_time_series
 
 
 # VARS
@@ -38,6 +38,13 @@ if 'selected_account' not in st.session_state:
         'type': None,
         'balance': None
     }
+
+# Initialize session state for search and delete actions
+if 'search_transaction_by_id_button_clicked' not in st.session_state:
+    st.session_state.search_button_clicked = False
+if 'transaction_id_to_remove' not in st.session_state:
+    st.session_state.transaction_id_to_remove = None
+
 
 
 
@@ -306,8 +313,9 @@ if page == pages[1]:
     st.title("Transactions")
 
     # Get transaction table
+    df_budgets, budget_id_to_name = get_budget_table()
     df_transactions = get_transaction_table(budget_id_to_name)
-    transaction_id_list = sorted(df_transactions.index.tolist())
+    transaction_id_list = sorted(df_transactions.id.tolist())
     current_transaction_categories = [category for category in df_transactions["category"].unique()]
     current_transaction_categories.insert(0, "New Category")
 
@@ -332,17 +340,17 @@ if page == pages[1]:
             account_table = requests.get(url, headers=st.session_state.headers)
             account_table = account_table.json()
             account_table = account_table["account table"]
-            account_names = [account[1] for account in account_table]
+            account_names = [account['name'] for account in account_table]
             account_names.insert(0, "None")
-        
+    
             # Get available budgets
             url = f"{api_url}/api/{api_version}/table/budget"
             budget_table = requests.get(url, headers=st.session_state.headers)
             budget_table = budget_table.json()
             budget_table = budget_table["budget table"]
-            budget_names = [budget[1] for budget in budget_table]
+            budget_names = [budget['name'] for budget in budget_table]
             budget_names.insert(0, "None")
-            budget_months = [budget[2] for budget in budget_table]
+            budget_months = [budget['month'] for budget in budget_table]
             budget_months.insert(0, "None")
 
 
@@ -380,7 +388,6 @@ if page == pages[1]:
                 "description": description.strip()
             }
 
-
             submit_button = st.form_submit_button(label='Create Transaction')
 
 
@@ -397,18 +404,29 @@ if page == pages[1]:
             st.subheader("Select transaction id to remove:")
             transaction_id_to_remove = st.selectbox("Choose transaction id", transaction_id_list, key="transaction_id_choice")
 
-            # Display transaction informations when id selected
-            if transaction_id_to_remove:
-                st.write("Delete this transaction ?")
-                st.dataframe(df_transactions.loc[transaction_id_to_remove])
+            # Search button
+            search_button = st.form_submit_button(label='Search')
 
-                # Submit button
+            if search_button:
+                st.session_state.search_transaction_by_id_button_clicked = True
+                st.session_state.transaction_id_to_remove = transaction_id_to_remove
+
+        if st.session_state.search_transaction_by_id_button_clicked:
+            st.write("Delete this transaction ?")
+            filtered_transaction_id = df_transactions[df_transactions["id"] == st.session_state.transaction_id_to_remove]
+            st.dataframe(filtered_transaction_id)
+
+            # Separate form for delete confirmation
+            with st.form(key="confirm_delete_form"):
                 submit_button = st.form_submit_button(label='Delete Transaction')
 
                 # Request API when submit button is clicked
                 if submit_button:
-                    delete_transaction(transaction_id_to_remove)
-
+                    delete_transaction(st.session_state.transaction_id_to_remove)
+                    st.success(f"Transaction {st.session_state.transaction_id_to_remove} has been deleted.")
+                    # Reset session state
+                    st.session_state.search_transaction_by_id_button_clicked = False
+                    st.session_state.transaction_id_to_remove = None
 
 ### END OF PAGE: TRANSACTIONS ###
 
@@ -416,8 +434,6 @@ if page == pages[1]:
 ### ANALYTICS ###
 if page == pages[2]: 
     st.title("Analytics")
-    st.warning("WORK IN PROGRESS")
-
 
     # Get transaction table
     df_budgets, budget_id_to_name = get_budget_table()

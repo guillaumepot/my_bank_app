@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import requests
 import streamlit as st
+import time
 
 
 # API VARS
@@ -12,6 +13,33 @@ api_version = os.getenv("API_VERSION", "0.2.0")
 api_url = os.getenv("API_URL", "http://localhost:8000")
 
 login_placeholder = st.sidebar.empty()
+
+
+
+def message_display(message, time_displayed:int, success=False) -> None:
+    """
+    Display a message using Streamlit's placeholder and wait for a specified amount of time before clearing it.
+    Parameters:
+    - message (str): The message to be displayed.
+    - time_displayed (int): The duration in seconds for which the message will be displayed.
+    - success (bool, optional): If True, the message will be displayed as a success message. If False (default), the message will be displayed as an error message.
+    Returns:
+    None
+    """
+    
+    # Create a placeholder
+    message_placeholder = st.empty()
+
+    if success == False:
+        message_placeholder.error(message)
+    else:
+        message_placeholder.success(message)
+
+    # Wait for <time_displayed> seconds
+    time.sleep(time_displayed)
+    # Clear the message
+    message_placeholder.empty()
+
 
 
 
@@ -116,9 +144,9 @@ def get_transaction_table(budget_id_to_name) -> pd.DataFrame:
 
     # Map each budget id in df_transactions to its corresponding name using the dictionary
     df_transactions["budget_name"] = df_transactions["budget"].map(budget_id_to_name).fillna("None")
-    df_transactions.drop(columns=["id", "budget"], inplace=True)
+    df_transactions.drop(columns=["budget"], inplace=True)
     df_transactions.rename(columns={"budget_name": "budget"}, inplace=True)
-    df_transactions = df_transactions[["date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description"]]
+    df_transactions = df_transactions[["date", "type", "amount", "origin_account", "destination_account", "budget", "recipient", "category", "description", "id"]]
 
     return df_transactions
 
@@ -141,10 +169,15 @@ def post_transaction_creation(transaction_data: dict) -> None:
     url = f"{api_url}/api/{api_version}/create/transaction"
 
     response = requests.post(url, params=transaction_data, headers=st.session_state.headers)
+
     if response.status_code == 200:
-        st.success(response.json())
+        message_display(response.json(), 3, success=True)
+        time.sleep(3)
     else:
-        st.error("An error occurred.")
+        message_display(response.json(), 5, success=False)
+        time.sleep(5)
+
+
 
 
 def delete_transaction(transaction_id_to_remove: str) -> None:
@@ -160,13 +193,17 @@ def delete_transaction(transaction_id_to_remove: str) -> None:
     Raises:
         None
     """
-    url = f"{api_url}/api/{api_version}/delete/transaction?transaction_id={transaction_id_to_remove}"
-    response = requests.delete(url, headers=st.session_state.headers)
+    url = f"{api_url}/api/{api_version}/delete/transaction"
+    params = {'transaction_id': transaction_id_to_remove}
+    response = requests.delete(url, params=params, headers=st.session_state.headers)
+    st.write(response) # Debug
+
     if response.status_code == 200:
-        st.success(response.json())
+        message_display(response.json(), 3, success=True)
+        time.sleep(3)
     else:
-        st.error("An error occurred.")
-        st.write(response)
+        message_display(response.json(), 5, success=False)
+        time.sleep(5)
 
 
 
@@ -195,7 +232,8 @@ def get_bar_chart(df, name, amount, legend=None):
         plt.text(bar.get_x() + bar.get_width() / 2, height - (height*0.05), f'{height}'+"€", ha='center', va='top', color='white') 
 
     plt.title(f"{name} expenses")
-    plt.xlabel(name, fontweight='bold', rotation = 90)
+    plt.xlabel(name, fontweight='bold')
+    plt.xticks(rotation=75)
     plt.ylabel(amount, fontweight='bold')
 
     if legend is not None:
@@ -229,6 +267,7 @@ def get_time_series(df):
     plt.plot(df['year_month'].astype(str), df["cumsum"], color="blue")  # Convert 'year_month' to string for plotting
     plt.fill_between(df['year_month'].astype(str), df["cumsum"], color="blue", alpha=0.3)
     plt.title("Cumulative expenses over time")
-    plt.xlabel("Date", fontweight='bold', rotation=90)
+    plt.xlabel("Date", fontweight='bold')
+    plt.xticks(rotation=75)
     plt.ylabel("Amount", fontweight='bold')
     st.pyplot(fig)

@@ -183,6 +183,9 @@ async def app_delete_transaction(transaction_id: str, current_user: str = Depend
     results = await query_for_informations(request_to_do="get_transaction_by_id", additional=transaction_id)
     
     transaction_info = results[0] if results else None
+    if not transaction_info:
+        raise HTTPException(status_code=404, detail="Transaction not found.")
+
     transaction_type = transaction_info.get('type')
     transaction_amount = transaction_info.get('amount')
     origin_account = transaction_info.get('origin_account')
