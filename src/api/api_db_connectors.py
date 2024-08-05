@@ -9,9 +9,7 @@ LIBS
 import asyncpg
 import os
 
-# OLD (v1.0.3)
-# import psycopg2
-# from psycopg2.extras import DictCursor
+
 
 """
 VARS
@@ -35,15 +33,6 @@ async def connect_to_db() -> asyncpg.connection:
     Returns:
         asyncpg.connection: The connection object representing the connection to the database.
     """
-    # OLD (v1.0.3)
-    # return psycopg2.connect(dbname=postgres_db,
-    #                         user=postgres_user,
-    #                         password=postgres_password,
-    #                         host=postgres_host,
-    #                         port=postgres_port)
-
-
-    # NEW (v1.0.4)
     return await asyncpg.connect(user=postgres_user,
                                    password=postgres_password,
                                    database=postgres_db,
