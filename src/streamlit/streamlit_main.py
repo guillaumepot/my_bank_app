@@ -8,13 +8,20 @@ import pandas as pd
 import requests
 import streamlit as st
 
-from api_requests_functions import api_version, api_url
-from api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
-from api_requests_functions import get_bar_chart, get_time_series
+from streamlit_api_requests_functions import api_version, api_url
+from streamlit_api_requests_functions import get_api_status, validate_credentials, get_account_table, get_budget_table, get_transaction_table
+from streamlit_api_requests_functions import post_transaction_creation, delete_transaction
+from streamlit_api_requests_functions import get_bar_chart, get_time_series
+
+
 # VARS
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 elt_to_display = ["All", "1", "5", "10", "15", "30", "50"]
 login_data = {}
+
+
+# STREAMLIT CONFIG
+st.set_page_config(layout="wide") ### TEST ###
 
 
 # API STATUS CHECKING
@@ -31,6 +38,13 @@ if 'selected_account' not in st.session_state:
         'type': None,
         'balance': None
     }
+
+# Initialize session state for search and delete actions
+if 'search_transaction_by_id_button_clicked' not in st.session_state:
+    st.session_state.search_button_clicked = False
+if 'transaction_id_to_remove' not in st.session_state:
+    st.session_state.transaction_id_to_remove = None
+
 
 
 
@@ -298,55 +312,69 @@ if page == pages[0]:
 if page == pages[1]: 
     st.title("Transactions")
 
-    # Create transaction form
-    with st.form(key="create_transaction_form"):
+    # Get transaction table
+    df_budgets, budget_id_to_name = get_budget_table()
+    df_transactions = get_transaction_table(budget_id_to_name)
+    transaction_id_list = sorted(df_transactions.id.tolist())
+    current_transaction_categories = [category for category in df_transactions["category"].unique()]
+    current_transaction_categories.insert(0, "New Category")
 
-        # Get available transaction types
-        url = f"{api_url}/api/{api_version}/available/transaction_types"
-        available_transaction_types = requests.get(url, headers=st.session_state.headers)
-        available_transaction_types = available_transaction_types.json()
 
-        # Get available accounts
-        url = f"{api_url}/api/{api_version}/table/account"
-        account_table = requests.get(url, headers=st.session_state.headers)
-        account_table = account_table.json()
-        account_table = account_table["account table"]
-        account_names = [account[1] for account in account_table]
-        account_names.insert(0, "None")
+
+
+
+    # Button to choose : Create | Delete (transaction)
+    create_delete_choice_transaction = st.radio("Choose", ["Create Transaction", "Delete Transaction"], key="create_delete_choice_transaction")
     
-        # Get available budgets
-        url = f"{api_url}/api/{api_version}/table/budget"
-        budget_table = requests.get(url, headers=st.session_state.headers)
-        budget_table = budget_table.json()
-        budget_table = budget_table["budget table"]
-        budget_names = [budget[1] for budget in budget_table]
-        budget_names.insert(0, "None")
-        budget_months = [budget[2] for budget in budget_table]
-        budget_months.insert(0, "None")
+    # Create transaction choice
+    if create_delete_choice_transaction == "Create Transaction":
+        with st.form(key="create_transaction_form"):
+
+            # Get available transaction types
+            url = f"{api_url}/api/{api_version}/available/transaction_types"
+            available_transaction_types = requests.get(url, headers=st.session_state.headers)
+            available_transaction_types = available_transaction_types.json()
+
+            # Get available accounts
+            url = f"{api_url}/api/{api_version}/table/account"
+            account_table = requests.get(url, headers=st.session_state.headers)
+            account_table = account_table.json()
+            account_table = account_table["account table"]
+            account_names = [account['name'] for account in account_table]
+            account_names.insert(0, "None")
+    
+            # Get available budgets
+            url = f"{api_url}/api/{api_version}/table/budget"
+            budget_table = requests.get(url, headers=st.session_state.headers)
+            budget_table = budget_table.json()
+            budget_table = budget_table["budget table"]
+            budget_names = [budget['name'] for budget in budget_table]
+            budget_names.insert(0, "None")
+            budget_months = [budget['month'] for budget in budget_table]
+            budget_months.insert(0, "None")
 
 
-        # Form
-        st.subheader("Please fill in the form below to create a transaction.")
+            # Form
+            st.subheader("Please fill in the form below to create a transaction.")
 
-        transaction_date = st.date_input("Transaction date", key="transaction_date")
-        transaction_date = str(transaction_date)
-        transaction_type = st.selectbox("Choose transaction type", available_transaction_types, key="available_transaction_type")
-        transaction_amount = st.number_input("Amount", format="%.2f", key="amount_transaction_input")
-        transaction_origin_account = st.selectbox("Choose origin account", account_names, key="transaction_origin_account")
-        transaction_destination_account = st.selectbox("Choose destination account", account_names, key="transaction_destination_account")
-        budget_name = st.selectbox("Choose budget", budget_names, key="transaction_budget_name")
-        budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
-        transaction_recipient = st.text_input(label="Transaction Recipient")
-        category = st.text_input(label="Transaction Category")
-        description = st.text_input(label="Transaction Description")
+            transaction_date = st.date_input("Transaction date", key="transaction_date")
+            transaction_date = str(transaction_date)
+            transaction_type = st.selectbox("Choose transaction type", available_transaction_types, key="available_transaction_type")
+            transaction_amount = st.number_input("Amount", format="%.2f", key="amount_transaction_input")
+            transaction_origin_account = st.selectbox("Choose origin account", account_names, key="transaction_origin_account")
+            transaction_destination_account = st.selectbox("Choose destination account", account_names, key="transaction_destination_account")
+            budget_name = st.selectbox("Choose budget", budget_names, key="transaction_budget_name")
+            budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
+            transaction_recipient = st.text_input(label="Transaction Recipient")
+            
+            #category = st.text_input(label="Transaction Category") # OLD
+            category = st.selectbox("Choose category", current_transaction_categories, key="transaction_category")
+            if category == "New Category":
+                category = st.text_input(label="New Category")
 
-        submit_button = st.form_submit_button(label='Create Transaction')
+            description = st.text_input(label="Transaction Description")
 
 
-        # Request API when submit button is clicked
-        if submit_button:
-
-            url = f"{api_url}/api/{api_version}/create/transaction"
             params = {
                 "transaction_date": transaction_date.strip(),
                 "transaction_type": transaction_type.strip(),
@@ -359,12 +387,46 @@ if page == pages[1]:
                 "category": category.strip(),
                 "description": description.strip()
             }
-            response = requests.post(url, params=params, headers=st.session_state.headers)
-            if response.status_code == 200:
-                st.success(response.json())
-            else:
-                st.error("An error occurred.")
 
+            submit_button = st.form_submit_button(label='Create Transaction')
+
+
+            # Request API when submit button is clicked
+            if submit_button:
+                post_transaction_creation(params)
+
+
+
+    # Delete transaction choice
+    if create_delete_choice_transaction == "Delete Transaction":
+
+        with st.form(key="delete_transaction_form"):
+            st.subheader("Select transaction id to remove:")
+            transaction_id_to_remove = st.selectbox("Choose transaction id", transaction_id_list, key="transaction_id_choice")
+
+            # Search button
+            search_button = st.form_submit_button(label='Search')
+
+            if search_button:
+                st.session_state.search_transaction_by_id_button_clicked = True
+                st.session_state.transaction_id_to_remove = transaction_id_to_remove
+
+        if st.session_state.search_transaction_by_id_button_clicked:
+            st.write("Delete this transaction ?")
+            filtered_transaction_id = df_transactions[df_transactions["id"] == st.session_state.transaction_id_to_remove]
+            st.dataframe(filtered_transaction_id)
+
+            # Separate form for delete confirmation
+            with st.form(key="confirm_delete_form"):
+                submit_button = st.form_submit_button(label='Delete Transaction')
+
+                # Request API when submit button is clicked
+                if submit_button:
+                    delete_transaction(st.session_state.transaction_id_to_remove)
+                    st.success(f"Transaction {st.session_state.transaction_id_to_remove} has been deleted.")
+                    # Reset session state
+                    st.session_state.search_transaction_by_id_button_clicked = False
+                    st.session_state.transaction_id_to_remove = None
 
 ### END OF PAGE: TRANSACTIONS ###
 
@@ -372,8 +434,6 @@ if page == pages[1]:
 ### ANALYTICS ###
 if page == pages[2]: 
     st.title("Analytics")
-    st.warning("WORK IN PROGRESS")
-
 
     # Get transaction table
     df_budgets, budget_id_to_name = get_budget_table()
@@ -468,6 +528,7 @@ if page == pages[3]:
 
     # Divide in two columns, one for accounts and one for budgets
     col_account, col_budget = st.columns(2)
+
 
     # Account Column
     with col_account:

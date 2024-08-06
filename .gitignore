@@ -4,9 +4,12 @@ __pycache__/
 # Ignore pytest cache
 .pytest_cache/
 
-# Ignore .venv
+# Ignore venv
 .venv/
+test_venv/
 
 # Ignore build and egg-info directories
-build/
 *.egg-info/
+
+# Ignore log files
+*.log

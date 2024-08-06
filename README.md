@@ -8,16 +8,23 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ---
 
+## Current Features
+
+- Add account (checking, saving, investment)
+- Create budgets
+- Create transactions & update accounts amounts
+- Display charts based on your transactions
+
+---
 
 ## Project Information
 
-- **Version**: 0.1.2 - Repo Update
-- **Development Stage**: Development
+- **Version**: 0.2.0 - QoL Update
+- **Development Stage**: Dev
 - **Author**: Guillaume Pot
 - **Contact Information**: guillaumepot.pro@outlook.com
 
 ---
-
 
 ## Table of Contents
 - [Repository Architecture](#repository-architecture)
@@ -28,33 +35,38 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ---
 
-
 ## Repository Architecture
 
 ```
 ├── .github
 │   │
-│   └── workflows
+│   └── workflows < Contains Workflows
 |           |
 |           ├── .env
 |           |
 |           └── upload_docker_images.yaml
 |   
-├── archives
+├── archives < Contains old code files
 |       |
 |       └── (obsolete)myBankPackage
+|
+├── build   < Contains builds
 |        
-├── changelogs
-|       |
-|       ├── 0.1.0.md
-|       ├── 0.1.0.md
-|       └── 0.1.2.md
+├── changelogs < Changelogs for each new version
 |        
-├── local_tests
-|       |
-|       ├── set_local_test.sh
-|       |
-|       └── remove_local_test.sh
+├── Common < Common files for each version
+|      |
+|      └── utils < Contains utils py scripts
+|            |
+|            ├── generate_requirements.py
+|            |
+|            ├── generate_tables.py
+|            |
+|            ├── generate_user_credentials.py
+|            |
+|            └── requirements.txt
+|        
+├── dev_test < Development test branch
 |
 ├── media
 |       |
@@ -94,19 +106,7 @@ This is a personal project to check my bank accounts. It is currently in develop
 |         |
 |         └── streamlit.py
 |
-├── storage
-|     |
-|     └── postgres_data
-|
-├── utils
-|     |
-|     ├── generate_requirements.py
-|     |
-|     ├── generate_tables.py
-|     |
-|     ├── generate_user_credentials.py
-|     |
-|     └── requirements.txt
+├── unit_tests < Contains unit tests
 |
 ├── .env
 |
@@ -119,15 +119,43 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ---
 
+## Branch logic
+
+```
+
+├── main    # Main branch, contains releases
+|   
+├── build   # Used to build releases
+|
+├── debug   # Debug branch
+|
+└── develop # New features development branch
+
+```
+
+---
+
 ## Requirements
-- Python
+- Python with psycopg2, passlib
 - Docker
 - Docker Compose
 
 ---
 
 ## Installation
-- Add a folder for the postgres volume (default: ./storage/postgres_data)
+Each step is notified as a comment you can find in the files.
+
+
+- Step 1: Create a directory for postgres data and attach it as a volume for the postgres container (Step1)
+- Step 2: Update the docker-compose file according to your needs.
+- Step 3 : Update api.env file according to your needs.
+
+
+
+- Step X: Comment port exposure for postgres container
+
+
+
 - Add the usernames to AUTHORIZED_USERS var in .env file
 - Configure POSTGRES variables in .env file.
 - Configure API variables in .env file.
@@ -141,48 +169,22 @@ This is a personal project to check my bank accounts. It is currently in develop
 
 ## Changelogs
 
+[v0.2.0](./changelogs/0.2.0.md)  
 [v0.1.3](./changelogs/0.1.3.md)  
 [v0.1.2](./changelogs/0.1.2.md)  
 [v0.1.1](./changelogs/0.1.1.md)  
 [v0.1.0](./changelogs/0.1.0.md)
 
-
-
 ---
 
 ## Roadmap
 
-**[Done]**
 ```
-0.1.3 - Mini Analytics update
-- Streamlit Analytics page now display charts based on transactions
-- Clean Streamlit code
-
-0.1.2 - Repo Update
-- Review README.MD
-
-0.1.1
-- Refactor API files (cleaning & readability)
-- Refactor Streamlit files (cleaning & readability)
-
-0.1.0
-- First version of the app containing an API & a Streamlit interface
-```
-
-
-**[Todo]**  
-```
-0.1.4 - Api security
-- Add a simple logger (API)
-- Update API security (max requests, etc.)
-0.1.5 - Streamlit code
 - Streamlit refactorization
-0.1.6 - CI Update
 - Add Container tests (Github Actions)
 - Add more unit tests, e.g., API tests
-0.2.0
+
 - Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
-0.3.0
 - Use a ML pipeline to predict things (budgets, ..)
 ```
