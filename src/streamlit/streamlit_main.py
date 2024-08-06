@@ -317,8 +317,8 @@ if page == pages[1]:
     df_transactions = get_transaction_table(budget_id_to_name)
     transaction_id_list = sorted(df_transactions.id.tolist())
     current_transaction_categories = [category for category in df_transactions["category"].unique()]
-    current_transaction_categories.insert(0, "New Category")
-
+    current_transaction_categories.sort()
+    current_transaction_categories.append("New Category")
 
 
 
