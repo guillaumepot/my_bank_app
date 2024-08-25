@@ -1,6 +1,6 @@
 x-common-environment:
   &common-env
-  API_VERSION: 0.2.0
+  API_VERSION: 0.2.1
   API_STATE: TEST
   API_URL: http://bank_app_api:8000
 
