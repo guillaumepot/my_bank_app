@@ -187,4 +187,9 @@ Each step is notified as a comment you can find in the files.
 - Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
 - Use a ML pipeline to predict things (budgets, ..)
+
+- Create new category in settings | Streamlit
+- Debug transferts
+- Update current bdd
+- Create init.sql & rmeove script .py | postGres
 ```
