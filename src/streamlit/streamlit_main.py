@@ -38,6 +38,9 @@ if 'selected_account' not in st.session_state:
         'type': None,
         'balance': None
     }
+if 'new_category' not in st.session_state:  # ADDED IN 0.2.1
+    st.session_state.new_category = None
+
 
 # Initialize session state for search and delete actions
 if 'search_transaction_by_id_button_clicked' not in st.session_state:
@@ -317,9 +320,9 @@ if page == pages[1]:
     df_transactions = get_transaction_table(budget_id_to_name)
     transaction_id_list = sorted(df_transactions.id.tolist())
     current_transaction_categories = [category for category in df_transactions["category"].unique()]
-    current_transaction_categories.sort()
-    current_transaction_categories.append("New Category")
-
+    current_transaction_categories.sort() # ADDED IN 0.2.1
+    if st.session_state.new_category: # ADDED IN 0.2.1
+        current_transaction_categories.insert(0, st.session_state.new_category) # CHANGED IN 0.2.1
 
 
 
@@ -367,10 +370,9 @@ if page == pages[1]:
             budget_month = st.selectbox("Choose month", budget_months, key="transaction_budget_month")
             transaction_recipient = st.text_input(label="Transaction Recipient")
             
-            #category = st.text_input(label="Transaction Category") # OLD
             category = st.selectbox("Choose category", current_transaction_categories, key="transaction_category")
-            if category == "New Category":
-                category = st.text_input(label="New Category")
+            # if category == "New Category":                        REMOVED SINCE 0.2.1
+            #     category = st.text_input(label="New Category")    REMOVED SINCE 0.2.1
 
             description = st.text_input(label="Transaction Description")
 
@@ -384,7 +386,7 @@ if page == pages[1]:
                 "budget_name": budget_name.strip(),
                 "budget_month": budget_month.strip(),
                 "recipient": transaction_recipient.strip(),
-                "category": category.strip(),
+                "category": category.strip() if category is not None else "", # CHANGED IN 0.2.1
                 "description": description.strip()
             }
 
@@ -527,7 +529,8 @@ if page == pages[3]:
             st.error("An error occurred while checking the API status.")
 
     # Divide in two columns, one for accounts and one for budgets
-    col_account, col_budget = st.columns(2)
+    col_account, col_budget, col_category = st.columns(3)
+
 
 
     # Account Column
@@ -681,6 +684,19 @@ if page == pages[3]:
                         st.write(response)
 
 
+
+    # Category Column       # ADDED IN 0.2.1
+    with col_category:
+        with st.form(key="create_new_category"):
+            st.subheader("Create a new category")
+            new_cat = st.text_input("New category name")
+            submit_button = st.form_submit_button(label='Create new category')
+            if submit_button:
+                st.session_state.new_category = new_cat
+                st.success(f"New category {new_cat} has been added to the current session.")
+
+
+
 ### END OF PAGE: SETTINGS ###
 
 
@@ -695,7 +711,6 @@ def addSidebarFooter():
     footer="""
      <footer style="margin-top: 350px;">
         <p>Author: Guillaume Pot</p>
-        <p>Email: <a href="mailto:guillaumepot.pro@outlook.com">guillaumepot.pro@outlook.com</a></p>
         <p>LinkedIn: <a href="https://www.linkedin.com/in/062guillaumepot/" target="_blank">Click Here</a></p>
     </footer>
     """

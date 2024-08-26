@@ -54,17 +54,13 @@ This is a personal project to check my bank accounts. It is currently in develop
 |        
 ├── changelogs < Changelogs for each new version
 |        
-├── Common < Common files for each version
-|      |
-|      └── utils < Contains utils py scripts
-|            |
-|            ├── generate_requirements.py
-|            |
-|            ├── generate_tables.py
-|            |
-|            ├── generate_user_credentials.py
-|            |
-|            └── requirements.txt
+├── utils < Contains utils py scripts
+|     |
+|     ├── generate_requirements.py
+|     |
+|     ├── generate_user_credentials.py
+|     |
+|     └── requirements.txt
 |        
 ├── dev_test < Development test branch
 |
@@ -143,8 +139,10 @@ This is a personal project to check my bank accounts. It is currently in develop
 ---
 
 ## Installation
-Each step is notified as a comment you can find in the files.
 
+[WIP]
+
+-- Current steps are obsolete, changes will be added soon
 
 - Step 1: Create a directory for postgres data and attach it as a volume for the postgres container (Step1)
 - Step 2: Update the docker-compose file according to your needs.
@@ -155,20 +153,18 @@ Each step is notified as a comment you can find in the files.
 - Step X: Comment port exposure for postgres container
 
 
-
 - Add the usernames to AUTHORIZED_USERS var in .env file
 - Configure POSTGRES variables in .env file.
 - Configure API variables in .env file.
 
-
 - User docker compose to start services (postgres, api, streamlit UI)
-- Use generate_tables.py to generate postgres Database
 - Use generate_user_credentials.py to generate new users
 
 ---
 
 ## Changelogs
 
+[v0.2.1](./changelogs/0.2.1.md)  
 [v0.2.0](./changelogs/0.2.0.md)  
 [v0.1.3](./changelogs/0.1.3.md)  
 [v0.1.2](./changelogs/0.1.2.md)  
@@ -181,10 +177,9 @@ Each step is notified as a comment you can find in the files.
 
 ```
 - Streamlit refactorization
-- Add Container tests (Github Actions)
-- Add more unit tests, e.g., API tests
+- New UI (flask web app)
 
-- Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
+- Create an ETL pipline to get transaction datas, put datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
 - Use a ML pipeline to predict things (budgets, ..)
 ```

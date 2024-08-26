@@ -1,5 +1,7 @@
 """
 Generate table in a PostgreSQL database
+
+- Obsolete since v0.2.1
 """
 
 import argparse

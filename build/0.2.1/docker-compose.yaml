@@ -5,7 +5,7 @@
 # Common environment variables
 x-common-environment:
   &common-env
-  API_VERSION: 0.2.0
+  API_VERSION: 0.2.1
   API_STATE: Production
   API_URL: http://bank_app_api:8000 # Make sure the API_URL is correct according to your setup
 
@@ -23,9 +23,9 @@ services:
       - POSTGRES_DB=bank_db    # Avoid changing this, unless you know what you are doing
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
-    # Comment ports if you don't want the database to be accessible from the host
-    ports:
-      - "5432:5432" # Comment this line for production to avoid exposing the database
+      - init.sql:/docker-entrypoint-initdb.d/init.sql
+    #ports:
+    #  - "5432:5432" # Comment this line for production to avoid exposing the database
     restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]

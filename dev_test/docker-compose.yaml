@@ -1,6 +1,6 @@
 x-common-environment:
   &common-env
-  API_VERSION: 0.2.0
+  API_VERSION: 0.2.1
   API_STATE: TEST
   API_URL: http://bank_app_api:8000
 
@@ -16,6 +16,7 @@ services:
       - POSTGRES_DB=bank_db
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
+      - ../src/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     restart: on-failure
