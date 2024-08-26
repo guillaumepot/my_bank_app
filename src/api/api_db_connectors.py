@@ -10,7 +10,6 @@ import asyncpg
 import os
 
 
-
 """
 VARS
 """
@@ -42,7 +41,7 @@ async def connect_to_db() -> asyncpg.connection:
 
 
 
-def transform_additional(additional) -> tuple:
+async def transform_additional(additional) -> tuple:
     """
     Transforms the additional parameter into a tuple if it is a string.
 
@@ -76,7 +75,7 @@ async def query_for_informations(request_to_do: str = None,
         ValueError: If an invalid request_to_do is provided.
 
     """
-    additional = transform_additional(additional)
+    additional = await transform_additional(additional)
     # Ensure additional is an iterable
     if additional is None:
         additional = []
@@ -116,7 +115,7 @@ async def query_for_informations(request_to_do: str = None,
 
 
 async def query_insert_values(request_to_do: str = None, additional=None) -> None:
-    additional = transform_additional(additional)
+    additional = await transform_additional(additional)
     if additional is None:
         additional = []
 
@@ -156,6 +155,7 @@ async def query_insert_values(request_to_do: str = None, additional=None) -> Non
             SET balance = balance + $1
             WHERE name = $2
             """
+
         if type == 'debit':
             additional_list.pop(2)
             additional = tuple(additional_list)
@@ -164,17 +164,18 @@ async def query_insert_values(request_to_do: str = None, additional=None) -> Non
             SET balance = balance - $1
             WHERE name = $2
             """
+
         if type == 'transfer':
             transaction_amount, origin_account, destination_account = additional_list
-            additional = (origin_account, transaction_amount, destination_account, transaction_amount, origin_account, destination_account)
+            additional = (origin_account, destination_account, transaction_amount)
             query = """
             UPDATE accounts
             SET balance = CASE 
-                WHEN name = $1 THEN balance - $2
-                WHEN name = $3 THEN balance + $4
+                WHEN name = $1 THEN balance - $3
+                WHEN name = $2 THEN balance + $3
                 ELSE balance
             END
-            WHERE name IN ($5, $6)
+            WHERE name IN ($1, $2)
             """ 
 
     engine = await connect_to_db()

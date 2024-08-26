@@ -139,8 +139,10 @@ This is a personal project to check my bank accounts. It is currently in develop
 ---
 
 ## Installation
-Each step is notified as a comment you can find in the files.
 
+[WIP]
+
+-- Current steps are obsolete, changes will be added soon
 
 - Step 1: Create a directory for postgres data and attach it as a volume for the postgres container (Step1)
 - Step 2: Update the docker-compose file according to your needs.
@@ -151,14 +153,11 @@ Each step is notified as a comment you can find in the files.
 - Step X: Comment port exposure for postgres container
 
 
-
 - Add the usernames to AUTHORIZED_USERS var in .env file
 - Configure POSTGRES variables in .env file.
 - Configure API variables in .env file.
 
-
 - User docker compose to start services (postgres, api, streamlit UI)
-- Use generate_tables.py to generate postgres Database
 - Use generate_user_credentials.py to generate new users
 
 ---
@@ -178,15 +177,11 @@ Each step is notified as a comment you can find in the files.
 
 ```
 - Streamlit refactorization
+- New UI (flask web app)
 - Add Container tests (Github Actions)
 - Add more unit tests, e.g., API tests
 
-- Create an ETL pipline to get transaction datas, put raw datas in a storage; transform datas for analytics
+- Create an ETL pipline to get transaction datas, put datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
 - Use a ML pipeline to predict things (budgets, ..)
-
-- Create new category in settings | Streamlit
-- Debug transferts
-- Update current bdd
-- Create init.sql & rmeove script .py | postGres
 ```
