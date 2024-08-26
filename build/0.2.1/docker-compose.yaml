@@ -23,7 +23,7 @@ services:
       - POSTGRES_DB=bank_db    # Avoid changing this, unless you know what you are doing
     volumes:
       - ./storage/postgres_data:/var/lib/postgresql/data
-      - init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     #ports:
     #  - "5432:5432" # Comment this line for production to avoid exposing the database
     restart: on-failure
@@ -73,7 +73,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001"]
-      interval: 60
+      interval: 60s
       timeout: 10s
       retries: 3
     networks:
