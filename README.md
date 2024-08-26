@@ -54,17 +54,13 @@ This is a personal project to check my bank accounts. It is currently in develop
 |        
 ├── changelogs < Changelogs for each new version
 |        
-├── Common < Common files for each version
-|      |
-|      └── utils < Contains utils py scripts
-|            |
-|            ├── generate_requirements.py
-|            |
-|            ├── generate_tables.py
-|            |
-|            ├── generate_user_credentials.py
-|            |
-|            └── requirements.txt
+├── utils < Contains utils py scripts
+|     |
+|     ├── generate_requirements.py
+|     |
+|     ├── generate_user_credentials.py
+|     |
+|     └── requirements.txt
 |        
 ├── dev_test < Development test branch
 |
