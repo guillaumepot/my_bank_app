@@ -29,5 +29,5 @@ ENTRYPOINT ["./generate_secret_key.sh"]
 CMD uvicorn api_main:app --host $UVICORN_HOST --port $UVICORN_PORT
 
 # Metadatas to the image
-LABEL version="0.2.0"
-LABEL description="API image v0.2.0, latest"
+LABEL version="0.2.1"
+LABEL description="API image v0.2.1, latest"

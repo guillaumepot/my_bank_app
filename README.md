@@ -178,8 +178,6 @@ This is a personal project to check my bank accounts. It is currently in develop
 ```
 - Streamlit refactorization
 - New UI (flask web app)
-- Add Container tests (Github Actions)
-- Add more unit tests, e.g., API tests
 
 - Create an ETL pipline to get transaction datas, put datas in a storage; transform datas for analytics
 - Add analytics charts (based on transactions) -> Analytics page ; Streamlit
