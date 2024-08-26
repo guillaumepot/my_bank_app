@@ -326,8 +326,6 @@ if page == pages[1]:
 
 
 
-
-
     # Button to choose : Create | Delete (transaction)
     create_delete_choice_transaction = st.radio("Choose", ["Create Transaction", "Delete Transaction"], key="create_delete_choice_transaction")
     
