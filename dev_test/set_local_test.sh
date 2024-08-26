@@ -14,7 +14,7 @@ case $user_credentials_choice in
         echo "User credentials for app already generated, generation disabled"
         ;;
     2)
-        echo "User credentials for app not generated, generation will be enable suring Postgres container start"
+        echo "User credentials for app not generated, generation will be enable during Postgres container start"
         ;;
     *)
         echo "Invalid choice. Exiting"
@@ -75,17 +75,17 @@ fi
 
 # Start Postgres container
 echo "Starting Postgres container"
-docker compose -f docker-compose.yaml up -d bank_app_postgres
-
+docker compose -f docker-compose.yaml up -d bank_app_postgres --build
+echo "Waiting for Postgres to start"
+sleep 20
 
 
 # Generate tables and test user credentials if not already done
 if [ -z "$TEST_BANK_APP_TABLE_AND_USER_GENERATION" ]; then
     echo "Generating tables and test user credentials"
-    cd ../common/utils
-    python3 generate_tables.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
+    cd ../utils
     python3 generate_user_credentials.py --user=root --password='root' --db=bank_db --host=localhost --port=5432
-    echo "Tables and test user credentials are ready"
+    echo "Test user credentials are ready"
 fi
 
 

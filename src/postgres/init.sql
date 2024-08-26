@@ -1,5 +1,5 @@
 -- init.sql
-\c train_delay_db
+\c bank_db
 
 -- Create tables
 

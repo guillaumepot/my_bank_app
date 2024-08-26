@@ -100,3 +100,15 @@ xkit==0.0.0
 xlrd==1.2.0
 yt-dlp==2022.4.8
 zipp==1.0.0
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+cffi==1.17.0
+passlib==1.7.4
+psycopg2==2.9.9
+pycparser==2.22
+argon2-cffi==23.1.0
+argon2-cffi-bindings==21.2.0
+cffi==1.17.0
+passlib==1.7.4
+psycopg2==2.9.9
+pycparser==2.22
